@@ -1,7 +1,7 @@
 /**
  * Internal types shared by crawl → checks → scoring. Not part of the public contract.
  */
-import type { Category, CheckStatus, CoreWebVitals, Severity } from "./types";
+import type { AiInsights, Category, CheckStatus, CoreWebVitals, Severity } from "./types";
 import type { PageData } from "./html";
 import type { IssueKey } from "./issues";
 
@@ -37,6 +37,8 @@ export interface AuditContext {
   /** result of probing http://host/ — null when not checked */
   httpToHttps: { checked: boolean; redirectsToHttps: boolean | null };
   psi: PsiOutcome;
+  /** audit start time; date-dependent checks use this (falls back to the current time) */
+  now?: Date;
 }
 
 export interface IssueSeed {
@@ -91,3 +93,12 @@ export function unavailable(
 export function plural(n: number, one: string, many?: string): string {
   return `${n} ${n === 1 ? one : (many ?? `${one}s`)}`;
 }
+
+/**
+ * Outcome of the optional LLM phase (T014). "skipped" = no key or not enough time;
+ * "failed" = the model call or its output didn't pass validation. Either way the
+ * geo.ai-clarity check is "unavailable" and scores are unchanged.
+ */
+export type AiPhase =
+  | { status: "ok"; insights: AiInsights; local: boolean }
+  | { status: "skipped" | "failed"; reason: "no_key" | "no_time" | "aborted" | "error" };

@@ -531,6 +531,240 @@ export const ISSUE_CATALOG = {
     howToFix:
       "Add `<meta property=\"og:site_name\" content=\"Your Business\">` and a `name` in Organization/LocalBusiness schema, matching the name in your page titles.",
   },
+  // ── T016: content format, fact consistency, raw-HTML facts ──
+  "geo.content-format:image-only": {
+    checkId: "geo.content-format",
+    category: "geo",
+    severity: "medium",
+    effort: "moderate",
+    title: "Your menu, prices or hours are shown as images",
+    description:
+      "A section about your menu, prices, hours or services is mostly pictures with little text. AI assistants and search engines read text much more reliably than text inside images. We don't read the images themselves, so check whether the same details are written out elsewhere.",
+    howToFix:
+      "Type the key details out as real text under the heading (keep the image if you like), e.g. `<h2>Prices</h2><ul><li>Haircut: £25</li><li>Colour: from £60</li></ul><p>Open Mon–Sat 9am–6pm.</p>`.",
+  },
+  "geo.content-format:pdf-only": {
+    checkId: "geo.content-format",
+    category: "geo",
+    severity: "medium",
+    effort: "moderate",
+    title: "Your menu or price list is a PDF",
+    description:
+      "You link to a menu, price list, brochure or timetable as a PDF. Some AI systems can read PDFs, but many skip them or quote them badly, and PDFs go stale. We don't open the PDF, so if the same details are already on a page as text you can ignore this.",
+    howToFix:
+      "Put the key details on a normal web page as text and keep the PDF as a download, e.g. `<h2>Menu</h2><h3>Starters</h3><ul><li>Soup of the day: £6</li></ul><p><a href=\"/menu.pdf\">Download the menu (PDF)</a></p>`.",
+  },
+  "geo.content-format:weak-alt": {
+    checkId: "geo.content-format",
+    category: "geo",
+    severity: "low",
+    effort: "quick",
+    title: "Images of key information have no useful alt text",
+    description:
+      "Images in your menu, price or hours sections have empty or very short alt text, so tools that can't see the picture get nothing from it.",
+    howToFix:
+      "Give each image a short description of what it shows, e.g. `<img src=\"menu.jpg\" alt=\"Lunch menu: soups from £6, mains from £12\">`, and still type the full details out as text.",
+  },
+  "geo.fact-consistency:struck-price": {
+    checkId: "geo.fact-consistency",
+    category: "geo",
+    severity: "medium",
+    effort: "quick",
+    title: "Old, crossed-out prices are still on your pages",
+    description:
+      "AI models read the text, not the line through it, so they can quote a crossed-out old price as your current one. We only see strike-through set in the HTML or inline styles, not in separate CSS files.",
+    howToFix:
+      "Remove old prices from the text, or say clearly what they are, e.g. `<p>Now £19/month (was £29 until March 2026)</p>` instead of `<s>£29</s> £19`.",
+  },
+  "geo.fact-consistency:hidden-facts": {
+    checkId: "geo.fact-consistency",
+    category: "geo",
+    severity: "low",
+    effort: "quick",
+    title: "Hidden text contains prices, phone numbers or times",
+    description:
+      "Some content marked hidden (the `hidden` attribute, inline `display:none`, or `aria-hidden`) contains prices, phone numbers or opening times. Tools that read the HTML can still pick these up even though visitors don't see them. Hidden mobile menus that repeat the same details are harmless.",
+    howToFix:
+      "Delete hidden copies that are out of date, and keep one visible, current version of each price, phone number and opening time.",
+  },
+  "geo.fact-consistency:schema-price": {
+    checkId: "geo.fact-consistency",
+    category: "geo",
+    severity: "medium",
+    effort: "quick",
+    title: "Prices in your schema don't match the page",
+    description:
+      "Your structured data (Offer `price`) lists prices we couldn't find as text on the pages we read. When schema and page disagree, AI tools may quote either one.",
+    howToFix:
+      "Update the `price` in your Product/Offer JSON-LD to match the price shown on the page (or show that price on the page), and update both together whenever prices change.",
+  },
+  "geo.fact-consistency:phones": {
+    checkId: "geo.fact-consistency",
+    category: "geo",
+    severity: "medium",
+    effort: "quick",
+    title: "Different phone numbers across your site",
+    description:
+      "We found more than one phone number in your phone links and schema. AI assistants may give customers the wrong one. Call-tracking numbers and separate department lines are common causes; if every number is current and labelled, this is fine.",
+    howToFix:
+      "Pick one main number, use it in your header, footer, `tel:` links and Organization/LocalBusiness schema `telephone`, and label any others (e.g. \"Sales\", \"Support\").",
+  },
+  "geo.fact-consistency:emails": {
+    checkId: "geo.fact-consistency",
+    category: "geo",
+    severity: "low",
+    effort: "quick",
+    title: "Several different email addresses",
+    description:
+      "We found more than one email address in your email links and schema. That's normal for separate departments, but an old or unlabelled address can be passed on to customers.",
+    howToFix:
+      "Check each address still works, remove old ones, label the rest (\"Bookings\", \"Support\"), and put the main one in your Organization schema `email`.",
+  },
+  "geo.fact-consistency:addresses": {
+    checkId: "geo.fact-consistency",
+    category: "geo",
+    severity: "medium",
+    effort: "quick",
+    title: "Different street addresses across your site",
+    description:
+      "We found more than one street address in your `<address>` blocks and schema. If you've moved, AI assistants may send people to the old one. Businesses with several locations will see this too.",
+    howToFix:
+      "Use the same current address everywhere (footer, contact page, LocalBusiness schema `address`). With several locations, give each its own page and its own LocalBusiness schema.",
+  },
+  "geo.fact-consistency:hours": {
+    checkId: "geo.fact-consistency",
+    category: "geo",
+    severity: "medium",
+    effort: "quick",
+    title: "Opening hours in your schema don't match your pages",
+    description:
+      "The opening hours in your structured data don't match any opening times written on your pages, so AI tools may quote the wrong hours.",
+    howToFix:
+      "Update `openingHoursSpecification` in your LocalBusiness schema to match the hours on your site (and your Google Business Profile), e.g. `{\"@type\":\"OpeningHoursSpecification\",\"dayOfWeek\":[\"Monday\",\"Tuesday\"],\"opens\":\"09:00\",\"closes\":\"17:30\"}`.",
+  },
+  "geo.fact-consistency:stale-year": {
+    checkId: "geo.fact-consistency",
+    category: "geo",
+    severity: "low",
+    effort: "quick",
+    title: "Your footer shows an old copyright year",
+    description:
+      "An out-of-date year in the footer makes the whole site look unmaintained to visitors and to tools judging freshness.",
+    howToFix:
+      "Update the year, or have your site fill it in automatically (most website builders and themes have a setting; in code, print the current year).",
+  },
+  "geo.raw-html-facts:js-shell": {
+    checkId: "geo.raw-html-facts",
+    category: "geo",
+    severity: "high",
+    effort: "involved",
+    title: "Your page is mostly empty until JavaScript runs",
+    description:
+      "The HTML your server sends has very little text: the content only appears after JavaScript runs. Google renders JavaScript, but many AI crawlers don't, so they see an empty page. We don't run JavaScript, so we can only say what the raw HTML lacks.",
+    howToFix:
+      "Ask your developer to turn on server-side rendering or static pre-rendering for public pages (e.g. Next.js/Nuxt/SvelteKit SSR or SSG, or a prerender service), so the main text, prices and contact details are in the HTML itself.",
+  },
+  "geo.raw-html-facts:jsonld-only": {
+    checkId: "geo.raw-html-facts",
+    category: "geo",
+    severity: "medium",
+    effort: "quick",
+    title: "Some key facts are only in hidden schema, not on the page",
+    description:
+      "Some core facts (phone, email, address, hours or prices) appear only in your JSON-LD structured data, not in the visible text of the HTML. Many AI tools read the visible text and ignore or distrust schema-only facts.",
+    howToFix:
+      "Show the same facts as plain text on the page too, e.g. in your footer: `<footer><p>Acme Plumbing, 12 High Street, Leeds LS1 4AB · <a href=\"tel:+441134960000\">0113 496 0000</a> · Mon–Fri 8am–6pm</p></footer>`.",
+  },
+  "geo.raw-html-facts:no-contact": {
+    checkId: "geo.raw-html-facts",
+    category: "geo",
+    severity: "low",
+    effort: "quick",
+    title: "No phone number or email in the HTML",
+    description:
+      "We couldn't find a phone number or email address anywhere in the HTML of the pages we read (text, links or schema). Contact forms and details added by JavaScript are invisible to many AI crawlers.",
+    howToFix:
+      "Add at least one contact method as plain text, ideally in the footer of every page, e.g. `<a href=\"mailto:hello@example.com\">hello@example.com</a>`.",
+  },
+  // geo.ai-clarity: an AI model read the site's text (contract v1.1). Copy describes how an AI
+  // model reads the site, never what a specific assistant says.
+  "geo.ai-clarity:what": {
+    checkId: "geo.ai-clarity",
+    category: "geo",
+    severity: "high",
+    effort: "quick",
+    title: "An AI model can't tell clearly what you do",
+    description:
+      "When an AI model read your pages, it couldn't pin down what your business sells or does. If a model can't say it, it can't recommend you.",
+    howToFix:
+      "Say it in one plain sentence near the top of your homepage, e.g. \"We repair and service boilers for homes in Leeds.\" Your full report includes a drafted \"about\" paragraph you can paste and adjust.",
+  },
+  "geo.ai-clarity:who-for": {
+    checkId: "geo.ai-clarity",
+    category: "geo",
+    severity: "high",
+    effort: "quick",
+    title: "An AI model can't tell who your business is for",
+    description:
+      "An AI model reading your site couldn't tell who your customers are, so it can't match you to people asking for someone like you.",
+    howToFix:
+      "Name your customers on the homepage, e.g. \"for families in north Leeds\" or \"for B2B SaaS teams of 10–200 people\". The drafted \"about\" paragraph in your full report shows one way to phrase it.",
+  },
+  "geo.ai-clarity:where": {
+    checkId: "geo.ai-clarity",
+    category: "geo",
+    severity: "medium",
+    effort: "quick",
+    title: "Your location or service area isn't clear",
+    description:
+      "For a local business, \"where\" is part of almost every question people ask an AI assistant. An AI model reading your site couldn't find it clearly.",
+    howToFix:
+      "Put your town or service area in your homepage heading or first paragraph, list your full address in the footer, and add it to your LocalBusiness schema (the drafted JSON-LD in your full report includes the address when your site states one).",
+  },
+  "geo.ai-clarity:pricing": {
+    checkId: "geo.ai-clarity",
+    category: "geo",
+    severity: "medium",
+    effort: "moderate",
+    title: "Your pricing isn't clear",
+    description:
+      "\"How much does it cost?\" is one of the most common questions people ask AI assistants. An AI model reading your site couldn't find prices or how pricing works.",
+    howToFix:
+      "Add a pricing page or section with typical prices, a \"from\" price, or how quotes work (e.g. \"Boiler service from £79, fixed price\"). Link it from your main menu.",
+  },
+  "geo.ai-clarity:contact": {
+    checkId: "geo.ai-clarity",
+    category: "geo",
+    severity: "medium",
+    effort: "quick",
+    title: "How to contact you isn't clear",
+    description:
+      "An AI model reading your site couldn't find a clear way to contact or book you, so it can't pass one on to a customer.",
+    howToFix:
+      "Show your phone number, email or booking link as plain text in the header or footer of every page (not only inside an image or form), and add `telephone` / `email` to your Organization schema.",
+  },
+  "geo.ai-clarity:proof": {
+    checkId: "geo.ai-clarity",
+    category: "geo",
+    severity: "low",
+    effort: "moderate",
+    title: "Little proof or reason to choose you",
+    description:
+      "An AI model reading your site found few reviews, credentials or reasons to pick you over alternatives, which are what answers to \"who is the best…\" draw on.",
+    howToFix:
+      "Add a few real testimonials, ratings, certifications or years in business to your homepage, plus one or two sentences on what makes you different.",
+  },
+  "geo.ai-clarity:unanswered-questions": {
+    checkId: "geo.ai-clarity",
+    category: "geo",
+    severity: "medium",
+    effort: "moderate",
+    title: "Your site doesn't answer common customer questions",
+    description:
+      "An AI model listed questions real customers ask about a business like yours and couldn't find full answers on your pages.",
+    howToFix:
+      "Answer each listed question on your site in 2–3 plain sentences, e.g. in an FAQ section with the question as a heading. The drafted \"about\" paragraph in your full report is a good first answer.",
+  },
 
   // ───────────────────────── Performance ─────────────────────────
   "performance.cwv:slow": {

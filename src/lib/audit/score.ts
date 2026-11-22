@@ -38,6 +38,10 @@ export const CHECK_WEIGHTS: Record<string, number> = {
   "geo.dates": 8, // freshness
   "geo.author": 7, // E-E-A-T style trust signals
   "geo.llms-txt": 6, // emerging, optional standard: low weight on purpose
+  "geo.raw-html-facts": 8, // T016: JS-only shells hide everything from non-rendering AI crawlers
+  "geo.fact-consistency": 6, // T016: struck/hidden/conflicting facts get quoted; noisy signals → modest
+  "geo.content-format": 5, // T016: key facts only in images/PDFs; we can't read them, so modest
+  "geo.ai-clarity": 11, // LLM reading of the site (≈11% of GEO); "unavailable" without a key → excluded
 
   // ── Performance ── (single PSI-backed check)
   "performance.cwv": 1,

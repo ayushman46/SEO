@@ -1,36 +1,86 @@
+import Image from "next/image";
+import { useId } from "react";
 import { cx } from "./cx";
+import { EngineStripToggle } from "./EngineStripToggle";
 
 /**
- * Bordered strip of engines we check against. TEXT wordmarks only: no logos,
- * no implied endorsement. Scroll-snaps horizontally on small screens inside its
- * own scroller, so the page never overflows.
+ * Official marks, keyed by the engine names in `site.enginesTracked`.
+ * Sources and trademark notes: docs/ASSETS.md ("Engine logos"). Width/height are
+ * the rendered CSS size at a 24 px logo height (from each SVG's viewBox), so
+ * nothing shifts while the files load. An engine without an entry renders as a
+ * text label only.
  */
-export function EngineStrip({ label, engines, className }: { label: string; engines: readonly string[]; className?: string }) {
+const LOGOS: Record<string, { src: string; width: number; height: number }> = {
+  ChatGPT: { src: "/logos/chatgpt.svg", width: 24, height: 24 },
+  Perplexity: { src: "/logos/perplexity.svg", width: 24, height: 24 },
+  Claude: { src: "/logos/claude.svg", width: 24, height: 24 },
+  Gemini: { src: "/logos/gemini.svg", width: 24, height: 24 },
+  "Google AI Overviews": { src: "/logos/google.svg", width: 24, height: 24 },
+  "Microsoft Copilot": { src: "/logos/copilot.svg", width: 26, height: 24 },
+  "Google Search": { src: "/logos/google.svg", width: 24, height: 24 },
+  Bing: { src: "/logos/bing.svg", width: 16, height: 24 },
+};
+
+function EngineList({ engines, label, hidden }: { engines: readonly string[]; label?: string; hidden?: boolean }) {
   return (
-    <div className={className}>
+    <ul aria-label={label} aria-hidden={hidden || undefined} className="engine-strip-list">
+      {engines.map((name) => {
+        const logo = LOGOS[name];
+        return (
+          <li key={name} className="engine-strip-item">
+            {logo ? (
+              <Image
+                src={logo.src}
+                width={logo.width}
+                height={logo.height}
+                alt=""
+                unoptimized
+                loading="lazy"
+                className="shrink-0"
+                style={{ width: logo.width, height: logo.height }}
+              />
+            ) : null}
+            <span className="text-[0.9375rem] leading-none font-medium tracking-[-0.01em] whitespace-nowrap text-ink-2">
+              {name}
+            </span>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+/**
+ * Bordered strip of the engines we check against: official logo + product name.
+ * CSS-only marquee (one track, list duplicated once, the copy aria-hidden),
+ * paused on hover, focus-within and by the pause button. Reduced motion: static
+ * wrapped row, no copy, no button. Overflow is clipped inside the strip.
+ * Styles: `.engine-strip*` in globals.css.
+ */
+export function EngineStrip({
+  label,
+  engines,
+  disclaimer,
+  className,
+}: {
+  label: string;
+  engines: readonly string[];
+  disclaimer: string;
+  className?: string;
+}) {
+  const trackId = useId();
+  return (
+    <div className={cx("engine-strip", className)}>
       <p className="text-center text-kicker font-semibold text-muted uppercase">{label}</p>
-      <div
-        role="region"
-        aria-label={label}
-        tabIndex={0}
-        className={cx(
-          "-mx-4 mt-6 snap-x snap-mandatory overflow-x-auto overscroll-x-contain px-4 [scrollbar-width:none] sm:-mx-6 sm:px-6",
-          "md:mx-0 md:overflow-visible md:px-0 [&::-webkit-scrollbar]:hidden",
-          "focus-visible:outline-offset-[-2px]",
-        )}
-      >
-        <ul className="flex w-max border-t border-l border-line md:grid md:w-full md:grid-cols-4 xl:grid-cols-8">
-          {engines.map((name) => (
-            <li
-              key={name}
-              className="flex h-20 w-[9.5rem] shrink-0 snap-start items-center justify-center border-r border-b border-line px-4 text-center md:h-24 md:w-auto"
-            >
-              <span className="text-[0.9375rem] leading-tight font-medium tracking-[-0.01em] text-balance text-ink-2">
-                {name}
-              </span>
-            </li>
-          ))}
-        </ul>
+      <div className="engine-strip-viewport mt-6 border-y border-line">
+        <div id={trackId} className="engine-strip-track">
+          <EngineList engines={engines} label={label} />
+          <EngineList engines={engines} hidden />
+        </div>
+      </div>
+      <div className="mt-4 flex items-center justify-center gap-3">
+        <p className="max-w-md text-center text-xs leading-relaxed text-balance text-muted">{disclaimer}</p>
+        <EngineStripToggle controls={trackId} />
       </div>
     </div>
   );

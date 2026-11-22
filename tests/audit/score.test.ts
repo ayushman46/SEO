@@ -214,8 +214,9 @@ describe("toPartialReport", () => {
     };
     const p = toPartialReport(result);
     expect(Object.keys(p).sort()).toEqual(
-      ["checks", "durationMs", "finalUrl", "hostname", "id", "issueCounts", "lockedIssues", "pagesScanned", "scores", "topIssues", "truncated"].sort(),
+      ["ai", "checks", "durationMs", "finalUrl", "hostname", "id", "issueCounts", "lockedIssues", "pagesScanned", "scores", "topIssues", "truncated"].sort(),
     );
+    expect(p.ai).toBeNull(); // contract v1.1: no AI insights → null teaser
     expect(p.topIssues).toHaveLength(3);
     expect(p.topIssues).toEqual(result.issues.slice(0, 3));
     expect(p.lockedIssues).toHaveLength(result.issues.length - 3);

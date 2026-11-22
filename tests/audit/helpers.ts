@@ -90,6 +90,7 @@ export function goodHome(url = "https://acme.example.com/"): string {
         <p>${LOREM}</p>
         <img src="/van.jpg" alt="Acme Plumbing van">
         <img src="/divider.png" alt="">
-      </main>`,
+      </main>
+      <footer><p>Call <a href="tel:+441134960000">0113 496 0000</a> or email <a href="mailto:hello@acme.example.com">hello@acme.example.com</a>.</p></footer>`,
   });
 }

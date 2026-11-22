@@ -208,6 +208,109 @@ dialog.menu-sheet::backdrop {
   }
 }
 
+/* Engine logo strip (ui/EngineStrip). One track holds the list twice; moving it
+   by -50% lands copy 2 exactly where copy 1 started, so the loop is seamless.
+   Only `transform` animates (compositor-only, T011); no will-change, no filters,
+   edge fades are two static gradient overlays (no mask on the moving layer). */
+.engine-strip {
+  --engine-strip-fade: var(--color-white);
+  --engine-strip-duration: 48s;
+}
+.engine-strip-viewport {
+  position: relative;
+  overflow: hidden;
+}
+.engine-strip-viewport::before,
+.engine-strip-viewport::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  z-index: 1;
+  width: 2.5rem;
+  pointer-events: none;
+}
+.engine-strip-viewport::before {
+  left: 0;
+  background: linear-gradient(to right, var(--engine-strip-fade), transparent);
+}
+.engine-strip-viewport::after {
+  right: 0;
+  background: linear-gradient(to left, var(--engine-strip-fade), transparent);
+}
+@media (min-width: 768px) {
+  .engine-strip-viewport::before,
+  .engine-strip-viewport::after {
+    width: 6rem;
+  }
+}
+.engine-strip-track {
+  display: flex;
+  width: max-content;
+}
+.engine-strip-list {
+  display: flex;
+  flex-shrink: 0;
+}
+.engine-strip-item {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  height: 3.5rem;
+  padding-inline: 1.5rem;
+  border-right: 1px solid var(--color-line);
+}
+@media (min-width: 768px) {
+  .engine-strip-item {
+    height: 4.5rem;
+    padding-inline: 2rem;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .engine-strip-track {
+    animation: engine-marquee var(--engine-strip-duration) linear infinite;
+  }
+  .engine-strip-viewport:hover .engine-strip-track,
+  .engine-strip-viewport:focus-within .engine-strip-track,
+  .engine-strip:has([data-marquee-toggle][data-paused="true"]) .engine-strip-track {
+    animation-play-state: paused;
+  }
+}
+@keyframes engine-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+/* Reduced motion: no movement, no duplicate, no pause control; the names wrap
+   into a centred static row inside the hairline band. */
+@media (prefers-reduced-motion: reduce) {
+  .engine-strip-track {
+    width: 100%;
+    animation: none;
+    transform: none;
+  }
+  .engine-strip-list {
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+    justify-content: center;
+    column-gap: 0.5rem;
+    padding-block: 0.5rem;
+  }
+  .engine-strip-list[aria-hidden="true"],
+  .engine-strip-toggle,
+  .engine-strip-viewport::before,
+  .engine-strip-viewport::after {
+    display: none;
+  }
+  .engine-strip-item {
+    height: 3rem;
+    padding-inline: 0.75rem;
+    border-right: 0;
+  }
+}
+
 /* Reveal: only elements the script marks as pending (below the fold, motion
    allowed) start hidden, so no-JS and reduced-motion users always see content. */
 [data-reveal="pending"] {

@@ -86,6 +86,75 @@ export interface AuditResult {
   /** true when the time budget cut the crawl short */
   truncated: boolean;
   notes: string[]; // e.g. "robots.txt disallows crawling /blog — skipped"
+  /** LLM-assisted insights (contract v1.1). null/absent when no LLM key, on timeout or on error. */
+  ai?: AiInsights | null;
+}
+
+/* ---------- AI insights (contract v1.1, additive) ----------
+ * Produced by an LLM reading ONLY text we extracted from the audited site.
+ * Everything here is one model's reading of the site, never a claim about what
+ * ChatGPT, Gemini or any other assistant actually answers. Page text is untrusted input.
+ */
+export type FactStatus = "clear" | "vague" | "missing";
+export type Answered = "yes" | "partly" | "no";
+
+export interface AiFact {
+  /** fixed keys: "what" | "who-for" | "where" | "pricing" | "contact" | "proof" | "differentiator" */
+  key: string;
+  label: string;
+  /** what the model found, quoted or closely paraphrased from the site; null when missing */
+  value: string | null;
+  status: FactStatus;
+}
+
+export interface AiQuestion {
+  /** a question a real customer would ask an AI assistant about this business */
+  question: string;
+  answered: Answered;
+  /** URL of the audited page that answers it, when answered */
+  sourceUrl: string | null;
+  /** one sentence: what is missing, or where the answer is */
+  note: string;
+}
+
+export interface AiDrafts {
+  /** ready-to-paste improvements; each is null when the current one is already good or cannot be drafted */
+  title: string | null;
+  metaDescription: string | null;
+  /** a complete llms.txt draft (llmstxt.org format); null if the site already has one */
+  llmsTxt: string | null;
+  /** Organization/LocalBusiness JSON-LD draft (valid JSON string) built only from facts found on the site */
+  organizationJsonLd: string | null;
+  /** 2-4 sentence answer-ready "about" paragraph built only from facts found on the site */
+  answerParagraph: string | null;
+}
+
+export interface AiInsights {
+  /** provider model id */
+  model: string;
+  /** 2-3 sentences: how an AI model would describe this business from its own site */
+  readback: string;
+  /** detected business type, e.g. "local dental clinic", "B2B SaaS" */
+  businessType: string | null;
+  facts: AiFact[];
+  questions: AiQuestion[];
+  drafts: AiDrafts;
+  /** 0..100, computed deterministically from facts + questions (never chosen by the model) */
+  clarityScore: number;
+}
+
+export interface PartialAiInsights {
+  model: string;
+  readback: string;
+  businessType: string | null;
+  clarityScore: number;
+  factCounts: Record<FactStatus, number>;
+  questionCounts: Record<Answered, number>;
+  /** first 2 questions in full; the rest and all drafts are locked */
+  sampleQuestions: AiQuestion[];
+  lockedQuestionCount: number;
+  /** which drafts exist, e.g. ["title", "llmsTxt"] */
+  lockedDrafts: (keyof AiDrafts)[];
 }
 
 /** What the browser gets before the email gate. */
@@ -103,6 +172,8 @@ export interface PartialAuditReport {
   checks: Pick<CheckResult, "id" | "category" | "label" | "status">[];
   durationMs: number;
   truncated: boolean;
+  /** Teaser of the AI insights; full detail only after unlock. */
+  ai?: PartialAiInsights | null;
 }
 
 export interface RunAuditOptions {

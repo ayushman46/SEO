@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { home } from "@/content/home";
-import { site } from "@/content/site";
+import { enginesDisclaimer, site } from "@/content/site";
 import { services } from "@/content/services";
 import { pricingTiers } from "@/content/pricing";
 import { SectionTear } from "@/components/collage/SectionTear";
@@ -30,6 +30,7 @@ export function ProofAndEngines() {
         <EngineStrip
           label="Checks how you show up in"
           engines={site.enginesTracked}
+          disclaimer={enginesDisclaimer}
           className="mt-14"
         />
       </Container>

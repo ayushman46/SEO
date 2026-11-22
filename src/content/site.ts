@@ -71,6 +71,10 @@ export const site = {
 /** Last time the marketing copy was reviewed (ISO date). Used for sitemap lastModified and visible "updated" dates. */
 export const contentUpdated = "2026-11-22";
 
+/** Small line under the engine logo strip ("Checks how you show up in"). */
+export const enginesDisclaimer =
+  "Logos are trademarks of their respective owners. seenhq is not affiliated with or endorsed by them.";
+
 /** Visible label for the "Last updated" line pages render next to contentUpdated. */
 export const lastUpdatedLabel = "Last updated";
 
