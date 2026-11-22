@@ -21,8 +21,8 @@ export function hasDateSignal(p: PageData): boolean {
       if (typeof n.datePublished === "string" || typeof n.dateModified === "string") return true;
     }
   }
-  if (p.$("time[datetime]").length > 0) return true;
-  if (p.$('[itemprop="dateModified"], [itemprop="datePublished"]').length > 0) return true;
+  // One selector pass (each full-document query costs a tree walk).
+  if (p.$('time[datetime], [itemprop="dateModified"], [itemprop="datePublished"]').length > 0) return true;
   return DATE_META.some((k) => metaContent(p.$, k));
 }
 

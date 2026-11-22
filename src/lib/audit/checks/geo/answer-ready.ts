@@ -1,6 +1,6 @@
 import type { CheerioAPI } from "cheerio";
 import { outcome, plural, type Check, type IssueSeed } from "../../context";
-import { cleanText, countWords, type PageData } from "../../html";
+import { cleanText, countWords, domRoot, firstDescendant, isElement, textOf, walk, SKIP, type DomNode, type PageData } from "../../html";
 
 const def = { id: "geo.answer-ready", category: "geo", label: "Answer-ready content" } as const;
 
@@ -9,7 +9,7 @@ const SUMMARY_SELECTOR =
   '[class*="tldr" i], [id*="tldr" i], [class*="tl-dr" i], [class*="key-takeaways" i], [id*="key-takeaways" i], [class*="takeaways" i], [class*="article-summary" i], [class*="post-summary" i]';
 
 function sentenceCount(text: string): number {
-  const m = text.match(/[.!?](\s|$)/g);
+  const m = text.match(/[.!?](\s|$)|[。！？]/g);
   return Math.max(1, m ? m.length : 0);
 }
 
@@ -20,24 +20,44 @@ export function isAnswerParagraph(text: string): boolean {
   return words >= 20 && words <= 60 && sentenceCount(t) <= 3;
 }
 
+/** Only the first headings matter (3 blocks give full marks); caps work on hostile pages. */
+const MAX_HEADINGS = 200;
+const CHROME = new Set(["nav", "footer", "header"]);
+
+function nextElement(n: DomNode): DomNode | null {
+  for (let s = n.next; s; s = s.next) if (isElement(s)) return s;
+  return null;
+}
+function prevElement(n: DomNode): DomNode | null {
+  for (let s = n.prev; s; s = s.prev) if (isElement(s)) return s;
+  return null;
+}
+
 /** Number of headings (H1–H3) directly followed by an answer-style paragraph. */
 export function countAnswerBlocks($: CheerioAPI): number {
+  // Collect H1–H3 outside nav/header/footer in one linear walk.
+  const headings: DomNode[] = [];
+  walk(domRoot($).children ?? [], false, (n, inChrome) => {
+    if (!isElement(n) || headings.length >= MAX_HEADINGS) return SKIP;
+    if (!inChrome && (n.name === "h1" || n.name === "h2" || n.name === "h3")) headings.push(n);
+    return inChrome || CHROME.has(n.name);
+  });
+
   let count = 0;
-  $("h1, h2, h3").each((_, el) => {
-    const $h = $(el);
-    if ($h.parents("nav, footer, header").length) return;
-    const candidates = [$h.next()];
+  for (const h of headings) {
+    const candidates: (DomNode | null)[] = [nextElement(h)];
     // Heading wrapped alone in a container: look at the container's next sibling too.
-    if ($h.parent().children().length === 1) candidates.push($h.parent().next());
+    if (!prevElement(h) && !nextElement(h) && h.parent) candidates.push(nextElement(h.parent));
     for (const c of candidates) {
-      if (!c.length) continue;
-      const p = c.is("p") ? c : c.find("p").first();
-      if (p.length && isAnswerParagraph(p.text())) {
+      if (!c) continue;
+      const p = c.name === "p" ? c : firstDescendant(c, "p");
+      // 60 words never need more than a few thousand characters.
+      if (p && isAnswerParagraph(textOf(p, 3_000))) {
         count++;
-        return;
+        break;
       }
     }
-  });
+  }
   return count;
 }
 
@@ -46,14 +66,47 @@ export function hasSummary(p: PageData): boolean {
   return p.$(SUMMARY_SELECTOR).not("summary").length > 0;
 }
 
+interface ListFlags {
+  inMain: boolean;
+  inChrome: boolean;
+  /** tr counter of the nearest enclosing table */
+  table: { rows: number; inMain: boolean } | null;
+}
+
+/**
+ * A real list (3+ items, outside nav/header/footer) or a table (2+ rows) in the main
+ * content (main/article/[role=main] when present, else the whole body). Single linear walk.
+ */
 export function hasListsOrTables($: CheerioAPI): boolean {
-  const root = $("main, article, [role=main]").length ? $("main, article, [role=main]") : $("body");
-  const lists = root
-    .find("ul, ol")
-    .filter((_, el) => $(el).parents("nav, header, footer").length === 0 && $(el).children("li").length >= 3);
-  if (lists.length > 0) return true;
-  const tables = root.find("table").filter((_, el) => $(el).find("tr").length >= 2);
-  return tables.length > 0;
+  let hasMain = false;
+  let listMain = false;
+  let listAny = false;
+  let tableMain = false;
+  let tableAny = false;
+  walk<ListFlags>(domRoot($).children ?? [], { inMain: false, inChrome: false, table: null }, (n, f) => {
+    if (!isElement(n)) return SKIP;
+    const isMain = n.name === "main" || n.name === "article" || n.attribs.role === "main";
+    if (isMain) hasMain = true;
+    const inMain = f.inMain || isMain;
+    const inChrome = f.inChrome || CHROME.has(n.name);
+    if ((n.name === "ul" || n.name === "ol") && !inChrome) {
+      let items = 0;
+      for (const c of n.children) if (isElement(c) && c.name === "li" && ++items >= 3) break;
+      if (items >= 3) {
+        listAny = true;
+        // Descendant-of-main only, like root.find(): the main element itself never is a list.
+        if (f.inMain) listMain = true;
+      }
+    }
+    let table = f.table;
+    if (n.name === "table") table = { rows: 0, inMain: f.inMain };
+    else if (n.name === "tr" && table && ++table.rows >= 2) {
+      tableAny = true;
+      if (table.inMain) tableMain = true;
+    }
+    return { inMain, inChrome, table };
+  });
+  return hasMain ? listMain || tableMain : listAny || tableAny;
 }
 
 export const answerReadyCheck: Check = (ctx) => {

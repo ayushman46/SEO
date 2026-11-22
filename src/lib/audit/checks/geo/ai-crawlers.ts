@@ -26,13 +26,41 @@ const WEIGHT = { search: 3, training: 1 } as const;
 export const aiCrawlersCheck: Check = (ctx) => {
   const robots = parseRobots(ctx.robots);
   const home = `${ctx.origin}/`;
-  const blocked = AI_BOTS.filter((b) => isBlocked(robots, home, b.name));
+  // Check every crawled page, not just "/": "Disallow: / + Allow: /$" or "Disallow: /blog/"
+  // leaves the homepage open while hiding the content.
+  const urls = [...new Set([home, ...ctx.pages.map((p) => p.url)])];
+  // A generic deep path tells "blocks the site except a few pages" apart from "blocks one section".
+  const probe = `${ctx.origin}/seenhq-robots-probe/page`;
+
+  const blocked: typeof AI_BOTS = [];
+  const partial: { bot: (typeof AI_BOTS)[number]; disallowed: string[] }[] = [];
+  for (const b of AI_BOTS) {
+    const disallowed = urls.filter((u) => isBlocked(robots, u, b.name));
+    if (disallowed.length === 0) continue;
+    const full =
+      disallowed.includes(home) ||
+      disallowed.length * 2 > urls.length ||
+      (disallowed.length * 2 >= urls.length && isBlocked(robots, probe, b.name));
+    if (full) blocked.push(b);
+    else partial.push({ bot: b, disallowed });
+  }
+
   const total = AI_BOTS.reduce((s, b) => s + WEIGHT[b.kind], 0);
-  const lost = blocked.reduce((s, b) => s + WEIGHT[b.kind], 0);
+  let lost = blocked.reduce((s, b) => s + WEIGHT[b.kind], 0);
+  for (const p of partial) lost += (WEIGHT[p.bot.kind] * p.disallowed.length) / urls.length;
   const searchBlocked = blocked.filter((b) => b.kind === "search");
   const trainingBlocked = blocked.filter((b) => b.kind === "training");
 
   const issues: IssueSeed[] = [];
+  if (partial.length) {
+    issues.push({
+      key: "geo.ai-crawlers:partially-blocked",
+      affectedUrls: [...new Set(partial.flatMap((p) => p.disallowed))],
+      detail: `Some pages are blocked for: ${partial.map((p) => `${p.bot.name} (${p.bot.product})`).join(", ")}.`,
+      ...(partial.some((p) => p.bot.kind === "search") ? { severity: "high" as const } : {}),
+      share: 1,
+    });
+  }
   if (searchBlocked.length) {
     issues.push({
       key: "geo.ai-crawlers:search-blocked",
@@ -49,9 +77,18 @@ export const aiCrawlersCheck: Check = (ctx) => {
     });
   }
 
-  const allowed = AI_BOTS.length - blocked.length;
+  const allowed = AI_BOTS.length - blocked.length - partial.length;
+  const partialNote = partial.length
+    ? ` ${partial.length} ${partial.length === 1 ? "is" : "are"} blocked from some pages (${partial.map((p) => p.bot.name).join(", ")}).`
+    : "";
   let summary: string;
-  if (blocked.length === 0) {
+  if (partial.length && blocked.length === 0) {
+    summary = `${allowed} of ${AI_BOTS.length} major AI crawlers can read your whole site;${partialNote}`;
+  } else if (partial.length) {
+    summary = `${allowed} of ${AI_BOTS.length} major AI crawlers can read your whole site; ${blocked.length} blocked (${blocked
+      .map((b) => b.name)
+      .join(", ")}).${partialNote}`;
+  } else if (blocked.length === 0) {
     summary =
       ctx.robots.status === "ok"
         ? `All ${AI_BOTS.length} major AI crawlers are allowed to read your site.`

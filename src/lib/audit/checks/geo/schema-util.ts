@@ -1,89 +1,31 @@
 import { nodeTypes, type JsonLdNode } from "../../html";
+import { ORG_TYPES } from "./org-types";
 
-/** Common Organization / LocalBusiness types (schema.org has hundreds of subtypes). */
-const ORG_TYPES = new Set(
-  [
-    "Organization",
-    "Corporation",
-    "LocalBusiness",
-    "OnlineBusiness",
-    "OnlineStore",
-    "NGO",
-    "NewsMediaOrganization",
-    "EducationalOrganization",
-    "MedicalOrganization",
-    "SportsOrganization",
-    "GovernmentOrganization",
-    "ProfessionalService",
-    "Store",
-    "Restaurant",
-    "FoodEstablishment",
-    "CafeOrCoffeeShop",
-    "Bakery",
-    "BarOrPub",
-    "Dentist",
-    "Physician",
-    "MedicalClinic",
-    "Hospital",
-    "Pharmacy",
-    "Optician",
-    "LegalService",
-    "Attorney",
-    "Notary",
-    "AccountingService",
-    "FinancialService",
-    "InsuranceAgency",
-    "RealEstateAgent",
-    "HomeAndConstructionBusiness",
-    "Plumber",
-    "Electrician",
-    "HVACBusiness",
-    "RoofingContractor",
-    "GeneralContractor",
-    "HousePainter",
-    "Locksmith",
-    "MovingCompany",
-    "AutomotiveBusiness",
-    "AutoRepair",
-    "AutoDealer",
-    "HealthAndBeautyBusiness",
-    "BeautySalon",
-    "HairSalon",
-    "DaySpa",
-    "NailSalon",
-    "HealthClub",
-    "ExerciseGym",
-    "LodgingBusiness",
-    "Hotel",
-    "BedAndBreakfast",
-    "ChildCare",
-    "Preschool",
-    "VeterinaryCare",
-    "TravelAgency",
-    "EmploymentAgency",
-    "EntertainmentBusiness",
-    "SportsActivityLocation",
-    "ShoppingCenter",
-    "Florist",
-    "ClothingStore",
-    "ElectronicsStore",
-    "FurnitureStore",
-    "GroceryStore",
-    "HardwareStore",
-    "JewelryStore",
-    "PetStore",
-  ].map((t) => t.toLowerCase()),
-);
+/** Extension / custom types we don't know: only clearly business-like names count. */
+const ORG_SUFFIX = /(business|organization|organisation|store|agency|clinic|contractor)$/;
 
 export function isOrgType(type: string): boolean {
-  const t = type.toLowerCase();
+  const t = type
+    .trim()
+    .replace(/^https?:[/][/](www[.])?schema[.]org[/]/i, "")
+    .replace(/^schema:/i, "")
+    .toLowerCase();
+  if (!t) return false;
   if (ORG_TYPES.has(t)) return true;
-  // "Service" alone is an offering, not an organization.
-  return t !== "service" && /(business|organization|store|service|agency|clinic|contractor)$/.test(t);
+  // "Service" and its subtypes (TaxiService, FoodService, ...) describe an offering, not a business.
+  if (t.endsWith("service")) return false;
+  return ORG_SUFFIX.test(t);
 }
 
+/**
+ * priceRange is defined only on LocalBusiness (openingHours is shared with CivicStructure,
+ * and address/telephone with Person/Place/ContactPoint, so those are not business signals).
+ */
+const LOCAL_BUSINESS_PROPS = ["priceRange"];
+
 export function isOrgNode(node: JsonLdNode): boolean {
-  return nodeTypes(node).some(isOrgType);
+  if (nodeTypes(node).some(isOrgType)) return true;
+  return LOCAL_BUSINESS_PROPS.some((k) => node[k] !== undefined && node[k] !== null);
 }
 
 export function stringProp(node: JsonLdNode, key: string): string | null {

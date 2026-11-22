@@ -95,6 +95,10 @@ export const pricingFaq = [
     a: "Yes. Content and entity work, where we rewrite key page sections so they answer questions clearly, add an FAQ block and make your business details consistent everywhere, is a separate fixed-scope service. It is described on the services page, and we confirm the price by email before any work starts.",
   },
   {
+    q: "Can you fix what AI assistants say about my business?",
+    a: "We can fix the sources they read, not the answers themselves. Three services on the services page cover this: an AI fact-check & fix that compares what assistants say with your real facts and corrects the sources behind wrong answers, a local AI visibility setup for profiles such as Bing Places, Apple Business and Yelp, and an AI crawler unblock for sites that turn AI crawlers away without meaning to. Each has its own fixed price, and none of them can promise what an AI will say.",
+  },
+  {
     q: "Do you work with website builders like Wix, Squarespace, Shopify or WordPress?",
     a: "Yes. The audit works on any public website. For fix sprints we work within what your platform allows and tell you up front if something can't be changed there.",
   },
@@ -113,7 +117,17 @@ export const pricingHighlightLabel = "Reviewed by a person";
 
 /** Short note under the tier grid (added by frontend-designer for T006; content-seo may refine). */
 export const pricingNote =
-  "Prices are in US dollars. Fix sprints and content work are quoted by email before any work starts, and you pay nothing until you agree to the quote.";
+  "Prices are in US dollars. Fix sprints and content work are quoted by email before any work starts, and you pay nothing until you agree to the quote. The AI fact-check, local AI setup and AI crawler unblock are priced on the services page.";
+
+/** Heading above the pricing FAQ list. */
+export const pricingFaqHeading = {
+  kicker: "FAQ",
+  title: "Questions about pricing",
+  cta: { label: "Ask us anything else", href: "/contact" },
+} as const;
+
+/** Link from /pricing to the full service descriptions, including services that are not pricing tiers. */
+export const pricingServicesLink = { label: "See every service in detail", href: "/services" } as const;
 
 /** Closing call to action on /pricing (added by frontend-designer for T006; content-seo may refine). */
 export const pricingClosing = {

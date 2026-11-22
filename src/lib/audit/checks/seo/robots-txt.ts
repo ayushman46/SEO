@@ -23,14 +23,23 @@ export const robotsTxtCheck: Check = (ctx) => {
   const robots = parseRobots(r);
   const home = `${ctx.origin}/`;
   const blocksGoogle = isBlocked(robots, home, "Googlebot");
-  const blocksAll = isBlocked(robots, home, "*");
-  if (blocksGoogle || blocksAll) {
+  const blocksBing = isBlocked(robots, home, "Bingbot");
+  if (blocksGoogle || blocksBing) {
     return outcome(def, {
       score: 0,
       summary: blocksGoogle
         ? "robots.txt blocks Google from crawling your homepage."
-        : "robots.txt blocks all crawlers from your homepage.",
+        : "robots.txt blocks Bing from crawling your homepage.",
       issues: [{ key: "seo.robots-txt:blocks-all", severity: blocksGoogle ? "critical" : "high" }],
+    });
+  }
+  // Google and Bing have their own allow groups, but every other crawler is shut out.
+  if (isBlocked(robots, home, "*")) {
+    return outcome(def, {
+      score: 0.8,
+      status: "warn",
+      summary: "robots.txt only lets listed crawlers in; Google and Bing are allowed.",
+      issues: [{ key: "seo.robots-txt:blocks-unlisted" }],
     });
   }
   return outcome(def, {

@@ -1,33 +1,45 @@
 import { outcome, plural, type Check, type IssueSeed } from "../../context";
-import type { PageData } from "../../html";
+import { metaContents, type PageData } from "../../html";
 
 const def = { id: "seo.indexability", category: "seo", label: "Indexability" } as const;
 
-const NOINDEX = /\b(noindex|none)\b/i;
+/**
+ * Meta robots content: comma-separated directives. "noindex"/"none" count only as whole
+ * directives, never as the value of another one ("max-image-preview:none"). Tokens without
+ * a colon are also split on spaces to tolerate "noindex nofollow".
+ */
+function metaSaysNoindex(content: string): boolean {
+  for (const raw of content.toLowerCase().split(",")) {
+    const token = raw.trim();
+    if (!token || token.includes(":")) continue;
+    if (token.split(/\s+/).some((w) => w === "noindex" || w === "none")) return true;
+  }
+  return false;
+}
 
 /** true when the page asks search engines not to index it (meta robots/googlebot or X-Robots-Tag). */
 export function isNoindex(p: PageData): boolean {
   const $ = p.$;
-  let meta = false;
-  $("meta[name][content]").each((_, el) => {
-    const name = ($(el).attr("name") ?? "").toLowerCase().trim();
-    if ((name === "robots" || name === "googlebot") && NOINDEX.test($(el).attr("content") ?? "")) meta = true;
-  });
-  if (meta) return true;
+  const metas = [...metaContents($, "robots"), ...metaContents($, "googlebot")];
+  if (metas.some(metaSaysNoindex)) return true;
 
   const header = p.headers["x-robots-tag"];
   if (!header) return false;
   // Header forms: "noindex", "googlebot: noindex, nofollow", "otherbot: noindex".
   // Only generic or googlebot-scoped directives count.
-  let scope: string | null = null;
-  for (const raw of header.split(",")) {
-    let token = raw.trim().toLowerCase();
-    const m = /^([a-z0-9_-]+)\s*:\s*(.*)$/.exec(token);
-    if (m && !/^(max-snippet|max-image-preview|max-video-preview|unavailable_after)$/.test(m[1])) {
-      scope = m[1];
-      token = m[2];
+  // One line per header (fetch keeps repeated X-Robots-Tag headers newline-separated): a bot
+  // scope only applies within its own header.
+  for (const line of header.split("\n")) {
+    let scope: string | null = null;
+    for (const raw of line.split(",")) {
+      let token = raw.trim().toLowerCase();
+      const m = /^([a-z0-9_-]+)\s*:\s*(.*)$/.exec(token);
+      if (m && !/^(max-snippet|max-image-preview|max-video-preview|unavailable_after)$/.test(m[1])) {
+        scope = m[1];
+        token = m[2];
+      }
+      if ((token === "noindex" || token === "none") && (scope === null || scope === "googlebot")) return true;
     }
-    if ((token === "noindex" || token === "none") && (scope === null || scope === "googlebot")) return true;
   }
   return false;
 }

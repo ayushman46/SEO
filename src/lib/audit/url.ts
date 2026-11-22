@@ -114,3 +114,14 @@ export function siteKey(hostname: string): string {
 export function isSameSite(a: string, b: string): boolean {
   return siteKey(a) === siteKey(b);
 }
+
+/** Comparable page key: host (www-insensitive) + path without trailing slash + query. */
+export function pageKey(url: string): string {
+  try {
+    const u = new URL(url);
+    const path = u.pathname.replace(/\/+$/, "") || "/";
+    return `${u.hostname.replace(/^www\./, "")}${path}${u.search}`;
+  } catch {
+    return url;
+  }
+}

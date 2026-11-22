@@ -34,6 +34,9 @@ export const site = {
         { label: "Technical fixes", href: "/services#technical-fixes" },
         { label: "Content & entity", href: "/services#content-entity" },
         { label: "Monitoring", href: "/services#monitoring" },
+        { label: "AI fact-check & fix", href: "/services#ai-fact-check" },
+        { label: "Local AI visibility setup", href: "/services#local-ai-setup" },
+        { label: "AI crawler unblock", href: "/services#ai-crawler-unblock" },
       ],
     },
     {

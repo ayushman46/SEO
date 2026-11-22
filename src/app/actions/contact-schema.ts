@@ -18,6 +18,9 @@ export const CONTACT_SERVICES = [
   "technical-fixes",
   "content-entity",
   "monitoring",
+  "ai-fact-check",
+  "local-ai-setup",
+  "ai-crawler-unblock",
   "not-sure",
 ] as const;
 export type ContactService = (typeof CONTACT_SERVICES)[number];
@@ -25,7 +28,7 @@ export type ContactService = (typeof CONTACT_SERVICES)[number];
 export const CONTACT_BUDGETS = ["under-100", "100-300", "300-1000", "1000-plus", "not-sure"] as const;
 export type ContactBudget = (typeof CONTACT_BUDGETS)[number];
 
-/** Form field names the server action reads. `company_website` is the honeypot (must stay empty). */
+/** Form field names the server action reads. CONTACT_HONEYPOT_FIELD is the honeypot (must stay empty). */
 export const CONTACT_FIELDS = [
   "name",
   "email",
@@ -37,7 +40,8 @@ export const CONTACT_FIELDS = [
   "consent",
 ] as const;
 export type ContactField = (typeof CONTACT_FIELDS)[number];
-export const CONTACT_HONEYPOT_FIELD = "company_website";
+/** Honeypot field name. Deliberately meaningless so browser autofill never fills it for real users. */
+export const CONTACT_HONEYPOT_FIELD = "hp_field_x7";
 
 const emptyToUndefined = (v: unknown): unknown =>
   v === null || (typeof v === "string" && v.trim() === "") ? undefined : v;

@@ -9,6 +9,9 @@ const SERVICE_ICONS: Record<string, string> = {
   "technical-fixes": "gauge",
   "content-entity": "file",
   monitoring: "clock",
+  "ai-fact-check": "shield",
+  "local-ai-setup": "map-pin",
+  "ai-crawler-unblock": "bot",
 };
 
 /**

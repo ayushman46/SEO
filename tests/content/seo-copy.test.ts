@@ -1,11 +1,19 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { site } from "@/content/site";
 import { home, homeMeta } from "@/content/home";
-import { services, servicesPage } from "@/content/services";
-import { pricingFaq, pricingPage, pricingTiers } from "@/content/pricing";
+import { services, servicesClosing, servicesPage } from "@/content/services";
+import {
+  pricingClosing,
+  pricingFaq,
+  pricingFaqHeading,
+  pricingNote,
+  pricingPage,
+  pricingServicesLink,
+  pricingTiers,
+} from "@/content/pricing";
 import { aboutPage, aboutSections } from "@/content/about";
 import { contactForm, contactPage, contactServiceOptions } from "@/content/contact";
-import { auditEmailGate, auditErrors, auditPage, auditProgressSteps } from "@/content/audit";
+import { auditEmailGate, auditErrors, auditFlowCopy, auditPage, auditProgressSteps } from "@/content/audit";
 import { privacy, privacyMeta, terms, termsMeta } from "@/content/legal";
 import { TITLE_SUFFIX, buildMetadata, pageMetadata, rootMetadata, siteUrl } from "@/lib/seo/metadata";
 import {
@@ -43,13 +51,20 @@ const allCopy = JSON.stringify({
   pricingTiers,
   pricingFaq,
   pricingPage,
+  pricingNote,
+  pricingClosing,
+  pricingFaqHeading,
+  pricingServicesLink,
   aboutPage,
   aboutSections,
   contactPage,
   contactForm,
+  contactServiceOptions,
   auditPage,
   auditEmailGate,
   auditErrors,
+  auditFlowCopy,
+  servicesClosing,
   privacy,
   terms,
   llms: buildLlmsTxt(),
@@ -120,8 +135,80 @@ describe("content rules", () => {
       "technical-fixes",
       "content-entity",
       "monitoring",
+      "ai-fact-check",
+      "local-ai-setup",
+      "ai-crawler-unblock",
     ]);
     for (const s of services) expect(s.priceFrom).toContain("[PLACEHOLDER");
+  });
+
+  it("new prices match the agreed placeholders", () => {
+    const price = (slug: string) => services.find((s) => s.slug === slug)!.priceFrom;
+    expect(price("ai-fact-check")).toBe("From $69 [PLACEHOLDER]");
+    expect(price("local-ai-setup")).toBe("$149 [PLACEHOLDER] per location");
+    expect(price("ai-crawler-unblock")).toBe("$149 [PLACEHOLDER]");
+  });
+
+  it("service descriptions carry no placeholders, so Service JSON-LD keeps them", () => {
+    for (const s of services) {
+      expect(s.description).not.toContain("[PLACEHOLDER");
+      expect(s.forWho).not.toContain("[PLACEHOLDER");
+    }
+  });
+
+  it("AI-facing services state their limits plainly", () => {
+    const text = (slug: string) => {
+      const s = services.find((x) => x.slug === slug)!;
+      return `${s.description} ${s.deliverables.join(" ")}`;
+    };
+    expect(text("ai-fact-check")).toMatch(/cannot control what an AI says/);
+    expect(text("ai-fact-check")).toMatch(/vary/);
+    expect(text("local-ai-setup")).toMatch(/only for an existing US listing/);
+    expect(text("local-ai-setup")).toMatch(/does not mean any AI assistant will recommend you/);
+    expect(text("ai-crawler-unblock")).toMatch(/host's decision/);
+    expect(text("ai-crawler-unblock")).toMatch(/does not mean being cited/);
+  });
+
+  it("never claims exclusivity, guarantees or results", () => {
+    expect(allCopy).not.toMatch(
+      /only provider|nobody else|no one else|the only (service|company|agency|one)|unique in the market|we guarantee|guaranteed (results|rankings?|citations?|placement)|used by \d|trusted by/i,
+    );
+  });
+
+  it("nothing still says there are five services", () => {
+    expect(allCopy).not.toMatch(/\bfive (focused |fixed-scope )?services\b/i);
+  });
+
+  it("footer lists every service", () => {
+    const footer = site.footerGroups.find((g) => g.title === "Services")!;
+    expect(footer.links.map((l) => l.href)).toEqual(services.map((s) => `/services#${s.slug}`));
+  });
+
+  it("home FAQ answers the wrong-AI-answer question", () => {
+    expect(home.faq.map((f) => f.q)).toContain("What if an AI assistant says something wrong about my business?");
+  });
+
+  it("audit flow copy and pricing helpers exist", () => {
+    for (const key of [
+      "timeHint",
+      "slowHint",
+      "noTopIssues",
+      "lockedHint",
+      "fullReportUnlocked",
+      "cwvSource",
+      "cwvUnavailable",
+      "retryIn",
+      "errorTitle",
+      "rateTitle",
+      "genericTitle",
+      "unlockRateLimited",
+    ]) {
+      expect(auditFlowCopy).toHaveProperty(key);
+    }
+    expect(auditFlowCopy.retryIn(1, "10:00")).toBe("You can try again in about a minute (around 10:00).");
+    expect(auditErrors.server_busy).toBe("We're running a lot of audits right now. Please try again in a minute.");
+    expect(pricingFaqHeading.cta.href).toBe("/contact");
+    expect(pricingServicesLink.href).toBe("/services");
   });
 
   it("contact service options cover every service plus not-sure", () => {
@@ -132,11 +219,11 @@ describe("content rules", () => {
     for (const t of pricingTiers.filter((t) => t.price !== "$0")) expect(t.price).toContain("[PLACEHOLDER");
   });
 
-  it("home has 4 tabs, 3 steps and 6-8 FAQs", () => {
+  it("home has 4 tabs, 3 steps and 6-9 FAQs", () => {
     expect(home.tabs.map((t) => t.id)).toEqual(["seo", "geo", "performance", "fixes"]);
     expect(home.howItWorks.steps).toHaveLength(3);
     expect(home.faq.length).toBeGreaterThanOrEqual(6);
-    expect(home.faq.length).toBeLessThanOrEqual(8);
+    expect(home.faq.length).toBeLessThanOrEqual(9);
   });
 
   it("audit copy covers every error code and progress step", () => {

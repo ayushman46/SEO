@@ -2,12 +2,12 @@ import "server-only";
 import { gunzipSync } from "node:zlib";
 import { AuditError } from "./types";
 import type { AuditContext, FetchedText, PsiOutcome } from "./context";
-import { parsePage, resolveHref, type PageData } from "./html";
-import { safeFetch, REQUEST_TIMEOUT_MS, type SafeFetchResult } from "./net/fetch";
+import { parsePage, resolveHref, visibleText, type PageData } from "./html";
+import { looksLikeHtml, safeFetch, REQUEST_TIMEOUT_MS, type SafeFetchResult } from "./net/fetch";
 import { resolvePublicAddress } from "./net/ssrf";
-import { isSameSite, normalizeAuditUrl } from "./url";
+import { isSameSite, normalizeAuditUrl, pageKey } from "./url";
 import { isBlocked, looksLikeRobotsTxt, OUR_BOT, parseRobots } from "./robots";
-import { parseSitemap } from "./checks/seo/sitemap";
+import { parseSitemap, type ParsedSitemap } from "./checks/seo/sitemap";
 import { fetchPsi } from "./net/psi";
 
 export interface CrawlOptions {
@@ -37,17 +37,6 @@ function pathOf(url: string): string {
   try {
     const u = new URL(url);
     return `${u.pathname}${u.search}`;
-  } catch {
-    return url;
-  }
-}
-
-/** Comparable key: origin + path without trailing slash + query. */
-function pageKey(url: string): string {
-  try {
-    const u = new URL(url);
-    const path = u.pathname.replace(/\/+$/, "") || "/";
-    return `${u.hostname.replace(/^www\./, "")}${path}${u.search}`;
   } catch {
     return url;
   }
@@ -117,16 +106,31 @@ export function selectInternalLinks(input: {
   return pool.slice(0, Math.max(0, input.max * 3)).map((p) => p.url);
 }
 
-function textOutcome(url: string, res: SafeFetchResult | null): FetchedText {
-  if (!res) return { status: "error", url, statusCode: null, text: null };
+/** Body starts (after optional BOM/whitespace, comments or an XML declaration) with an HTML document. */
+const STARTS_AS_HTML =
+  /^﻿?\s*(?:(?:<!--[\s\S]{0,512}?-->|<\?xml[^>]{0,256}>)\s*){0,4}<(?:!doctype\s+html|html[\s>]|head[\s>]|body[\s>])/i;
+
+/**
+ * An HTML page served at /robots.txt, /llms.txt or /sitemap.xml is a soft 404. Sniff the body
+ * (a real text/XML file with a wrong content-type must still count); a text/html content-type
+ * plus HTML markup near the top is enough too.
+ */
+export function isHtmlSoft404(text: string, contentType: string): boolean {
+  const head = text.slice(0, 2048);
+  if (STARTS_AS_HTML.test(head)) return true;
+  return /\btext\/html\b/i.test(contentType) && looksLikeHtml(head);
+}
+
+export function textOutcome(url: string, res: SafeFetchResult | null): FetchedText {
+  if (!res) return { status: "error", url, requestedUrl: url, statusCode: null, text: null };
   const code = res.status;
+  const base = { url: res.finalUrl, requestedUrl: url, statusCode: code };
   if (code === 200) {
-    const looksHtml = /^\s*(<!doctype html|<html)/i.test(res.text.slice(0, 512));
-    if (looksHtml) return { status: "missing", url: res.finalUrl, statusCode: code, text: null };
-    return { status: "ok", url: res.finalUrl, statusCode: code, text: res.text };
+    if (isHtmlSoft404(res.text, res.headers["content-type"] ?? "")) return { ...base, status: "missing", text: null };
+    return { ...base, status: "ok", text: res.text };
   }
-  if (code >= 400 && code < 500) return { status: "missing", url: res.finalUrl, statusCode: code, text: null };
-  return { status: "error", url: res.finalUrl, statusCode: code, text: null };
+  if (code >= 400 && code < 500) return { ...base, status: "missing", text: null };
+  return { ...base, status: "error", text: null };
 }
 
 export async function crawl(requestedUrl: string, opts: CrawlOptions): Promise<CrawlOutput> {
@@ -176,6 +180,7 @@ export async function crawl(requestedUrl: string, opts: CrawlOptions): Promise<C
     }
     if (homeRes.truncated) notes.push("Your homepage is very large; only the first 2 MB was analysed.");
 
+    // Throws AuditError("too_large") for hostile/huge DOMs, before any analysis runs.
     const homePage = parsePage({
       url: homeUrl,
       requestedUrl,
@@ -206,9 +211,9 @@ export async function crawl(requestedUrl: string, opts: CrawlOptions): Promise<C
         if (res.status === 200 && res.bytes[0] === 0x1f && res.bytes[1] === 0x8b) {
           try {
             const xml = gunzipSync(res.bytes, { maxOutputLength: 4 * 1024 * 1024 }).toString("utf-8");
-            return { status: "ok", url: res.finalUrl, statusCode: 200, text: xml };
+            return { status: "ok", url: res.finalUrl, requestedUrl: url, statusCode: 200, text: xml };
           } catch {
-            return { status: "error", url: res.finalUrl, statusCode: 200, text: null };
+            return { status: "error", url: res.finalUrl, requestedUrl: url, statusCode: 200, text: null };
           }
         }
         return textOutcome(url, res);
@@ -245,9 +250,12 @@ export async function crawl(requestedUrl: string, opts: CrawlOptions): Promise<C
       robots.text = null;
     }
 
+    // parseRobots binds rules to robots.requestedUrl (our origin), so a robots.txt that
+    // redirects to another host still applies to this site (RFC 9309).
     const robotsParsed = parseRobots(robots);
     let sitemap = sitemapDefault;
-    if (sitemap.status !== "ok" || !sitemap.text || parseSitemap(sitemap.text).kind === "invalid") {
+    let sitemapParsed: ParsedSitemap | null = sitemap.status === "ok" && sitemap.text ? parseSitemap(sitemap.text) : null;
+    if (!sitemapParsed || sitemapParsed.kind === "invalid") {
       const declared = (robotsParsed?.getSitemaps() ?? []).filter((u) => pageKey(u) !== pageKey(`${origin}/sitemap.xml`));
       for (const candidate of declared.slice(0, 2)) {
         if (remaining() < MIN_PAGE_START_MS) break;
@@ -258,8 +266,10 @@ export async function crawl(requestedUrl: string, opts: CrawlOptions): Promise<C
           continue;
         }
         const r = await getSitemap(normalized);
-        if (r.status === "ok" && r.text && parseSitemap(r.text).kind !== "invalid") {
+        const parsed = r.status === "ok" && r.text ? parseSitemap(r.text) : null;
+        if (parsed && parsed.kind !== "invalid") {
           sitemap = r;
+          sitemapParsed = parsed;
           break;
         }
       }
@@ -267,13 +277,7 @@ export async function crawl(requestedUrl: string, opts: CrawlOptions): Promise<C
     // A /sitemap.xml that serves an HTML page isn't a sitemap; keep "missing".
 
     // ── 3. Internal pages ──
-    const sitemapUrls =
-      sitemap.status === "ok" && sitemap.text
-        ? (() => {
-            const p = parseSitemap(sitemap.text);
-            return p.kind === "urlset" ? p.locs : [];
-          })()
-        : [];
+    const sitemapUrls = sitemap.status === "ok" && sitemapParsed?.kind === "urlset" ? sitemapParsed.locs : [];
     const candidates = selectInternalLinks({
       homeUrl,
       links: homePage.links,
@@ -285,6 +289,7 @@ export async function crawl(requestedUrl: string, opts: CrawlOptions): Promise<C
     const queue = candidates;
     const pages: PageData[] = [homePage];
     const seenFinal = new Set<string>([pageKey(homeUrl)]);
+    let homeText: string | null = null;
     const results: (PageData | null)[] = new Array(queue.length).fill(null);
     let cursor = 0;
     let collected = 0;
@@ -311,18 +316,35 @@ export async function crawl(requestedUrl: string, opts: CrawlOptions): Promise<C
           const key = pageKey(res.finalUrl);
           if (seenFinal.has(key)) continue;
           seenFinal.add(key);
-          const page = parsePage({
-            url: res.finalUrl,
-            requestedUrl: url,
-            statusCode: res.status,
-            headers: res.headers,
-            html: res.text,
-            isHome: false,
-          });
-          // A page whose canonical is the homepage (e.g. "/home") is a duplicate URL, not a new page.
+          let page: PageData;
+          try {
+            page = parsePage({
+              url: res.finalUrl,
+              requestedUrl: url,
+              statusCode: res.status,
+              headers: res.headers,
+              html: res.text,
+              isHome: false,
+            });
+          } catch (err) {
+            if (err instanceof AuditError && err.code === "too_large") {
+              notes.push(`${pathOf(url)} is too complex to analyse (an extremely large page structure), so we skipped it.`);
+              continue;
+            }
+            throw err;
+          }
+          // A page whose canonical is the homepage is skipped only when it really is a copy of the
+          // homepage (e.g. "/home"). A site-wide canonical to "/" on distinct pages is a serious
+          // misconfiguration that seo.canonical must report, so those pages are kept.
           const canonical = page.$('link[rel~="canonical" i][href]').first().attr("href");
           const canonicalUrl = canonical ? resolveHref(canonical, page.url) : null;
-          if (canonicalUrl && pageKey(canonicalUrl) === pageKey(homeUrl)) continue;
+          if (canonicalUrl && pageKey(canonicalUrl) === pageKey(homeUrl)) {
+            homeText ??= visibleText(homePage.$);
+            if (page.title === homePage.title && visibleText(page.$) === homeText) {
+              notes.push(`${pathOf(url)} is a copy of your homepage, so we skipped it.`);
+              continue;
+            }
+          }
           results[idx] = page;
           collected++;
         } catch (err) {

@@ -1,5 +1,5 @@
 import { outcome, plural, type Check } from "../../context";
-import { allJsonLdNodes, cleanText, nodeTypes } from "../../html";
+import { allJsonLdNodes, cleanText, nodeTypes, textOf, type DomNode } from "../../html";
 
 const def = { id: "geo.faq", category: "geo", label: "Questions & answers" } as const;
 
@@ -28,7 +28,8 @@ export const faqCheck: Check = (ctx) => {
   for (const p of ctx.pages) {
     for (const h of p.headings) if (h.level >= 2 && isQuestion(h.text)) questions.add(h.text.toLowerCase());
     p.$("summary, dt").each((_, el) => {
-      const t = cleanText(p.$(el).text());
+      // Bounded text: nested <details><summary> chains can't make this quadratic.
+      const t = cleanText(textOf(el as unknown as DomNode, 1_000));
       if (isQuestion(t)) questions.add(t.toLowerCase());
     });
   }

@@ -17,6 +17,9 @@ export const contactServiceOptions: { value: string; label: string }[] = [
   { value: "technical-fixes", label: "Technical fixes" },
   { value: "content-entity", label: "Content & entity" },
   { value: "monitoring", label: "Monitoring" },
+  { value: "ai-fact-check", label: "AI fact-check & fix" },
+  { value: "local-ai-setup", label: "Local AI visibility setup" },
+  { value: "ai-crawler-unblock", label: "AI crawler unblock" },
   { value: "not-sure", label: "Not sure yet" },
 ];
 

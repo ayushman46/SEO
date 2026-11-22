@@ -10,6 +10,9 @@ import { performanceCheck } from "./checks/performance";
 import { isIndexable } from "./checks/seo/indexability";
 import { computeScores, finalize } from "./score";
 
+const MAX_TITLE_CHARS = 300;
+const MAX_DESCRIPTION_CHARS = 500;
+
 export const ALL_CHECKS: Check[] = [...SEO_CHECKS, ...GEO_CHECKS, performanceCheck];
 
 function runCheck(check: Check, ctx: AuditContext): CheckOutcome | null {
@@ -43,10 +46,12 @@ export function analyze(ctx: AuditContext): {
   const scores = computeScores(checks);
 
   const pages: PageSummary[] = ctx.pages.map((p) => ({
-    url: p.url,
+    // Cap page-controlled strings so a hostile page can't bloat the stored/sealed result.
+    // Checks above still saw the full values.
+    url: p.url.slice(0, 2_048),
     statusCode: p.statusCode,
-    title: p.title,
-    metaDescription: p.metaDescription,
+    title: p.title === null ? null : p.title.slice(0, MAX_TITLE_CHARS),
+    metaDescription: p.metaDescription === null ? null : p.metaDescription.slice(0, MAX_DESCRIPTION_CHARS),
     h1Count: p.h1Count,
     wordCount: p.wordCount,
     indexable: isIndexable(p),

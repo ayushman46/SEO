@@ -180,7 +180,7 @@ export const home = {
   servicesTeaser: {
     kicker: "Services",
     title: "Prefer it done for you?",
-    body: "Five focused services: a Full audit that covers SEO and GEO together, hands-on technical fixes, content and entity work, and monthly monitoring. Fixed scope, plain pricing.",
+    body: "Eight focused services: a Full audit that covers SEO and GEO together, hands-on technical fixes, content and entity work, monthly monitoring, an AI fact-check and fix, local AI visibility setup and AI crawler unblocking. Fixed scope, plain pricing, all done by a person.",
   },
 
   pricingTeaser: {
@@ -225,6 +225,10 @@ export const home = {
     {
       q: "Is seenhq useful for a local business, not just a startup?",
       a: "Yes. Local businesses are increasingly recommended by AI assistants when someone asks for a nearby service. We check LocalBusiness schema, a consistent business name and the basics that help both Google and AI engines connect your website to your real-world location.",
+    },
+    {
+      q: "What if an AI assistant says something wrong about my business?",
+      a: "Fix the sources it learns from, because you cannot edit an AI answer directly. Assistants such as ChatGPT, Gemini and Google AI Overviews build answers from your website, your business profiles and other pages about you, so a wrong phone number, an old price or a \"permanently closed\" label usually traces back to a page somewhere. Correct the facts on your own site and profiles first, then ask other sites to fix theirs and use each assistant's feedback button. Our AI fact-check & fix service does this for you and re-tests after 30 days. Nobody can control what an AI says, and answers vary between runs, so we report what changed rather than promise a result.",
     },
     {
       q: "Can you guarantee rankings or AI citations?",

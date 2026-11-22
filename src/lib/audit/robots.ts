@@ -8,7 +8,9 @@ export const OUR_BOT = "seenhqbot";
 /** Parsed robots.txt, or null when there is none / it couldn't be read. */
 export function parseRobots(robots: FetchedText): Robots | null {
   if (robots.status !== "ok" || robots.text === null) return null;
-  return robotsParser(robots.url, robots.text);
+  // Rules fetched through a redirect apply to the original host (RFC 9309). robots-parser
+  // returns undefined (= "allowed") for URLs on another origin, so bind it to the requested URL.
+  return robotsParser(robots.requestedUrl ?? robots.url, robots.text);
 }
 
 /** true only when robots.txt explicitly disallows `url` for `ua`. */

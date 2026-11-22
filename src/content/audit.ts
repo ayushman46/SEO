@@ -75,6 +75,27 @@ export const auditErrors = {
   rate_limited: "You've run several audits in a short time. Please wait a little while before running another one.",
   invalid_or_expired: "This report has expired. Run the audit again to unlock the full results.",
   generic: "Something went wrong on our side. Please try again in a moment.",
+  server_busy: "We're running a lot of audits right now. Please try again in a minute.",
+} as const;
+
+/**
+ * Sentence-length strings for the audit flow UI, mirrored from src/components/audit/labels.ts
+ * (wording unchanged) so the frontend can read them from content.
+ */
+export const auditFlowCopy = {
+  timeHint: "This usually takes 15 to 40 seconds.",
+  slowHint: "Still working. Larger or slower sites can take up to a minute.",
+  noTopIssues: "We found no issues worth flagging on the pages we checked.",
+  lockedHint: "Unlock with your email to see the details and fixes.",
+  fullReportUnlocked: "Unlocked. Every issue and every fix is below.",
+  cwvSource: "Mobile, measured by Google PageSpeed Insights.",
+  cwvUnavailable: "PageSpeed data was not available for this audit.",
+  retryIn: (mins: number, at: string) =>
+    mins <= 1 ? `You can try again in about a minute (around ${at}).` : `You can try again in about ${mins} minutes (around ${at}).`,
+  errorTitle: "We couldn't finish this audit",
+  rateTitle: "Please wait a little",
+  genericTitle: "Something went wrong",
+  unlockRateLimited: "Too many unlock attempts. Please wait a little before trying again.",
 } as const;
 
 export type AuditErrorCopyKey = keyof typeof auditErrors;

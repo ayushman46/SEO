@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { contactSchema, isHoneypotTripped, parseContactForm } from "@/app/actions/contact-schema";
+import {
+  CONTACT_BUDGETS,
+  CONTACT_HONEYPOT_FIELD,
+  CONTACT_SERVICES,
+  contactSchema,
+  isHoneypotTripped,
+  parseContactForm,
+} from "@/app/actions/contact-schema";
+import { contactBudgetOptions, contactServiceOptions } from "@/content/contact";
 
 function form(values: Record<string, string>): FormData {
   const fd = new FormData();
@@ -16,7 +24,7 @@ const valid = {
   budget: "",
   message: "We'd like an AI visibility review of our docs site.",
   consent: "on",
-  company_website: "",
+  [CONTACT_HONEYPOT_FIELD]: "",
 };
 
 describe("contact schema", () => {
@@ -80,6 +88,35 @@ describe("contact schema", () => {
 
   it("detects the honeypot", () => {
     expect(isHoneypotTripped(form(valid))).toBe(false);
-    expect(isHoneypotTripped(form({ ...valid, company_website: "http://spam.example" }))).toBe(true);
+    expect(isHoneypotTripped(form({ ...valid, [CONTACT_HONEYPOT_FIELD]: "http://spam.example" }))).toBe(true);
+  });
+
+  it("uses a honeypot name that autofill does not recognise", () => {
+    expect(CONTACT_HONEYPOT_FIELD).toBe("hp_field_x7");
+    expect(CONTACT_HONEYPOT_FIELD).not.toMatch(/company|website|url|name|email|phone|address/i);
+  });
+});
+
+describe("contact option lists stay in sync", () => {
+  it("service slugs match the form options exactly", () => {
+    expect([...CONTACT_SERVICES].sort()).toEqual(contactServiceOptions.map((o) => o.value).sort());
+  });
+
+  it("budget values match the form options exactly", () => {
+    expect([...CONTACT_BUDGETS]).toEqual(contactBudgetOptions.map((o) => o.value));
+  });
+
+  it("every service slug satisfies the DB check (slug shape, <= 64 chars)", () => {
+    for (const slug of CONTACT_SERVICES) {
+      expect(slug).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/);
+      expect(slug.length).toBeLessThanOrEqual(64);
+    }
+  });
+
+  it("validation derives from CONTACT_SERVICES", () => {
+    for (const service of CONTACT_SERVICES) {
+      expect(contactSchema.safeParse({ ...valid, consent: true, service }).success).toBe(true);
+    }
+    expect(contactSchema.safeParse({ ...valid, consent: true, service: "made-up-service" }).success).toBe(false);
   });
 });

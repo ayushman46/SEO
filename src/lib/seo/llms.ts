@@ -20,6 +20,8 @@ export function buildLlmsTxt(): string {
     "",
     `${site.name} (always written in lowercase) offers a free automated website audit that scores a site on SEO, GEO (Generative Engine Optimization) and mobile performance, plus fixed-scope services for startups, SaaS teams and local businesses. The audit reads a site's homepage and up to five internal pages, robots.txt, sitemap and llms.txt, and runs Google PageSpeed Insights. The full report is unlocked by entering an email address; nothing else is required.`,
     "",
+    `Paid services are done by a person, not by automated tracking. Besides audits, fixes, content work and monthly monitoring, they include an AI fact-check & fix (checking what AI assistants say about a business against its real facts and correcting the sources it controls), a local AI visibility setup (Bing Places, Apple Business, Yelp or a local equivalent, and the ChatGPT business profile where eligible) and an AI crawler unblock (finding and fixing the server, CDN or host layer that refuses AI crawlers). ${site.name} cannot control what any AI assistant says, and AI answers vary between runs.`,
+    "",
     `Engines checked against: ${site.enginesTracked.join(", ")}. ${site.name} is not affiliated with any of them.`,
     "",
     ...definitions.flatMap((f) => [`**${f.q}** ${f.a}`, ""]),

@@ -29,7 +29,7 @@ function echoValues(formData: FormData): Extract<ContactFormState, { ok: false }
 
 /**
  * Contact form server action, for `useActionState(submitContact, null)`.
- * Field names: see CONTACT_FIELDS in ./contact-schema (plus the empty honeypot `company_website`).
+ * Field names: see CONTACT_FIELDS in ./contact-schema (plus the empty honeypot CONTACT_HONEYPOT_FIELD).
  */
 export async function submitContact(
   _prevState: ContactFormState | null,

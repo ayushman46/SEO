@@ -9,8 +9,10 @@ export type FetchedStatus = "ok" | "missing" | "error" | "skipped";
 
 export interface FetchedText {
   status: FetchedStatus;
-  /** URL we fetched (or would have fetched) */
+  /** final URL after redirects (or the URL we would have fetched) */
   url: string;
+  /** URL we asked for, before redirects (e.g. https://site/robots.txt) */
+  requestedUrl?: string;
   statusCode: number | null;
   text: string | null;
 }

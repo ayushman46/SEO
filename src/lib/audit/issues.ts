@@ -157,6 +157,17 @@ export const ISSUE_CATALOG = {
     howToFix:
       "Keep exactly one `<link rel=\"canonical\">` per page. Two plugins (e.g. a theme and an SEO plugin) both adding one is the usual cause; turn one off.",
   },
+  "seo.canonical:points-to-home": {
+    checkId: "seo.canonical",
+    category: "seo",
+    severity: "high",
+    effort: "quick",
+    title: "Inner pages declare the homepage as their canonical",
+    description:
+      "These pages tell Google that your homepage is the real version of them, so Google drops them from search results. A theme or SEO plugin setting applying one canonical to every page is the usual cause.",
+    howToFix:
+      "Make each page's canonical point to itself, e.g. on /about use `<link rel=\"canonical\" href=\"https://yourdomain.com/about\">`. In your SEO plugin, clear any site-wide canonical URL so each page gets its own.",
+  },
   "seo.indexability:noindex": {
     checkId: "seo.indexability",
     category: "seo",
@@ -199,6 +210,17 @@ export const ISSUE_CATALOG = {
       "Your robots.txt tells every crawler to stay away (`Disallow: /`), so Google can't read your pages. This is often left over from when the site was being built.",
     howToFix:
       "Edit `/robots.txt` and change `Disallow: /` to `Allow: /` under `User-agent: *` (or delete that line). On WordPress, untick \"Discourage search engines\" in Settings → Reading.",
+  },
+  "seo.robots-txt:blocks-unlisted": {
+    checkId: "seo.robots-txt",
+    category: "seo",
+    severity: "low",
+    effort: "quick",
+    title: "robots.txt only lets listed crawlers in",
+    description:
+      "Google and Bing can crawl your site, but every other crawler is blocked by `User-agent: *` / `Disallow: /`. That also shuts out smaller search engines and many AI assistants.",
+    howToFix:
+      "If you didn't mean to block everyone else, change `Disallow: /` under `User-agent: *` to `Allow: /` (or list the specific bots you want to block instead).",
   },
   "seo.robots-txt:unreadable": {
     checkId: "seo.robots-txt",
@@ -358,6 +380,17 @@ export const ISSUE_CATALOG = {
       "Blocking AI training bots is a legitimate choice, but it means future AI models learn less about your business. If you did this on purpose, you can ignore this.",
     howToFix:
       "If you want AI models to know your business, remove the `Disallow: /` rules for these bots in `/robots.txt`. Keep the block if you prefer not to share content for training.",
+  },
+  "geo.ai-crawlers:partially-blocked": {
+    checkId: "geo.ai-crawlers",
+    category: "geo",
+    severity: "medium",
+    effort: "quick",
+    title: "AI crawlers are blocked from some of your pages",
+    description:
+      "Your robots.txt lets these AI bots read your homepage but blocks them from other pages we checked, so AI assistants can't read or cite that content.",
+    howToFix:
+      "In `/robots.txt`, find the `Disallow:` lines under these bots (or under `User-agent: *`) that cover the listed pages and remove them, or add `Allow:` rules for the sections you want AI assistants to see.",
   },
   "geo.llms-txt:missing": {
     checkId: "geo.llms-txt",

@@ -59,6 +59,10 @@ function flattenHeaders(res: IncomingMessage): Record<string, string> {
     if (v === undefined) continue;
     out[k.toLowerCase()] = Array.isArray(v) ? v.join(", ") : v;
   }
+  // Keep one line per X-Robots-Tag header: a bot scope ("bingbot: nofollow") must not leak
+  // into a separate, generic header ("noindex") when the two are joined.
+  const xr = res.headersDistinct?.["x-robots-tag"];
+  if (xr?.length) out["x-robots-tag"] = xr.join("\n");
   return out;
 }
 
@@ -66,7 +70,7 @@ function isHtmlContentType(ct: string): boolean {
   return /\b(text\/html|application\/xhtml\+xml)\b/i.test(ct);
 }
 
-function looksLikeHtml(text: string): boolean {
+export function looksLikeHtml(text: string): boolean {
   return /<(!doctype\s+html|html[\s>]|head[\s>]|body[\s>])/i.test(text.slice(0, 4096));
 }
 

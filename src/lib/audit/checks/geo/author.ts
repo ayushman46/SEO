@@ -5,8 +5,13 @@ const def = { id: "geo.author", category: "geo", label: "Author signals" } as co
 
 export function hasAuthorSignal(p: PageData): boolean {
   if (metaContent(p.$, "author") || metaContent(p.$, "article:author")) return true;
-  if (p.$('a[rel~="author" i], link[rel~="author" i], [itemprop="author"], [rel="author"]').length > 0) return true;
-  if (p.$('.byline, .author, .post-author, .entry-author, [class*="byline"]').length > 0) return true;
+  // One selector pass (each full-document query costs a tree walk).
+  if (
+    p.$(
+      'a[rel~="author" i], link[rel~="author" i], [itemprop="author"], [rel="author"], .byline, .author, .post-author, .entry-author, [class*="byline"]',
+    ).length > 0
+  )
+    return true;
   for (const b of p.jsonLd) {
     for (const n of b.nodes) {
       if (n.author !== undefined && n.author !== null && n.author !== "") return true;
