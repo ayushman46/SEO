@@ -3,11 +3,13 @@
  * so it can be exercised end-to-end against HTML fixtures.
  */
 import type { AuditIssue, AuditScores, CheckResult, PageSummary } from "./types";
-import { unavailable, type AiPhase, type AuditContext, type Check, type CheckOutcome } from "./context";
+import { unavailable, type AiPhase, type AuditContext, type Check, type CheckOutcome, type CrawlerProbe, type Soft404Probe } from "./context";
 import { SEO_CHECKS } from "./checks/seo";
 import { GEO_CHECKS } from "./checks/geo";
 import { performanceCheck } from "./checks/performance";
 import { aiClarityOutcome } from "./checks/geo/ai-clarity";
+import { crawlerProbeOutcome } from "./checks/geo/crawler-probe";
+import { soft404Outcome } from "./checks/seo/soft-404";
 import { isIndexable } from "./checks/seo/indexability";
 import { computeScores, finalize } from "./score";
 
@@ -25,6 +27,8 @@ function runCheck(check: Check, ctx: AuditContext): CheckOutcome | null {
 }
 
 const NO_AI: AiPhase = { status: "skipped", reason: "no_key" };
+const NO_PROBE: CrawlerProbe = { status: "skipped", reason: "not_run" };
+const NO_SOFT404: Soft404Probe = { status: "skipped", reason: "not_run" };
 
 /** Deterministic checks only (no LLM). Feeds the AI prompt and the final assembly. */
 export function runChecks(ctx: AuditContext): { outcomes: CheckOutcome[]; notes: string[] } {
@@ -51,6 +55,8 @@ export function assemble(
   ctx: AuditContext,
   deterministic: { outcomes: CheckOutcome[]; notes: string[] },
   ai: AiPhase = NO_AI,
+  probe: CrawlerProbe = NO_PROBE,
+  soft404: Soft404Probe = NO_SOFT404,
 ): {
   checks: CheckResult[];
   issues: AuditIssue[];
@@ -66,7 +72,22 @@ export function assemble(
   } catch {
     aiOutcome = aiClarityOutcome({ status: "failed", reason: "error" });
   }
-  outcomes.splice(SEO_CHECKS.length + GEO_CHECKS.length, 0, aiOutcome);
+  let probeOutcome: CheckOutcome;
+  try {
+    probeOutcome = crawlerProbeOutcome(probe);
+  } catch {
+    probeOutcome = crawlerProbeOutcome({ status: "skipped", reason: "error" });
+  }
+  // Live-probe and AI checks sit after the other GEO checks, before performance.
+  outcomes.splice(SEO_CHECKS.length + GEO_CHECKS.length, 0, probeOutcome, aiOutcome);
+  let soft404Result: CheckOutcome;
+  try {
+    soft404Result = soft404Outcome(soft404, ctx);
+  } catch {
+    soft404Result = soft404Outcome({ status: "skipped", reason: "error" }, ctx);
+  }
+  // Network-backed SEO check goes at the end of the SEO block.
+  outcomes.splice(SEO_CHECKS.length, 0, soft404Result);
 
   const { checks, issues } = finalize(outcomes);
   const scores = computeScores(checks);
@@ -87,6 +108,11 @@ export function assemble(
   return { checks, issues, scores, pages, notes };
 }
 
-export function analyze(ctx: AuditContext, ai: AiPhase = NO_AI): ReturnType<typeof assemble> {
-  return assemble(ctx, runChecks(ctx), ai);
+export function analyze(
+  ctx: AuditContext,
+  ai: AiPhase = NO_AI,
+  probe: CrawlerProbe = NO_PROBE,
+  soft404: Soft404Probe = NO_SOFT404,
+): ReturnType<typeof assemble> {
+  return assemble(ctx, runChecks(ctx), ai, probe, soft404);
 }

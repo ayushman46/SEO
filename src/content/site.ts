@@ -44,6 +44,7 @@ export const site = {
       title: "Company",
       links: [
         { label: "About", href: "/about" },
+        { label: "How the audit works", href: "/methodology" },
         { label: "Contact", href: "/contact" },
         { label: "llms.txt", href: "/llms.txt" },
       ],
@@ -69,7 +70,7 @@ export const site = {
 } satisfies SiteConfig;
 
 /** Last time the marketing copy was reviewed (ISO date). Used for sitemap lastModified and visible "updated" dates. */
-export const contentUpdated = "2026-11-22";
+export const contentUpdated = "2026-11-23";
 
 /** Small line under the engine logo strip ("Checks how you show up in"). */
 export const enginesDisclaimer =

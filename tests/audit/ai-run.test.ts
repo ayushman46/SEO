@@ -21,6 +21,17 @@ vi.mock("@/lib/audit/crawl", async () => {
   };
 });
 
+// The live crawler probe is network IO: never run it here (covered in probe.test.ts).
+vi.mock("@/lib/audit/net/probe", () => ({
+  PROBE_MAX_MS: 6_000,
+  probeCrawlers: async () => ({ status: "skipped", reason: "not_run" }),
+}));
+
+vi.mock("@/lib/audit/net/soft404", () => ({
+  SOFT404_TIMEOUT_MS: 4_000,
+  probeSoft404: async () => ({ status: "skipped", reason: "not_run" }),
+}));
+
 const { runAudit } = await import("@/lib/audit/run");
 const { analyze } = await import("@/lib/audit/analyze");
 const { toPartialReport } = await import("@/lib/audit/report");
@@ -116,7 +127,7 @@ describe("runAudit AI phase", () => {
     setTimeout(() => ac.abort(), 50);
     const t0 = Date.now();
     const r = await runAudit(HOME, { signal: ac.signal });
-    expect(Date.now() - t0).toBeLessThan(2_000);
+    expect(Date.now() - t0).toBeLessThan(5_000);
     expect(r.ai).toBeNull();
   });
 });

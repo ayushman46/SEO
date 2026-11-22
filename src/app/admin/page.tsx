@@ -3,9 +3,10 @@ import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { isDbConfigured } from "@/lib/db";
-import { listContacts, type ContactRow } from "@/lib/db/contact";
+import { listContacts, type ContactRow, type StoredQuote } from "@/lib/db/contact";
 import { listLeads, type LeadRow } from "@/lib/db/leads";
 import { getAdminMetrics, type AdminMetrics } from "@/lib/db/stats";
+import { formatPrice } from "@/lib/quote/catalog";
 import { isAuthorizedAdmin } from "@/lib/security/admin-auth";
 
 /*
@@ -27,6 +28,50 @@ function formatDate(value: Date | string): string {
 
 function truncate(text: string, max: number): string {
   return text.length > max ? `${text.slice(0, max - 1)}…` : text;
+}
+
+/** Quote cell: catalog total, fixed or not, validity and items. Everything rendered as text. */
+function QuoteCell({ quote, auditId, auditUrl }: { quote: StoredQuote | null; auditId: string | null; auditUrl: string | null }) {
+  const audit =
+    auditId || auditUrl ? (
+      <span className="block break-all opacity-70">
+        Audit: {auditUrl ?? "-"}
+        {auditId ? ` (${auditId.slice(0, 8)})` : ""}
+      </span>
+    ) : null;
+  if (!quote) return audit ?? <>-</>;
+  if (quote.malformed || quote.currency === null) {
+    return (
+      <>
+        <span className="block font-semibold">Unreadable quote (dropped)</span>
+        {audit}
+      </>
+    );
+  }
+  const currency = quote.currency;
+  const money = (n: number | null): string => (n === null ? "by email" : formatPrice(n, currency));
+  return (
+    <>
+      <span className="block font-semibold tabular-nums">
+        {quote.fixed ? "" : "from "}
+        {money(quote.catalogTotal)} {currency}
+      </span>
+      <span className="block text-xs">
+        {quote.fixed ? "Fixed" : "Not fixed: confirm in 1 business day"} ·{" "}
+        {quote.valid ? "matches catalog" : `MISMATCH (client said ${money(quote.submittedTotal)})`}
+      </span>
+      <ul className="mt-1 list-disc pl-4 text-xs">
+        {(Array.isArray(quote.items) ? quote.items : []).map((item, i) => (
+          <li key={`${item.serviceSlug}-${i}`}>
+            {item.label} ({item.submittedFrom ? "from " : ""}
+            {money(item.submittedPrice)})
+            {item.valid ? null : <strong> invalid: {item.problem ?? "unknown"}</strong>}
+          </li>
+        ))}
+      </ul>
+      {audit}
+    </>
+  );
 }
 
 export default function AdminPage() {
@@ -143,6 +188,7 @@ async function AdminContent() {
                   <th scope="col" className="py-2 pr-4">Company / website</th>
                   <th scope="col" className="py-2 pr-4">Service</th>
                   <th scope="col" className="py-2 pr-4">Budget</th>
+                  <th scope="col" className="py-2 pr-4">Quote</th>
                   <th scope="col" className="py-2 pr-4">Status</th>
                   <th scope="col" className="py-2 pr-4">Message</th>
                 </tr>
@@ -163,6 +209,9 @@ async function AdminContent() {
                     </td>
                     <td className="py-2 pr-4">{c.service}</td>
                     <td className="py-2 pr-4">{c.budget ?? "-"}</td>
+                    <td className="min-w-48 py-2 pr-4">
+                      <QuoteCell quote={c.quote} auditId={c.auditId} auditUrl={c.auditUrl} />
+                    </td>
                     <td className="py-2 pr-4">{c.status}</td>
                     <td className="py-2 pr-4 whitespace-pre-wrap" title={c.message}>
                       {truncate(c.message, 600)}

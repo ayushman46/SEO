@@ -41,6 +41,30 @@ export interface PageScan {
   /** an SPA mount point (#root, #app, #__next, ...) with no content */
   emptyRoot: boolean;
   scripts: { inlineChars: number; external: number };
+  /** text inside elements marked data-nosnippet (outermost only, capped) */
+  nosnippetTexts: string[];
+  /** words inside data-nosnippet elements */
+  nosnippetWords: number;
+  /** testimonial / review quote blocks (outermost only) and whether each names its source */
+  testimonials: { text: string; attributed: boolean }[];
+}
+
+const TESTIMONIAL_CLASS = /(^|[\s_-])(testimonials?|customer-reviews?|review-(item|card|text|body|content)|reviews?-(list|slider|carousel)|quote-(card|block))([\s_-]|$)/i;
+const ATTRIBUTION_TAIL = /(?:[—–-]|~)\s*[A-Z][\p{L}'.-]+(?:\s+[A-Z][\p{L}'.-]*){0,3}\s*(?:,[^,]{1,60})?$/u;
+
+function hasAttribution(n: DomNode, text: string): boolean {
+  let found = false;
+  let visited = 0;
+  walk([n], null, (x) => {
+    if (found || ++visited > 1_000) return SKIP;
+    if (!isElement(x)) return SKIP;
+    const a = x.attribs;
+    if (x.name === "cite" || x.name === "figcaption" || a.itemprop === "author" || /(^|[\s_-])(author|name|reviewer|client|cite|source)([\s_-]|$)/i.test(a.class ?? "")) {
+      if (cleanText(textOf(x, 120, 200)).length >= 2) found = true;
+    }
+    return null;
+  });
+  return found || ATTRIBUTION_TAIL.test(text.slice(-120));
 }
 
 const CACHE = new WeakMap<CheerioAPI, PageScan>();
@@ -49,6 +73,8 @@ interface Flags {
   hidden: boolean;
   struck: boolean;
   footer: boolean;
+  nosnippet: boolean;
+  testimonial: boolean;
 }
 
 function isHiddenEl(a: Record<string, string>): boolean {
@@ -135,11 +161,14 @@ export function scanPage(p: PageData): PageScan {
     noscriptText: "",
     emptyRoot: false,
     scripts: { inlineChars: 0, external: 0 },
+    nosnippetTexts: [],
+    nosnippetWords: 0,
+    testimonials: [],
   };
   const keyHeadings: { node: DomNode; level: number }[] = [];
   let footers = 0;
 
-  walk<Flags>(domRoot(p.$).children ?? [], { hidden: false, struck: false, footer: false }, (n, f) => {
+  walk<Flags>(domRoot(p.$).children ?? [], { hidden: false, struck: false, footer: false, nosnippet: false, testimonial: false }, (n, f) => {
     if (!isElement(n)) return SKIP;
     const a = n.attribs;
     const name = n.name;
@@ -187,6 +216,19 @@ export function scanPage(p: PageData): PageScan {
     if (!f.footer && (name === "footer" || a.role === "contentinfo")) {
       next.footer = true;
       if (footers++ < 2) scan.footerText += ` ${cleanText(textOf(n, 3_000, 5_000))}`;
+    }
+    if (!f.nosnippet && a["data-nosnippet"] !== undefined) {
+      next.nosnippet = true;
+      const t = cleanText(textOf(n, 5_000, 5_000));
+      scan.nosnippetWords += countWords(t);
+      if (scan.nosnippetTexts.length < MAX_COLLECTED && t) scan.nosnippetTexts.push(t.slice(0, 2_000));
+    }
+    if (!f.testimonial && (name === "blockquote" || TESTIMONIAL_CLASS.test(`${a.class ?? ""} ${a.id ?? ""}`) || a.itemtype?.endsWith("/Review"))) {
+      next.testimonial = true;
+      if (scan.testimonials.length < 30) {
+        const t = cleanText(textOf(n, 1_500, 1_500));
+        if (countWords(t) >= 5) scan.testimonials.push({ text: t.slice(0, 300), attributed: hasAttribution(n, t) });
+      }
     }
     if (name === "address" && scan.addressTexts.length < 10) {
       scan.addressTexts.push(cleanText(textOf(n, 300, 500)));

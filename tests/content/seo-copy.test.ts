@@ -2,7 +2,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { site } from "@/content/site";
-import { home, homeMeta } from "@/content/home";
+import { home, homeMeta, sampleReportMeta } from "@/content/home";
 import { services, servicesClosing, servicesPage } from "@/content/services";
 import {
   pricingHighlightLabel,
@@ -23,7 +23,29 @@ import {
 } from "@/content/pricing";
 import { aboutClosing, aboutPage, aboutSections } from "@/content/about";
 import { contactForm, contactNextSteps, contactPage, contactServiceOptions } from "@/content/contact";
-import { auditEmailGate, auditErrors, auditFlowCopy, auditPage, auditProgressSteps } from "@/content/audit";
+import {
+  auditAiCopy,
+  auditEmailGate,
+  auditErrors,
+  auditExportCopy,
+  auditFlowCopy,
+  auditPage,
+  auditProgressSteps,
+} from "@/content/audit";
+import { methodologyFaq, methodologyPage, methodologySections } from "@/content/methodology";
+import {
+  botFaq,
+  botPage,
+  botRobotsRule,
+  botSections,
+  botSimulatedTokens,
+  botSimulatedUserAgent,
+  botToken,
+  botUserAgent,
+} from "@/content/bot";
+import { CHECK_WEIGHTS } from "@/lib/audit/score";
+import { SIMULATED_BOT_TOKENS, simulatedUserAgent, userAgent } from "@/lib/audit/net/fetch";
+import sitemap from "@/app/sitemap";
 import { privacy, privacyMeta, terms, termsMeta } from "@/content/legal";
 import { TITLE_SUFFIX, buildMetadata, pageMetadata, rootMetadata, siteUrl } from "@/lib/seo/metadata";
 import {
@@ -51,6 +73,9 @@ const templatedPages = {
   auditPage,
   privacyMeta,
   termsMeta,
+  methodologyPage,
+  botPage,
+  sampleReportMeta,
 };
 
 const allCopy = JSON.stringify({
@@ -88,6 +113,14 @@ const allCopy = JSON.stringify({
   servicesClosing,
   privacy,
   terms,
+  methodologyPage,
+  methodologySections,
+  methodologyFaq,
+  botPage,
+  botSections,
+  botFaq,
+  auditAiCopy,
+  auditExportCopy,
   llms: buildLlmsTxt(),
 });
 
@@ -347,18 +380,20 @@ describe("content rules", () => {
     expect(privacyText).toMatch(/Vercel/);
   });
 
-  it("home has 4 tabs, 3 steps and 6-9 FAQs", () => {
+  it("home has 4 tabs, 3 steps and 6-10 FAQs", () => {
     expect(home.tabs.map((t) => t.id)).toEqual(["seo", "geo", "performance", "fixes"]);
     expect(home.howItWorks.steps).toHaveLength(3);
     expect(home.faq.length).toBeGreaterThanOrEqual(6);
-    expect(home.faq.length).toBeLessThanOrEqual(9);
+    expect(home.faq.length).toBeLessThanOrEqual(10);
+    expect(home.faq.map((f) => f.q)).toContain("What are Google AI Overviews?");
   });
 
   it("audit copy covers every error code and progress step", () => {
     for (const code of ["invalid_url", "blocked_host", "unreachable", "timeout", "not_html", "too_large", "rate_limited"]) {
       expect(auditErrors).toHaveProperty(code);
     }
-    expect(auditProgressSteps).toHaveLength(5);
+    expect(auditProgressSteps).toHaveLength(6);
+    expect(auditProgressSteps).toContain("Running the AI reading");
   });
 });
 
@@ -421,7 +456,19 @@ describe("metadata", () => {
 
   it("every page has metadata", () => {
     expect(Object.keys(pageMetadata).sort()).toEqual(
-      ["about", "audit", "contact", "home", "pricing", "privacy", "services", "terms"].sort(),
+      [
+        "about",
+        "audit",
+        "bot",
+        "contact",
+        "home",
+        "methodology",
+        "pricing",
+        "privacy",
+        "sampleReport",
+        "services",
+        "terms",
+      ].sort(),
     );
   });
 });
@@ -494,5 +541,135 @@ describe("llms.txt", () => {
       expect(line).toMatch(/^- \[[^\]]+\]\([^)]+\)(: .+)?$/);
     }
     expect(txt.indexOf("What is GEO")).toBeLessThan(firstH2);
+  });
+});
+
+/** Split all exported copy into sentence-ish fragments (JSON string boundaries count as breaks). */
+const sentences = allCopy
+  .split(/\\n|(?<=[.!?])\s+|"\s*[,:{}[\]]\s*"?/)
+  .map((x) => x.trim())
+  .filter(Boolean);
+
+describe("AI reading honesty (T018)", () => {
+  const engines = /ChatGPT|Gemini|Perplexity|Claude\b|Copilot|AI Overviews/;
+  const aiReading = /AI reading|how an AI model|AI model's reading|language model|open-weight/i;
+
+  it("never says or implies the AI reading is what ChatGPT, Gemini or other assistants say", () => {
+    expect(allCopy).not.toMatch(
+      /(see|shows?|reveals?|find out|learn|check|tells? you) (exactly )?(what|how) (ChatGPT|Gemini|Perplexity|Claude|Copilot|AI Overviews|AI assistants?|AI engines?|answer engines?)[^."]{0,40} (says?|thinks?|knows?|reads?|describes?|sees?)\b/i,
+    );
+    expect(allCopy).not.toMatch(/(ChatGPT|Gemini|Perplexity)('s)? (reading|view|opinion) of/i);
+    for (const s of sentences) {
+      // A question may name both ("Is the AI reading what ChatGPT says...?"); its answer is checked below.
+      if (s.endsWith("?")) continue;
+      if (aiReading.test(s) && engines.test(s)) expect(s).toMatch(/\bnot\b|\bnever\b|\bno\b/i);
+    }
+    for (const f of [...home.faq, ...methodologyFaq, ...botFaq]) {
+      if (aiReading.test(f.q) && engines.test(f.q)) expect(f.a, f.q).toMatch(/^No\./);
+    }
+  });
+
+  it("states the AI reading's limits wherever it is explained", () => {
+    const faq = home.faq.find((f) => f.q === "Does the audit use AI?");
+    expect(faq).toBeDefined();
+    expect(faq!.a).toMatch(/^Yes/);
+    expect(faq!.a).toMatch(/NVIDIA/);
+    expect(faq!.a).toMatch(/not what ChatGPT/);
+    expect(faq!.a).toMatch(/can be wrong/);
+    const ai = methodologySections.find((x) => x.id === "ai-reading")!.body.join(" ");
+    expect(ai).toMatch(/It is not what ChatGPT/);
+    expect(ai).toMatch(/It can be wrong/);
+    expect(buildLlmsTxt()).toMatch(/not what ChatGPT, Gemini or Perplexity say/);
+  });
+
+  it("privacy names NVIDIA, the page text sent, and that visitor data is never sent", () => {
+    const text = privacy.sections.flatMap((x) => x.body).join(" ");
+    expect(privacy.updated).toBe("2026-11-23");
+    expect(terms.updated).toBe("2026-11-23");
+    expect(text).toMatch(/text from the public pages we fetched from the audited website to NVIDIA's hosted model API/);
+    expect(text).toMatch(/never send your email address, your contact form messages/);
+    expect(text).toMatch(/simulated requests/);
+    const processors = privacy.sections.find((x) => x.heading === "Who processes your data")!.body.join(" ");
+    expect(processors).toMatch(/NVIDIA/);
+    const termsText = terms.sections.flatMap((x) => x.body).join(" ");
+    expect(termsText).toMatch(/may contain errors/);
+    expect(termsText).toMatch(/Review and correct every AI-generated reading or draft before you rely on it or publish it/);
+  });
+
+  it("the AI-crawler test is always described as simulated, with its IP caveat", () => {
+    const mentions = sentences.filter((s) => /crawler (access )?test|AI-crawler (fetch|requests?|test)|fetch as those bots/i.test(s));
+    expect(mentions.length).toBeGreaterThan(3);
+    for (const s of mentions) expect(s).toMatch(/simulat/i);
+    expect(JSON.stringify(methodologySections.find((x) => x.id === "limits"))).toMatch(/verify crawler IP addresses/);
+  });
+});
+
+describe("methodology and bot pages (T018)", () => {
+  it("methodology check weights match the engine and cover every weighted check", () => {
+    const checks = methodologySections.find((x) => x.id === "checks")!;
+    const items = checks.groups!.flatMap((g) => g.items);
+    for (const item of items) {
+      if (item.id && item.id in CHECK_WEIGHTS) expect(item.weight, item.id).toBe(CHECK_WEIGHTS[item.id]);
+      if (item.weight !== undefined) expect(Object.keys(CHECK_WEIGHTS)).toContain(item.id);
+    }
+    const listed = new Set(items.map((i) => i.id));
+    for (const id of Object.keys(CHECK_WEIGHTS)) expect(listed.has(id), id).toBe(true);
+    expect(checks.groups!.map((g) => g.id)).toEqual(["seo", "geo", "ai", "performance"]);
+  });
+
+  it("methodology states the real scoring formula", () => {
+    const scores = methodologySections.find((x) => x.id === "scores")!.body.join(" ");
+    expect(scores).toContain("45% SEO, 35% GEO and 20% Performance");
+    expect(scores).toMatch(/facts count for 60% and questions for 40%/);
+  });
+
+  it("methodology covers fetch, checks, scores, AI reading, limits and removal", () => {
+    expect(methodologySections.map((x) => x.id)).toEqual([
+      "what-we-fetch",
+      "checks",
+      "scores",
+      "ai-reading",
+      "limits",
+      "data-removal",
+    ]);
+    const limits = JSON.stringify(methodologySections.find((x) => x.id === "limits"));
+    expect(limits).toMatch(/do not open the PDF or read the image/);
+    expect(limits).toMatch(/No JavaScript/);
+    expect(methodologySections.find((x) => x.id === "data-removal")!.cta!.href).toBe("/contact");
+  });
+
+  it("bot page documents the real user agent, the robots rule and contact", () => {
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://seenhq.example");
+    expect(botUserAgent(siteUrl())).toBe(userAgent());
+    expect([...botSimulatedTokens]).toEqual([...SIMULATED_BOT_TOKENS]);
+    for (const t of botSimulatedTokens) expect(botSimulatedUserAgent(t, siteUrl())).toBe(simulatedUserAgent(t));
+    vi.unstubAllEnvs();
+    expect(botToken).toBe("seenhqbot");
+    expect(botRobotsRule).toBe("User-agent: seenhqbot\nDisallow: /");
+    expect(botSections.find((x) => x.id === "contact")!.cta!.href).toBe("/contact");
+    expect(JSON.stringify(botSections)).toMatch(/up to five internal pages/);
+    expect(botFaq.map((f) => f.q)).toContain("How do I block seenhqbot?");
+  });
+
+  it("new FAQs are kept whole in FAQPage JSON-LD", () => {
+    for (const list of [methodologyFaq, botFaq]) {
+      expect((faqLd(list).mainEntity as unknown[]).length).toBe(list.length);
+    }
+  });
+
+  it("footer, sitemap and llms.txt include the new pages", () => {
+    const company = site.footerGroups.find((g) => g.title === "Company")!;
+    expect(company.links.map((l) => l.href)).toContain("/methodology");
+    expect(contentUpdated).toBe("2026-11-23");
+    const urls = sitemap().map((e) => e.url);
+    expect(urls.some((u) => u.endsWith("/methodology"))).toBe(true);
+    expect(urls.some((u) => u.endsWith("/bot"))).toBe(true);
+    expect(urls.some((u) => u.endsWith("/sample-report"))).toBe(true);
+    expect(sampleReportMeta.metaTitle).toBe("Sample audit report: see every check and fix");
+    expect(pageMetadata.sampleReport.alternates?.canonical).toBe("/sample-report");
+    const txt = buildLlmsTxt();
+    expect(txt).toMatch(/^- \[How the audit works\]\(https?:\/\/.+\/methodology\): .+$/m);
+    expect(txt).toMatch(/^- \[Sample audit report\]\(https?:\/\/.+\/sample-report\): .+$/m);
+    expect(txt).toMatch(/^- \[About seenhqbot\]\(https?:\/\/.+\/bot\): .+$/m);
   });
 });

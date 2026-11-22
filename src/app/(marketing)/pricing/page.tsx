@@ -9,7 +9,9 @@ import {
   pricingIndiaNotes,
   pricingNote,
   pricingNoteInr,
+  pricingOrderSteps,
   pricingPage,
+  pricingTaxNote,
   pricingTiers,
   pricingTiersInr,
 } from "@/content/pricing";
@@ -81,9 +83,12 @@ export default function PricingPage() {
                     ))}
                   </ul>
                   <div className="mt-10 flex flex-col gap-5 border-t border-line pt-8 md:flex-row md:items-center md:justify-between">
-                    <p className="max-w-2xl text-[0.9375rem] leading-relaxed text-pretty text-muted">
-                      <PlaceholderText value={pricingNote} />
-                    </p>
+                    <div className="max-w-2xl text-[0.9375rem] leading-relaxed text-pretty text-muted">
+                      <p>
+                        <PlaceholderText value={pricingNote} />
+                      </p>
+                      <p className="mt-2 font-medium text-ink-2">{pricingTaxNote}</p>
+                    </div>
                     <Button href="/services" variant="link" icon="arrow-right" className="self-start md:self-auto">
                       See every service in detail
                     </Button>
@@ -113,6 +118,30 @@ export default function PricingPage() {
               ),
             }}
           />
+        </Container>
+      </section>
+
+      <section aria-labelledby="order-steps-title" className="pb-20 sm:pb-28">
+        <Container>
+          <div className="border-t border-line pt-10 sm:pt-12">
+            <h2 id="order-steps-title" className="font-serif text-display-sm text-ink">
+              {pricingOrderSteps.title}
+            </h2>
+            <ol className="mt-8 grid gap-4 md:grid-cols-3 md:gap-5">
+              {pricingOrderSteps.steps.map((step, i) => (
+                <li
+                  key={step.title}
+                  className="rounded-card bg-white p-5 shadow-[inset_0_0_0_1px_var(--color-line)] sm:p-6"
+                >
+                  <span aria-hidden className="font-serif text-2xl leading-none text-accent-ink tabular-nums">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <h3 className="mt-4 text-[1.0625rem] font-semibold text-ink">{step.title}</h3>
+                  <p className="mt-2 text-[0.9375rem] leading-relaxed text-pretty text-muted">{step.body}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
         </Container>
       </section>
 

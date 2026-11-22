@@ -16,6 +16,10 @@ export interface IssueCopy {
   howToFix: string;
 }
 
+/** Required caveat on every crawler-probe string (ADR-017). Kept in sync with PROBE_HONESTY. */
+const PROBE_CAVEAT =
+  "Simulated from our servers with a labelled test user agent; sites that verify crawler IP addresses may treat the real bot differently.";
+
 const CMS_HINT =
   "On WordPress this lives in your SEO plugin (Yoast, Rank Math); on Wix, Squarespace and Shopify it's in each page's SEO settings.";
 
@@ -685,6 +689,230 @@ export const ISSUE_CATALOG = {
       "We couldn't find a phone number or email address anywhere in the HTML of the pages we read (text, links or schema). Contact forms and details added by JavaScript are invisible to many AI crawlers.",
     howToFix:
       "Add at least one contact method as plain text, ideally in the footer of every page, e.g. `<a href=\"mailto:hello@example.com\">hello@example.com</a>`.",
+  },
+  // geo.ai-crawler-probe (ADR-017). Every description carries the "simulated" caveat.
+  "geo.ai-crawler-probe:blocked-cloudflare": {
+    checkId: "geo.ai-crawler-probe",
+    category: "geo",
+    severity: "high",
+    effort: "quick",
+    title: "Cloudflare is blocking AI crawlers that your robots.txt allows",
+    description: `Requests labelled as AI crawlers were refused or challenged by Cloudflare, even though your robots.txt lets them in. ${PROBE_CAVEAT}`,
+    howToFix:
+      "In the Cloudflare dashboard for this domain, check Security → Bots (the \"Block AI bots\" / AI Scrapers and Crawlers setting and Bot Fight Mode), AI Crawl Control (allow the crawlers you want), and any Security → WAF custom rules that match these user agents. Menu names change over time; Cloudflare's docs list the current ones.",
+  },
+  "geo.ai-crawler-probe:blocked-vercel": {
+    checkId: "geo.ai-crawler-probe",
+    category: "geo",
+    severity: "high",
+    effort: "quick",
+    title: "Vercel Firewall is blocking AI crawlers that your robots.txt allows",
+    description: `Requests labelled as AI crawlers were refused or challenged by the Vercel Firewall, even though your robots.txt lets them in. ${PROBE_CAVEAT}`,
+    howToFix:
+      "In your Vercel project, open Firewall and check the bot rules (the managed AI bots rule set and Bot Protection; set them to Log or allow the crawlers you want), any custom rules that match these user agents, and whether Attack Challenge Mode is on.",
+  },
+  "geo.ai-crawler-probe:blocked-akamai": {
+    checkId: "geo.ai-crawler-probe",
+    category: "geo",
+    severity: "high",
+    effort: "moderate",
+    title: "Akamai is blocking AI crawlers that your robots.txt allows",
+    description: `Requests labelled as AI crawlers were refused by Akamai (an "Access Denied" page), even though your robots.txt lets them in. ${PROBE_CAVEAT}`,
+    howToFix:
+      "Ask whoever manages Akamai to check the Bot Manager / App & API Protector policy for this site: set the AI crawler bot category to Monitor or Allow for the crawlers you want, and review custom rules matching these user agents.",
+  },
+  "geo.ai-crawler-probe:blocked-sucuri": {
+    checkId: "geo.ai-crawler-probe",
+    category: "geo",
+    severity: "high",
+    effort: "quick",
+    title: "Sucuri's firewall is blocking AI crawlers that your robots.txt allows",
+    description: `Requests labelled as AI crawlers were refused by the Sucuri Website Firewall, even though your robots.txt lets them in. ${PROBE_CAVEAT}`,
+    howToFix:
+      "In the Sucuri Firewall dashboard, review Access Control (blocked user agents and allowlists) and the bot-protection settings, and allow the AI crawlers you want. Sucuri support can confirm which rule matched.",
+  },
+  "geo.ai-crawler-probe:blocked-wordfence": {
+    checkId: "geo.ai-crawler-probe",
+    category: "geo",
+    severity: "high",
+    effort: "quick",
+    title: "Wordfence is blocking AI crawlers that your robots.txt allows",
+    description: `Requests labelled as AI crawlers were refused by the Wordfence WordPress plugin, even though your robots.txt lets them in. ${PROBE_CAVEAT}`,
+    howToFix:
+      "In WordPress, open Wordfence → Firewall: check Blocking (custom pattern blocks on user agents) and the Rate Limiting rules for crawlers, and remove the rules that catch the AI crawlers you want.",
+  },
+  "geo.ai-crawler-probe:blocked-imperva": {
+    checkId: "geo.ai-crawler-probe",
+    category: "geo",
+    severity: "high",
+    effort: "moderate",
+    title: "Imperva is blocking AI crawlers that your robots.txt allows",
+    description: `Requests labelled as AI crawlers were refused by Imperva, even though your robots.txt lets them in. ${PROBE_CAVEAT}`,
+    howToFix:
+      "Ask whoever manages Imperva to review the site's Bot Protection / security rules and allow the AI crawlers you want (by their documented user agents and IP ranges).",
+  },
+  "geo.ai-crawler-probe:blocked-aws": {
+    checkId: "geo.ai-crawler-probe",
+    category: "geo",
+    severity: "high",
+    effort: "moderate",
+    title: "AWS (CloudFront / AWS WAF) is blocking AI crawlers that your robots.txt allows",
+    description: `Requests labelled as AI crawlers were refused at the AWS edge, even though your robots.txt lets them in. ${PROBE_CAVEAT}`,
+    howToFix:
+      "Ask your developer to check the AWS WAF web ACL on this CloudFront distribution or load balancer: in the Bot Control rule group, set the AI bot category to Count or Allow for the crawlers you want, and review custom rules matching these user agents.",
+  },
+  "geo.ai-crawler-probe:blocked-host": {
+    checkId: "geo.ai-crawler-probe",
+    category: "geo",
+    severity: "high",
+    effort: "moderate",
+    title: "Your host or firewall is blocking AI crawlers that your robots.txt allows",
+    description: `Requests labelled as AI crawlers were refused, even though your robots.txt lets them in, and we couldn't tell which service did it. ${PROBE_CAVEAT}`,
+    howToFix:
+      "Send your host a ticket like: \"Our robots.txt allows GPTBot, OAI-SearchBot, ChatGPT-User, ClaudeBot, PerplexityBot and bingbot, but requests with these user agents get refused (see the status codes in our audit). Please tell us which firewall or bot rule blocks them and allow these crawlers. They publish their IP ranges for verification.\"",
+  },
+  "geo.ai-crawler-probe:different-content": {
+    checkId: "geo.ai-crawler-probe",
+    category: "geo",
+    severity: "low",
+    effort: "moderate",
+    title: "AI crawlers get a much smaller page than visitors",
+    description: `Requests labelled as AI crawlers got a page much smaller than the one our own crawler received, which can mean a stripped-down or blocked version. ${PROBE_CAVEAT}`,
+    howToFix:
+      "Ask your developer whether the site or a plugin serves different content by user agent (bot detection, dynamic rendering, cookie walls) and make sure crawlers get the same main content as visitors.",
+  },
+  // ── T020 ──
+  "geo.snippet-eligibility:nosnippet": {
+    checkId: "geo.snippet-eligibility",
+    category: "geo",
+    severity: "high",
+    effort: "quick",
+    title: "Pages tell search engines not to show any snippet",
+    description:
+      "These pages carry `nosnippet` (or `max-snippet:0`) in a robots meta tag or X-Robots-Tag header. Google's documentation says a page must be eligible to be shown with a snippet to appear as a supporting link in AI Overviews or AI Mode, so these pages can't be. Being eligible doesn't guarantee being shown.",
+    howToFix:
+      "Remove `nosnippet` / `max-snippet:0` from the page's `<meta name=\"robots\">` tag (or the X-Robots-Tag header your server or SEO plugin sends), unless you deliberately want the page kept out of snippets and AI answers.",
+  },
+  "geo.snippet-eligibility:max-snippet": {
+    checkId: "geo.snippet-eligibility",
+    category: "geo",
+    severity: "medium",
+    effort: "quick",
+    title: "Snippet length is limited to a few characters",
+    description:
+      "A very low `max-snippet` value lets search engines quote only a few characters from these pages, which Google lists among the controls that limit what's shown from your pages in Search and its AI features. Google doesn't publish which values matter.",
+    howToFix:
+      "Remove the `max-snippet` directive or set it to `-1` (no limit), e.g. `<meta name=\"robots\" content=\"max-snippet:-1, max-image-preview:large\">`.",
+  },
+  "geo.snippet-eligibility:data-nosnippet-facts": {
+    checkId: "geo.snippet-eligibility",
+    category: "geo",
+    severity: "medium",
+    effort: "quick",
+    title: "Key facts are marked data-nosnippet",
+    description:
+      "Content inside `data-nosnippet` can't be shown in Google snippets or used as a snippet for its AI features. On these pages it wraps core facts such as prices, contact details, hours or the main description.",
+    howToFix:
+      "Remove the `data-nosnippet` attribute from elements that hold facts you want quoted; keep it only on things like cookie banners or legal boilerplate.",
+  },
+  "geo.snippet-eligibility:noarchive": {
+    checkId: "geo.snippet-eligibility",
+    category: "geo",
+    severity: "low",
+    effort: "quick",
+    title: "NOARCHIVE keeps pages out of Bing's AI answers",
+    description:
+      "Bing has documented that content tagged NOARCHIVE is not included in its chat answers (now Microsoft Copilot), while NOCACHE still allows the URL, title and snippet. This only affects Bing and Copilot.",
+    howToFix:
+      "Remove `noarchive` from the robots meta tag or X-Robots-Tag header, or replace it with `nocache` if you want Copilot to show only your title, link and snippet.",
+  },
+  "geo.review-signals:no-profiles": {
+    checkId: "geo.review-signals",
+    category: "geo",
+    severity: "low",
+    effort: "quick",
+    title: "Your site doesn't link to any review profiles",
+    description:
+      "We found no links to profiles on Google Business Profile, Trustpilot, G2, Capterra, Yelp, Tripadvisor, Justdial, Practo or similar sites. Some vendor studies associate review profiles with more AI citations; that evidence is mostly vendor-run and correlational. We don't read the review sites themselves.",
+    howToFix:
+      "Link your real review profiles from the footer or a \"Reviews\" page and add them to your Organization schema `sameAs`. In regulated fields (e.g. clinics in India) check the rules on soliciting reviews first.",
+  },
+  "geo.review-signals:schema-without-visible": {
+    checkId: "geo.review-signals",
+    category: "geo",
+    severity: "medium",
+    effort: "quick",
+    title: "Rating markup with no visible reviews",
+    description:
+      "These pages have AggregateRating or Review structured data, but we couldn't find reviews or ratings in the visible text. Markup that doesn't match the page is a mismatch risk: Google's review snippet guidelines require the reviews to be visible.",
+    howToFix:
+      "Either show the reviews and rating on the page (with reviewer names) or remove the AggregateRating/Review markup from it.",
+  },
+  "geo.review-signals:anonymous-testimonials": {
+    checkId: "geo.review-signals",
+    category: "geo",
+    severity: "low",
+    effort: "quick",
+    title: "Testimonials don't say who gave them",
+    description:
+      "Most testimonials we found have no named source. Quotes without a name, role or company are harder for people and AI tools to trust. Evidence that this changes AI recommendations is mostly vendor-run and correlational.",
+    howToFix:
+      "Add the person's name and context under each quote (with permission), e.g. `<blockquote>Fixed our boiler the same day.<cite>— Priya S., Leeds</cite></blockquote>`.",
+  },
+  "seo.bing-indexnow:not-verified": {
+    checkId: "seo.bing-indexnow",
+    category: "seo",
+    severity: "low",
+    effort: "quick",
+    title: "No sign your site is set up in Bing Webmaster Tools",
+    description:
+      "We didn't find Bing's verification tag (`msvalidate.01`) on your homepage. Bing's index is confirmed to feed Microsoft Copilot; whether it feeds other assistants isn't confirmed. Bing also allows verification by DNS or an XML file we can't see, so if you've verified another way, ignore this.",
+    howToFix:
+      "1) Sign in to Bing Webmaster Tools and add your site (you can import it from Google Search Console). 2) Submit your sitemap there. 3) Turn on IndexNow (many hosts and SEO plugins have a switch; otherwise host the key file Bing gives you and ping IndexNow when pages change). Then check the AI Performance report.",
+  },
+  "seo.bing-indexnow:stale-lastmod": {
+    checkId: "seo.bing-indexnow",
+    category: "seo",
+    severity: "low",
+    effort: "quick",
+    title: "Your sitemap says nothing has changed in months",
+    description:
+      "The newest `<lastmod>` date in your sitemap is more than 6 months old. Search engines, including Bing (which feeds Copilot), use it to decide what to recrawl.",
+    howToFix:
+      "Make your sitemap generator write the real last-modified date of each page (most CMSs and SEO plugins do this automatically), and resubmit the sitemap in Bing Webmaster Tools and Google Search Console.",
+  },
+  "seo.bing-indexnow:no-lastmod": {
+    checkId: "seo.bing-indexnow",
+    category: "seo",
+    severity: "low",
+    effort: "quick",
+    title: "Your sitemap has no lastmod dates",
+    description:
+      "Your sitemap doesn't say when pages last changed, so search engines (including Bing, which feeds Copilot) can't tell which pages to recrawl first.",
+    howToFix:
+      "Add `<lastmod>2026-11-20</lastmod>` (the real date) to each `<url>` entry; most CMSs and SEO plugins have a setting for it.",
+  },
+  "seo.soft-404:returns-200": {
+    checkId: "seo.soft-404",
+    category: "seo",
+    severity: "medium",
+    effort: "moderate",
+    title: "Missing pages return \"200 OK\" (soft 404)",
+    description:
+      "We requested a made-up address on your site and got a normal page with status 200 instead of 404. Search engines and AI agents can then treat broken links and junk URLs as real pages. We tested one URL only.",
+    howToFix:
+      "Configure your site or host to return HTTP status 404 for unknown URLs while still showing your friendly \"page not found\" page (in most frameworks: a not-found route; on WordPress: check your theme or a redirect plugin).",
+  },
+  "seo.soft-404:redirects-home": {
+    checkId: "seo.soft-404",
+    category: "seo",
+    severity: "low",
+    effort: "moderate",
+    title: "Missing pages redirect to your homepage",
+    description:
+      "A made-up address on your site redirected to the homepage instead of returning 404. Google treats this as a soft 404, and it hides broken links from you. We tested one URL only.",
+    howToFix:
+      "Return a 404 page for unknown URLs, and redirect only old URLs you know about to their closest real replacement (not all to the homepage).",
   },
   // geo.ai-clarity: an AI model read the site's text (contract v1.1). Copy describes how an AI
   // model reads the site, never what a specific assistant says.

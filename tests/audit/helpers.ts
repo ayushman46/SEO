@@ -70,6 +70,7 @@ export function goodHome(url = "https://acme.example.com/"): string {
       <meta property="og:image" content="https://acme.example.com/share.jpg">
       <meta property="og:site_name" content="Acme Plumbing">
       <meta name="author" content="Jane Acme">
+      <meta name="msvalidate.01" content="0123456789ABCDEF0123456789ABCDEF">
       <meta property="article:modified_time" content="2026-01-10">
       <script type="application/ld+json">{"@context":"https://schema.org","@graph":[
         {"@type":"Plumber","name":"Acme Plumbing","url":"https://acme.example.com/","logo":"https://acme.example.com/logo.png","sameAs":["https://facebook.com/acme"]},
@@ -91,6 +92,6 @@ export function goodHome(url = "https://acme.example.com/"): string {
         <img src="/van.jpg" alt="Acme Plumbing van">
         <img src="/divider.png" alt="">
       </main>
-      <footer><p>Call <a href="tel:+441134960000">0113 496 0000</a> or email <a href="mailto:hello@acme.example.com">hello@acme.example.com</a>.</p></footer>`,
+      <footer><p>Call <a href="tel:+441134960000">0113 496 0000</a> or email <a href="mailto:hello@acme.example.com">hello@acme.example.com</a>. <a href="https://uk.trustpilot.com/review/acme.example.com">Our reviews on Trustpilot</a></p></footer>`,
   });
 }

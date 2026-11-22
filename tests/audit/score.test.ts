@@ -133,7 +133,7 @@ describe("finalize → issues", () => {
       makeCtx({
         pages: [page(goodHome())],
         robots: "User-agent: *\nAllow: /",
-        sitemap: "<urlset><url><loc>https://acme.example.com/</loc></url></urlset>",
+        sitemap: `<urlset><url><loc>https://acme.example.com/</loc><lastmod>${new Date().toISOString().slice(0, 10)}</lastmod></url></urlset>`,
         llms: "# Acme\n",
       }),
     );

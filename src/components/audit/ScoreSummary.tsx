@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { AuditScores, Severity } from "@/lib/audit/types";
 import { auditResultCopy } from "@/content/audit";
 import { ScoreRing } from "@/components/ui/ScoreRing";
@@ -61,6 +62,14 @@ export function ScoreSummary({
               </li>
             ))}
           </ul>
+          <p className="mt-5 text-sm">
+            <Link
+              href="/methodology#scores"
+              className="rounded-sm text-accent-ink underline decoration-accent-ink/30 underline-offset-4 hover:decoration-accent-ink"
+            >
+              {auditUi.howWeScore}
+            </Link>
+          </p>
         </div>
       </div>
 

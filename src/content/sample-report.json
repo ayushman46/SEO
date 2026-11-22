@@ -1,0 +1,728 @@
+{
+  "id": "5a3e0c1d-7b2f-4c8e-9d41-0f6a2b8c9e13",
+  "version": 1,
+  "requestedUrl": "https://www.marigold-dental.example/",
+  "finalUrl": "https://www.marigold-dental.example/",
+  "hostname": "www.marigold-dental.example",
+  "startedAt": "2026-11-23T09:41:52.000Z",
+  "durationMs": 31480,
+  "scores": {
+    "overall": 77,
+    "seo": 86,
+    "geo": 85,
+    "performance": 44
+  },
+  "checks": [
+    {
+      "id": "seo.indexability",
+      "category": "seo",
+      "label": "Indexability",
+      "status": "pass",
+      "score": 1,
+      "weight": 15,
+      "summary": "6 of 6 pages can be indexed by search engines (status 200, no noindex)."
+    },
+    {
+      "id": "seo.https",
+      "category": "seo",
+      "label": "HTTPS",
+      "status": "pass",
+      "score": 1,
+      "weight": 10,
+      "summary": "Your site uses HTTPS and redirects http:// to https://."
+    },
+    {
+      "id": "seo.title",
+      "category": "seo",
+      "label": "Title tags",
+      "status": "warn",
+      "score": 0.867,
+      "weight": 12,
+      "summary": "4 of 6 pages have a unique title between 30 and 60 characters."
+    },
+    {
+      "id": "seo.meta-description",
+      "category": "seo",
+      "label": "Meta descriptions",
+      "status": "warn",
+      "score": 0.5,
+      "weight": 8,
+      "summary": "3 of 6 pages have a unique meta description between 70 and 160 characters."
+    },
+    {
+      "id": "seo.headings",
+      "category": "seo",
+      "label": "Headings",
+      "status": "pass",
+      "score": 1,
+      "weight": 7,
+      "summary": "6 of 6 pages have exactly one H1 and headings in order."
+    },
+    {
+      "id": "seo.canonical",
+      "category": "seo",
+      "label": "Canonical URLs",
+      "status": "pass",
+      "score": 1,
+      "weight": 6,
+      "summary": "6 of 6 pages have a single, absolute canonical URL on your own domain."
+    },
+    {
+      "id": "seo.robots-txt",
+      "category": "seo",
+      "label": "robots.txt",
+      "status": "pass",
+      "score": 1,
+      "weight": 8,
+      "summary": "robots.txt exists and lets search engines crawl your site."
+    },
+    {
+      "id": "seo.sitemap",
+      "category": "seo",
+      "label": "XML sitemap",
+      "status": "pass",
+      "score": 1,
+      "weight": 6,
+      "summary": "Sitemap found listing 6 URLs."
+    },
+    {
+      "id": "seo.viewport",
+      "category": "seo",
+      "label": "Mobile viewport",
+      "status": "pass",
+      "score": 1,
+      "weight": 7,
+      "summary": "6 of 6 pages are set up for mobile screens (width=device-width)."
+    },
+    {
+      "id": "seo.structured-data",
+      "category": "seo",
+      "label": "Structured data",
+      "status": "pass",
+      "score": 1,
+      "weight": 6,
+      "summary": "1 of 6 pages has valid JSON-LD (Dentist)."
+    },
+    {
+      "id": "seo.image-alt",
+      "category": "seo",
+      "label": "Image alt text",
+      "status": "warn",
+      "score": 0.5,
+      "weight": 5,
+      "summary": "50% of 12 images have alt text or are marked as decorative."
+    },
+    {
+      "id": "seo.open-graph",
+      "category": "seo",
+      "label": "Social sharing (Open Graph)",
+      "status": "fail",
+      "score": 0.167,
+      "weight": 4,
+      "summary": "1 of 6 pages has og:title, og:description and og:image."
+    },
+    {
+      "id": "seo.lang",
+      "category": "seo",
+      "label": "Language attribute",
+      "status": "pass",
+      "score": 1,
+      "weight": 3,
+      "summary": "6 of 6 pages declare a language on the <html> tag."
+    },
+    {
+      "id": "seo.bing-indexnow",
+      "category": "seo",
+      "label": "Bing & IndexNow readiness",
+      "status": "warn",
+      "score": 0.6,
+      "weight": 3,
+      "summary": "No Bing verification tag (msvalidate.01) on the homepage; newest sitemap lastmod 2026-09-14; no visible IndexNow reference (keys are usually private, so this is weak)."
+    },
+    {
+      "id": "seo.soft-404",
+      "category": "seo",
+      "label": "Missing pages return 404",
+      "status": "warn",
+      "score": 0.5,
+      "weight": 4,
+      "summary": "A made-up URL (/seenhq-check-7f3a9c2e) redirected to your homepage instead of returning 404."
+    },
+    {
+      "id": "geo.ai-crawlers",
+      "category": "geo",
+      "label": "AI crawler access",
+      "status": "warn",
+      "score": 0.833,
+      "weight": 20,
+      "summary": "9 of 10 major AI crawlers are allowed; 1 blocked (PerplexityBot)."
+    },
+    {
+      "id": "geo.organization-schema",
+      "category": "geo",
+      "label": "Business schema",
+      "status": "warn",
+      "score": 0.8,
+      "weight": 14,
+      "summary": "Dentist schema found but it's missing: logo or sameAs."
+    },
+    {
+      "id": "geo.answer-ready",
+      "category": "geo",
+      "label": "Answer-ready content",
+      "status": "pass",
+      "score": 1,
+      "weight": 15,
+      "summary": "Found 11 answer-style sections, a summary, lists/tables present."
+    },
+    {
+      "id": "geo.faq",
+      "category": "geo",
+      "label": "Questions & answers",
+      "status": "pass",
+      "score": 1,
+      "weight": 10,
+      "summary": "3 question-style headings found across your pages."
+    },
+    {
+      "id": "geo.entity-consistency",
+      "category": "geo",
+      "label": "Name consistency",
+      "status": "pass",
+      "score": 1,
+      "weight": 8,
+      "summary": "Your business name is consistent (Marigold Dental)."
+    },
+    {
+      "id": "geo.dates",
+      "category": "geo",
+      "label": "Freshness dates",
+      "status": "pass",
+      "score": 1,
+      "weight": 8,
+      "summary": "Published/updated dates found on 6 of 6 pages."
+    },
+    {
+      "id": "geo.author",
+      "category": "geo",
+      "label": "Author signals",
+      "status": "pass",
+      "score": 1,
+      "weight": 7,
+      "summary": "Author or owner information found on 6 of 6 pages."
+    },
+    {
+      "id": "geo.llms-txt",
+      "category": "geo",
+      "label": "llms.txt",
+      "status": "warn",
+      "score": 0,
+      "weight": 6,
+      "summary": "No /llms.txt file was found."
+    },
+    {
+      "id": "geo.content-format",
+      "category": "geo",
+      "label": "Menus, prices & hours as text",
+      "status": "warn",
+      "score": 0.6,
+      "weight": 5,
+      "summary": "Found 1 link to a menu, price list or similar PDF (we don't open PDFs or read images)."
+    },
+    {
+      "id": "geo.fact-consistency",
+      "category": "geo",
+      "label": "Consistent prices & contact details",
+      "status": "warn",
+      "score": 0.75,
+      "weight": 6,
+      "summary": "1 possible mismatch an AI model could quote: several phone numbers."
+    },
+    {
+      "id": "geo.raw-html-facts",
+      "category": "geo",
+      "label": "Facts readable without JavaScript",
+      "status": "pass",
+      "score": 1,
+      "weight": 8,
+      "summary": "Pages have readable text without JavaScript. Facts in the raw HTML: phone: in page text; email: in page text; address: in page text; hours: in page text; price: not found in raw HTML."
+    },
+    {
+      "id": "geo.snippet-eligibility",
+      "category": "geo",
+      "label": "Eligible for AI answers (snippet controls)",
+      "status": "pass",
+      "score": 1,
+      "weight": 8,
+      "summary": "No snippet restrictions found on 6 pages we read, so they stay eligible to be quoted."
+    },
+    {
+      "id": "geo.review-signals",
+      "category": "geo",
+      "label": "Review signals",
+      "status": "warn",
+      "score": 0.7,
+      "weight": 3,
+      "summary": "No links to review profiles found."
+    },
+    {
+      "id": "geo.ai-crawler-probe",
+      "category": "geo",
+      "label": "AI crawler access (live test)",
+      "status": "warn",
+      "score": 0.857,
+      "weight": 8,
+      "summary": "GPTBot, ClaudeBot were refused (Cloudflare) although robots.txt allows them. Simulated from our servers with a labelled test user agent; sites that verify crawler IP addresses may treat the real bot differently."
+    },
+    {
+      "id": "geo.ai-clarity",
+      "category": "geo",
+      "label": "AI readability of your business",
+      "status": "warn",
+      "score": 0.68,
+      "weight": 11,
+      "summary": "An AI model reading your site rated its clarity 68/100: 2 core facts are vague or missing, and 3 of 6 likely customer questions aren't fully answered."
+    },
+    {
+      "id": "performance.cwv",
+      "category": "performance",
+      "label": "Mobile speed (Core Web Vitals)",
+      "status": "fail",
+      "score": 0.44,
+      "weight": 1,
+      "summary": "Mobile performance score 44/100 (LCP 4.6 s, CLS 0.04, TBT 170 ms)."
+    }
+  ],
+  "issues": [
+    {
+      "id": "performance.cwv:slow",
+      "checkId": "performance.cwv",
+      "category": "performance",
+      "severity": "high",
+      "title": "Your site is slow on mobile",
+      "description": "Google's PageSpeed test rates your homepage's mobile performance poorly. Slow pages lose visitors and rank lower. Google's mobile score for your homepage is 44/100.",
+      "howToFix": "Start with the biggest wins: compress and resize images (use WebP/AVIF), remove unused plugins/apps and third-party scripts, and enable caching on your host or a CDN.",
+      "effort": "involved",
+      "impact": 7.5,
+      "affectedUrls": [
+        "https://www.marigold-dental.example/"
+      ]
+    },
+    {
+      "id": "performance.cwv:lcp",
+      "checkId": "performance.cwv",
+      "category": "performance",
+      "severity": "high",
+      "title": "The main content takes too long to appear",
+      "description": "Largest Contentful Paint (LCP) measures how long the biggest element (usually the hero image or headline) takes to show. Google wants under 2.5 seconds. Yours is 4.6 s.",
+      "howToFix": "Shrink and compress the hero image, serve it as WebP/AVIF, don't lazy-load it (`loading=\"eager\"` / `fetchpriority=\"high\"`), and cut render-blocking scripts and fonts.",
+      "effort": "moderate",
+      "impact": 3.7,
+      "affectedUrls": [
+        "https://www.marigold-dental.example/"
+      ]
+    },
+    {
+      "id": "geo.ai-crawlers:search-blocked",
+      "checkId": "geo.ai-crawlers",
+      "category": "geo",
+      "severity": "high",
+      "title": "AI search assistants are blocked from your site",
+      "description": "Your robots.txt blocks the bots that ChatGPT search, Perplexity or Claude use to look up live answers, so they can't read or recommend your pages. Blocked: PerplexityBot (Perplexity).",
+      "howToFix": "In `/robots.txt`, remove the `Disallow: /` lines for these bots, or allow them explicitly, e.g. `User-agent: OAI-SearchBot` / `Allow: /`. If a security plugin or CDN bot setting added the block, switch it off there.",
+      "effort": "quick",
+      "impact": 0.9,
+      "affectedUrls": []
+    },
+    {
+      "id": "seo.meta-description:missing",
+      "checkId": "seo.meta-description",
+      "category": "seo",
+      "severity": "medium",
+      "title": "Pages are missing a meta description",
+      "description": "The meta description is the short text under your link in search results. A good one gets more people to click.",
+      "howToFix": "Add a 70–160 character summary to each page, e.g. `<meta name=\"description\" content=\"Family-run bakery in Bristol baking sourdough daily. Order online for next-day pickup.\">`. On WordPress this lives in your SEO plugin (Yoast, Rank Math); on Wix, Squarespace and Shopify it's in each page's SEO settings.",
+      "effort": "quick",
+      "impact": 1.7,
+      "affectedUrls": [
+        "https://www.marigold-dental.example/treatments/invisalign/",
+        "https://www.marigold-dental.example/about/",
+        "https://www.marigold-dental.example/contact/"
+      ]
+    },
+    {
+      "id": "seo.image-alt:missing",
+      "checkId": "seo.image-alt",
+      "category": "seo",
+      "severity": "medium",
+      "title": "Images are missing alt text",
+      "description": "Alt text describes an image for Google Images, AI tools and people using screen readers. Without it, your images are invisible to them. 6 of 12 images have no alt attribute.",
+      "howToFix": "Add a short description to each meaningful image, e.g. `<img src=\"cake.jpg\" alt=\"Three-tier lemon wedding cake\">`. For purely decorative images use `alt=\"\"`. Site builders have an \"Alt text\" field in each image's settings.",
+      "effort": "moderate",
+      "impact": 1.1,
+      "affectedUrls": [
+        "https://www.marigold-dental.example/",
+        "https://www.marigold-dental.example/treatments/",
+        "https://www.marigold-dental.example/treatments/invisalign/",
+        "https://www.marigold-dental.example/about/"
+      ]
+    },
+    {
+      "id": "geo.organization-schema:incomplete",
+      "checkId": "geo.organization-schema",
+      "category": "geo",
+      "severity": "medium",
+      "title": "Your business schema is missing key details",
+      "description": "AI assistants match your business across the web using its name, website, logo and social profiles. Missing fields make that harder. Missing: logo or sameAs.",
+      "howToFix": "Fill in `name`, `url`, and `logo` and/or `sameAs` (links to your Google Business Profile, Facebook, LinkedIn, Instagram, etc.) in your Organization/LocalBusiness JSON-LD.",
+      "effort": "quick",
+      "impact": 0.7,
+      "affectedUrls": [
+        "https://www.marigold-dental.example/"
+      ]
+    },
+    {
+      "id": "seo.title:duplicate",
+      "checkId": "seo.title",
+      "category": "seo",
+      "severity": "medium",
+      "title": "Several pages share the same title",
+      "description": "When pages have identical titles, Google can't tell which one to show and they end up competing with each other.",
+      "howToFix": "Make each title describe that specific page, e.g. `Pricing | Acme` and `About us | Acme` instead of `Acme` everywhere.",
+      "effort": "quick",
+      "impact": 0.7,
+      "affectedUrls": [
+        "https://www.marigold-dental.example/about/",
+        "https://www.marigold-dental.example/contact/"
+      ]
+    },
+    {
+      "id": "geo.content-format:pdf-only",
+      "checkId": "geo.content-format",
+      "category": "geo",
+      "severity": "medium",
+      "title": "Your menu or price list is a PDF",
+      "description": "You link to a menu, price list, brochure or timetable as a PDF. Some AI systems can read PDFs, but many skip them or quote them badly, and PDFs go stale. We don't open the PDF, so if the same details are already on a page as text you can ignore this. PDF links found: \"Download our price list (PDF)\".",
+      "howToFix": "Put the key details on a normal web page as text and keep the PDF as a download, e.g. `<h2>Menu</h2><h3>Starters</h3><ul><li>Soup of the day: £6</li></ul><p><a href=\"/menu.pdf\">Download the menu (PDF)</a></p>`.",
+      "effort": "moderate",
+      "impact": 0.5,
+      "affectedUrls": [
+        "https://www.marigold-dental.example/fees/"
+      ]
+    },
+    {
+      "id": "geo.ai-clarity:unanswered-questions",
+      "checkId": "geo.ai-clarity",
+      "category": "geo",
+      "severity": "medium",
+      "title": "Your site doesn't answer common customer questions",
+      "description": "An AI model listed questions real customers ask about a business like yours and couldn't find full answers on your pages. Not fully answered: \"How much does a check-up cost at Marigold Dental?\"; \"Does Marigold Dental see emergency patients?\"; \"Can I spread the cost of treatment?\".",
+      "howToFix": "Answer each listed question on your site in 2–3 plain sentences, e.g. in an FAQ section with the question as a heading. The drafted \"about\" paragraph in your full report is a good first answer.",
+      "effort": "moderate",
+      "impact": 0.4,
+      "affectedUrls": []
+    },
+    {
+      "id": "geo.fact-consistency:phones",
+      "checkId": "geo.fact-consistency",
+      "category": "geo",
+      "severity": "medium",
+      "title": "Different phone numbers across your site",
+      "description": "We found more than one phone number in your phone links and schema. AI assistants may give customers the wrong one. Call-tracking numbers and separate department lines are common causes; if every number is current and labelled, this is fine. We found 2 different phone numbers in links and schema (01134960418, 01134960952).",
+      "howToFix": "Pick one main number, use it in your header, footer, `tel:` links and Organization/LocalBusiness schema `telephone`, and label any others (e.g. \"Sales\", \"Support\").",
+      "effort": "quick",
+      "impact": 0.4,
+      "affectedUrls": []
+    },
+    {
+      "id": "geo.ai-crawler-probe:blocked-cloudflare",
+      "checkId": "geo.ai-crawler-probe",
+      "category": "geo",
+      "severity": "medium",
+      "title": "Cloudflare is blocking AI crawlers that your robots.txt allows",
+      "description": "Requests labelled as AI crawlers were refused or challenged by Cloudflare, even though your robots.txt lets them in. Simulated from our servers with a labelled test user agent; sites that verify crawler IP addresses may treat the real bot differently. Refused by Cloudflare (server: cloudflare / cf-ray): GPTBot, ClaudeBot got 403 on /, /treatments/, /fees/, /robots.txt, while robots.txt allows them and our own crawler got a normal response.",
+      "howToFix": "In the Cloudflare dashboard for this domain, check Security → Bots (the \"Block AI bots\" / AI Scrapers and Crawlers setting and Bot Fight Mode), AI Crawl Control (allow the crawlers you want), and any Security → WAF custom rules that match these user agents. Menu names change over time; Cloudflare's docs list the current ones.",
+      "effort": "quick",
+      "impact": 0.3,
+      "affectedUrls": [
+        "https://www.marigold-dental.example/",
+        "https://www.marigold-dental.example/treatments/",
+        "https://www.marigold-dental.example/fees/",
+        "https://www.marigold-dental.example/robots.txt"
+      ]
+    },
+    {
+      "id": "geo.llms-txt:missing",
+      "checkId": "geo.llms-txt",
+      "category": "geo",
+      "severity": "low",
+      "title": "No llms.txt file",
+      "description": "llms.txt is an emerging, optional standard: a short plain-text guide to your site written for AI tools. It's cheap to add and helps AI assistants find your key pages.",
+      "howToFix": "Create `/llms.txt` starting with `# Your Business Name`, a one-line summary in `> quotes`, then a list of your most important pages as `- [Page name](https://…): what it covers`.",
+      "effort": "quick",
+      "impact": 1.5,
+      "affectedUrls": []
+    },
+    {
+      "id": "seo.open-graph:incomplete",
+      "checkId": "seo.open-graph",
+      "category": "seo",
+      "severity": "low",
+      "title": "Social sharing previews are incomplete",
+      "description": "Open Graph tags control the title, text and image shown when your link is shared on Facebook, LinkedIn, WhatsApp or Slack. Missing tags mean plain or random previews. Missing: og:title (5 pages), og:description (5 pages), og:image (5 pages).",
+      "howToFix": "Add to each page's `<head>`: `<meta property=\"og:title\" content=\"…\">`, `<meta property=\"og:description\" content=\"…\">` and `<meta property=\"og:image\" content=\"https://…/share.jpg\">` (1200×630 px works well). Most SEO plugins have a \"Social\" tab for this.",
+      "effort": "quick",
+      "impact": 1.4,
+      "affectedUrls": [
+        "https://www.marigold-dental.example/treatments/",
+        "https://www.marigold-dental.example/treatments/invisalign/",
+        "https://www.marigold-dental.example/fees/",
+        "https://www.marigold-dental.example/about/",
+        "https://www.marigold-dental.example/contact/"
+      ]
+    },
+    {
+      "id": "seo.soft-404:redirects-home",
+      "checkId": "seo.soft-404",
+      "category": "seo",
+      "severity": "low",
+      "title": "Missing pages redirect to your homepage",
+      "description": "A made-up address on your site redirected to the homepage instead of returning 404. Google treats this as a soft 404, and it hides broken links from you. We tested one URL only.",
+      "howToFix": "Return a 404 page for unknown URLs, and redirect only old URLs you know about to their closest real replacement (not all to the homepage).",
+      "effort": "moderate",
+      "impact": 0.9,
+      "affectedUrls": [
+        "https://www.marigold-dental.example/seenhq-check-7f3a9c2e"
+      ]
+    },
+    {
+      "id": "seo.bing-indexnow:not-verified",
+      "checkId": "seo.bing-indexnow",
+      "category": "seo",
+      "severity": "low",
+      "title": "No sign your site is set up in Bing Webmaster Tools",
+      "description": "We didn't find Bing's verification tag (`msvalidate.01`) on your homepage. Bing's index is confirmed to feed Microsoft Copilot; whether it feeds other assistants isn't confirmed. Bing also allows verification by DNS or an XML file we can't see, so if you've verified another way, ignore this.",
+      "howToFix": "1) Sign in to Bing Webmaster Tools and add your site (you can import it from Google Search Console). 2) Submit your sitemap there. 3) Turn on IndexNow (many hosts and SEO plugins have a switch; otherwise host the key file Bing gives you and ping IndexNow when pages change). Then check the AI Performance report.",
+      "effort": "quick",
+      "impact": 0.5,
+      "affectedUrls": []
+    },
+    {
+      "id": "geo.ai-clarity:contact",
+      "checkId": "geo.ai-clarity",
+      "category": "geo",
+      "severity": "low",
+      "title": "How to contact you isn't clear",
+      "description": "An AI model reading your site couldn't find a clear way to contact or book you, so it can't pass one on to a customer. It's mentioned, but only vaguely or partly.",
+      "howToFix": "Show your phone number, email or booking link as plain text in the header or footer of every page (not only inside an image or form), and add `telephone` / `email` to your Organization schema.",
+      "effort": "quick",
+      "impact": 0.2,
+      "affectedUrls": []
+    },
+    {
+      "id": "geo.ai-clarity:pricing",
+      "checkId": "geo.ai-clarity",
+      "category": "geo",
+      "severity": "low",
+      "title": "Your pricing isn't clear",
+      "description": "\"How much does it cost?\" is one of the most common questions people ask AI assistants. An AI model reading your site couldn't find prices or how pricing works. It's mentioned, but only vaguely or partly.",
+      "howToFix": "Add a pricing page or section with typical prices, a \"from\" price, or how quotes work (e.g. \"Boiler service from £79, fixed price\"). Link it from your main menu.",
+      "effort": "moderate",
+      "impact": 0.2,
+      "affectedUrls": []
+    },
+    {
+      "id": "geo.ai-clarity:proof",
+      "checkId": "geo.ai-clarity",
+      "category": "geo",
+      "severity": "low",
+      "title": "Little proof or reason to choose you",
+      "description": "An AI model reading your site found few reviews, credentials or reasons to pick you over alternatives, which are what answers to \"who is the best…\" draw on.",
+      "howToFix": "Add a few real testimonials, ratings, certifications or years in business to your homepage, plus one or two sentences on what makes you different.",
+      "effort": "moderate",
+      "impact": 0.2,
+      "affectedUrls": []
+    },
+    {
+      "id": "geo.review-signals:no-profiles",
+      "checkId": "geo.review-signals",
+      "category": "geo",
+      "severity": "low",
+      "title": "Your site doesn't link to any review profiles",
+      "description": "We found no links to profiles on Google Business Profile, Trustpilot, G2, Capterra, Yelp, Tripadvisor, Justdial, Practo or similar sites. Some vendor studies associate review profiles with more AI citations; that evidence is mostly vendor-run and correlational. We don't read the review sites themselves.",
+      "howToFix": "Link your real review profiles from the footer or a \"Reviews\" page and add them to your Organization schema `sameAs`. In regulated fields (e.g. clinics in India) check the rules on soliciting reviews first.",
+      "effort": "quick",
+      "impact": 0.2,
+      "affectedUrls": []
+    }
+  ],
+  "pages": [
+    {
+      "url": "https://www.marigold-dental.example/",
+      "statusCode": 200,
+      "title": "Marigold Dental | Family & Cosmetic Dentist in Leeds",
+      "metaDescription": "Friendly family dentist in Headingley, Leeds. Check-ups, hygiene, white fillings, whitening and Invisalign. New NHS and private patients welcome.",
+      "h1Count": 1,
+      "wordCount": 150,
+      "indexable": true,
+      "issueCount": 5
+    },
+    {
+      "url": "https://www.marigold-dental.example/treatments/",
+      "statusCode": 200,
+      "title": "Dental Treatments in Leeds | Marigold Dental",
+      "metaDescription": "Check-ups, hygiene, white fillings, crowns, teeth whitening and Invisalign at Marigold Dental in Headingley, Leeds. See what each treatment involves.",
+      "h1Count": 1,
+      "wordCount": 157,
+      "indexable": true,
+      "issueCount": 3
+    },
+    {
+      "url": "https://www.marigold-dental.example/treatments/invisalign/",
+      "statusCode": 200,
+      "title": "Invisalign Clear Aligners in Leeds | Marigold Dental",
+      "metaDescription": null,
+      "h1Count": 1,
+      "wordCount": 140,
+      "indexable": true,
+      "issueCount": 3
+    },
+    {
+      "url": "https://www.marigold-dental.example/fees/",
+      "statusCode": 200,
+      "title": "Private & NHS Dental Fees | Marigold Dental",
+      "metaDescription": "Private and NHS dental fees at Marigold Dental in Headingley, Leeds. Download our full price list or ask about spreading the cost of treatment.",
+      "h1Count": 1,
+      "wordCount": 74,
+      "indexable": true,
+      "issueCount": 3
+    },
+    {
+      "url": "https://www.marigold-dental.example/about/",
+      "statusCode": 200,
+      "title": "Marigold Dental | Dentist in Headingley, Leeds",
+      "metaDescription": null,
+      "h1Count": 1,
+      "wordCount": 84,
+      "indexable": true,
+      "issueCount": 4
+    },
+    {
+      "url": "https://www.marigold-dental.example/contact/",
+      "statusCode": 200,
+      "title": "Marigold Dental | Dentist in Headingley, Leeds",
+      "metaDescription": null,
+      "h1Count": 1,
+      "wordCount": 80,
+      "indexable": true,
+      "issueCount": 3
+    }
+  ],
+  "coreWebVitals": {
+    "source": "pagespeed-insights",
+    "strategy": "mobile",
+    "performanceScore": 44,
+    "lcpMs": 4620,
+    "cls": 0.04,
+    "inpMs": null,
+    "fcpMs": 2240,
+    "tbtMs": 170
+  },
+  "truncated": false,
+  "notes": [],
+  "ai": {
+    "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+    "readback": "Marigold Dental is an independent family and cosmetic dental practice in Headingley, Leeds, offering check-ups, hygiene, white fillings, teeth whitening and Invisalign for children and adults. It is welcoming new private patients and has limited NHS places for children.",
+    "businessType": "local dental practice",
+    "facts": [
+      {
+        "key": "what",
+        "label": "What you do",
+        "value": "Independent dental practice offering check-ups, hygiene, white fillings, crowns, teeth whitening and Invisalign.",
+        "status": "clear"
+      },
+      {
+        "key": "who-for",
+        "label": "Who it is for",
+        "value": "Children and adults in Headingley; new private patients and limited NHS places for children.",
+        "status": "clear"
+      },
+      {
+        "key": "where",
+        "label": "Where you are",
+        "value": "3 Marigold Lane, Headingley, Leeds LS6 2QA",
+        "status": "clear"
+      },
+      {
+        "key": "pricing",
+        "label": "Pricing",
+        "value": "Private fees are said to be published, but only in a downloadable PDF; NHS treatment at national bands.",
+        "status": "vague"
+      },
+      {
+        "key": "contact",
+        "label": "How to contact you",
+        "value": "Phone 0113 496 0418 in the footer, but 0113 496 0952 on the contact page; email hello@marigold-dental.example.",
+        "status": "vague"
+      },
+      {
+        "key": "proof",
+        "label": "Proof",
+        "value": null,
+        "status": "missing"
+      },
+      {
+        "key": "differentiator",
+        "label": "What makes you different",
+        "value": "Unhurried appointments and an independent, local team.",
+        "status": "vague"
+      }
+    ],
+    "questions": [
+      {
+        "question": "Is Marigold Dental taking new patients?",
+        "answered": "yes",
+        "sourceUrl": "https://www.marigold-dental.example/",
+        "note": "The homepage says new private patients are welcome and there are limited NHS places for children."
+      },
+      {
+        "question": "How much does a check-up cost at Marigold Dental?",
+        "answered": "no",
+        "sourceUrl": null,
+        "note": "Prices are only in a PDF price list, so no fee appears in the page text."
+      },
+      {
+        "question": "Does Marigold Dental offer Invisalign, and how long does it take?",
+        "answered": "yes",
+        "sourceUrl": "https://www.marigold-dental.example/treatments/invisalign/",
+        "note": "The Invisalign page says most adult cases take six to eighteen months."
+      },
+      {
+        "question": "What are Marigold Dental's opening hours?",
+        "answered": "yes",
+        "sourceUrl": "https://www.marigold-dental.example/contact/",
+        "note": "Hours are listed on the contact page and in the footer."
+      },
+      {
+        "question": "Does Marigold Dental see emergency patients?",
+        "answered": "no",
+        "sourceUrl": null,
+        "note": "No page mentions emergency or same-day appointments."
+      },
+      {
+        "question": "Can I spread the cost of treatment?",
+        "answered": "partly",
+        "sourceUrl": "https://www.marigold-dental.example/fees/",
+        "note": "The fees page invites you to ask about spreading the cost but gives no plan, deposit or terms."
+      }
+    ],
+    "drafts": {
+      "title": "Family Dentist in Headingley, Leeds | Marigold Dental",
+      "metaDescription": "Independent family dentist in Headingley, Leeds: check-ups, hygiene, white fillings, whitening and Invisalign. New private patients welcome. Call 0113 496 0418.",
+      "llmsTxt": "# Marigold Dental\n\n> Independent family and cosmetic dental practice in Headingley, Leeds, offering check-ups, hygiene, white fillings, teeth whitening and Invisalign for children and adults.\n\nAddress: 3 Marigold Lane, Headingley, Leeds LS6 2QA. Phone: 0113 496 0418. Email: hello@marigold-dental.example. Open Mon to Fri 8:30am to 6pm, Sat 9am to 1pm.\n\n## Pages\n\n- [Treatments](https://www.marigold-dental.example/treatments/): check-ups, hygiene, fillings, whitening and Invisalign\n- [Invisalign](https://www.marigold-dental.example/treatments/invisalign/): how clear aligners work and how long they take\n- [Fees](https://www.marigold-dental.example/fees/): private and NHS fees\n- [About us](https://www.marigold-dental.example/about/): the team and the practice\n- [Contact](https://www.marigold-dental.example/contact/): address, phone, opening hours\n",
+      "organizationJsonLd": "{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"Dentist\",\n  \"name\": \"Marigold Dental\",\n  \"url\": \"https://www.marigold-dental.example/\",\n  \"telephone\": \"0113 496 0418\",\n  \"email\": \"hello@marigold-dental.example\",\n  \"address\": {\n    \"@type\": \"PostalAddress\",\n    \"streetAddress\": \"3 Marigold Lane, Headingley\",\n    \"addressLocality\": \"Leeds\",\n    \"postalCode\": \"LS6 2QA\",\n    \"addressCountry\": \"GB\"\n  },\n  \"openingHours\": [\n    \"Mo-Fr 08:30-18:00\",\n    \"Sa 09:00-13:00\"\n  ],\n  \"availableService\": [\n    \"Dental check-ups\",\n    \"Dental hygiene\",\n    \"White fillings\",\n    \"Teeth whitening\",\n    \"Invisalign\"\n  ]\n}",
+      "answerParagraph": "Marigold Dental is an independent dental practice at 3 Marigold Lane in Headingley, Leeds. It offers check-ups, hygiene visits, white fillings, crowns, teeth whitening and Invisalign clear aligners for children and adults. The practice is open Monday to Friday 8:30am to 6pm and Saturday 9am to 1pm, and new private patients can book by calling 0113 496 0418."
+    },
+    "clarityScore": 68
+  }
+}

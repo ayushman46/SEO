@@ -3,11 +3,11 @@ import type { PageCopy } from "./types";
 export const auditPage = {
   metaTitle: "Free SEO and GEO audit for your website",
   metaDescription:
-    "Check your website for Google and AI answer engines in about a minute. Get SEO, GEO and performance scores plus a ranked list of fixes, for free.",
+    "Free check for Google and AI answer engines: SEO, GEO and speed scores, an AI model's reading of your pages and a ranked fix list, in about a minute.",
   kicker: "Free audit",
   title: "How does your site look to search and AI?",
   intro:
-    "Enter your website address. seenhq checks your homepage and up to five key pages for SEO, GEO and mobile performance, then scores them and ranks what to fix first.",
+    "Enter your website address. seenhq checks your homepage and up to five key pages for SEO, GEO and mobile performance, has a language model read them to see how clearly they describe your business, then scores everything and ranks what to fix first.",
 } satisfies PageCopy;
 
 export const auditForm = {
@@ -25,6 +25,7 @@ export const auditProgressSteps = [
   "Reading robots.txt and sitemap",
   "Scanning pages",
   "Asking PageSpeed",
+  "Running the AI reading",
   "Scoring",
 ] as const;
 
@@ -99,3 +100,111 @@ export const auditFlowCopy = {
 } as const;
 
 export type AuditErrorCopyKey = keyof typeof auditErrors;
+
+/* ---------- AI reading (T017) ---------- */
+
+export const auditAiCopy = {
+  partialTitle: "How an AI model reads your site",
+  fullTitle: "AI reading",
+  honesty:
+    "Read by an open-weight language model hosted on NVIDIA. This is how one AI model reads your pages, not what ChatGPT or Gemini say about you.",
+  modelLabel: "Model",
+  unavailable: "AI reading wasn't available for this run. Your scores don't depend on it.",
+  readbackLabel: "What it understood from your pages",
+  businessTypeLabel: "Business type",
+  clarityLabel: "Clarity",
+  clarityHint:
+    "How clearly your pages state the basics customers ask about. We calculate it from the facts and questions below; the model doesn't pick it.",
+  factsTitle: "Key facts",
+  factsIntro: "The seven things an AI model needs to describe you correctly.",
+  factNotFound: "Not found on your site",
+  questionsTitle: "Customer questions",
+  questionsIntro: "Questions a real customer might ask an AI assistant about you, and whether your pages answer them.",
+  answeredOn: "Answered on",
+  lockedTitle: "Unlocks with your email",
+  lockedQuestions: (n: number) => `${n} more customer ${n === 1 ? "question" : "questions"}`,
+  lockedDraft: (label: string) => `${label}, ready to paste`,
+  lockedCta: "Unlock the full report",
+  draftsTitle: "Ready-to-paste drafts",
+  draftsIntro: "Written only from facts found on your pages. Check every fact before you publish.",
+  noDrafts: "Nothing to draft this time: what you have already reads well, or there wasn't enough on your pages to write from.",
+  copy: "Copy",
+  copied: "Copied",
+  copyFailed: "Couldn't copy. Select the text and copy it by hand.",
+} as const;
+
+export const auditFactStatusLabels = { clear: "Clear", vague: "Vague", missing: "Missing" } as const;
+
+export const auditAnsweredLabels = { yes: "Answered", partly: "Partly answered", no: "Not answered" } as const;
+
+/** Draft names and one line on where each one goes. Keys match AiDrafts in src/lib/audit/types.ts. */
+export const auditDraftCopy = {
+  title: { label: "Title tag", where: "Replace the text inside the <title> tag in your homepage's <head>." },
+  metaDescription: {
+    label: "Meta description",
+    where: 'Use as the content of <meta name="description"> in your homepage\'s <head>.',
+  },
+  llmsTxt: { label: "llms.txt", where: "Save as a plain-text file at the root of your site, so it loads at /llms.txt." },
+  organizationJsonLd: {
+    label: "Organization schema (JSON-LD)",
+    where: 'Paste inside a <script type="application/ld+json"> tag in your homepage\'s <head>.',
+  },
+  answerParagraph: {
+    label: "Answer-ready About paragraph",
+    where: "Place near the top of your homepage or About page, directly under the main heading.",
+  },
+} as const;
+
+export const auditExportCopy = {
+  title: "Hand it to whoever builds your site",
+  helper:
+    "Copy every issue as Markdown tickets with an acceptance test each, or as one prompt you can paste into a coding agent such as Claude Code or Cursor.",
+  copyTickets: "Copy as developer tickets",
+  copyPrompt: "Copy as one prompt for a coding agent",
+  download: "Download .md",
+  copiedTickets: "Developer tickets copied.",
+  copiedPrompt: "Coding agent prompt copied.",
+  downloaded: "Tickets downloaded.",
+  copyFailed: "Couldn't copy. Try Download .md instead.",
+} as const;
+
+/**
+ * Instant quote in the audit report (T022). Prices, the tax note and the confirm note come from
+ * src/lib/quote (QUOTE_TEXT, buildQuote); this is only the wording around them.
+ * Rules: no urgency, no discounts, no pre-selected extras, no loss estimates.
+ */
+export const auditQuoteCopy = {
+  title: "Your fixed quote",
+  intro: "What it would cost for us to fix what this audit found, worked out from the issues above. You can also fix everything yourself: every issue has the steps.",
+  currencyLabel: "Currency",
+  currencyUsd: "USD $",
+  currencyInr: "India ₹",
+  covers: "Covers",
+  totalLabel: "Total",
+  perLocation: "per location",
+  alternativeTitle: "Want a person to look first?",
+  diyTitle: "You can fix these yourself for free",
+  diyEmpty: "None of these issues is a quick do-it-yourself fix.",
+  ignoreTitle: "Safe to ignore for now",
+  ignoreEmpty: "Nothing here is safe to leave.",
+  noLines: "Nothing in this report needs paid help.",
+  request: "Request this fix",
+  requestMany: "Request these fixes",
+  requestAlternative: "Request the full audit",
+  diy: "I'll fix it myself",
+  // per issue
+  fixMyself: "Fix it myself",
+  haveUsFix: (priceText: string) => `Have us fix this · ${priceText}`,
+  /** screen-reader name after "Copy": "Copy as a ticket: <issue title>" */
+  copyTicket: "as a ticket",
+  // tray
+  trayTitle: "Your fix list",
+  trayCount: (n: number) => `${n} ${n === 1 ? "issue" : "issues"} picked`,
+  trayClear: "Clear list",
+  trayAdded: (title: string, n: number, total: string) => `Added "${title}" to your fix list. ${n} ${n === 1 ? "issue" : "issues"}, ${total}.`,
+  trayRemoved: (title: string, n: number) => `Removed "${title}" from your fix list. ${n} ${n === 1 ? "issue" : "issues"} left.`,
+  trayCleared: "Fix list cleared.",
+  /** sample report: the same panel, pointing to the audit instead of an order */
+  sampleRequest: "Run this on your own site",
+  sampleNote: "This quote is for the fictional sample site. Run the audit on your own site for yours.",
+} as const;

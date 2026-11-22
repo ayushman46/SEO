@@ -1,18 +1,44 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useActionState, useEffect, useRef, type ReactNode } from "react";
+import {
+  Suspense,
+  useActionState,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
 import { useSearchParams } from "next/navigation";
 import { submitContact } from "@/app/actions/contact";
 // type-only: keeps zod out of the client bundle
-import type { ContactField, ContactFormState } from "@/app/actions/contact-schema";
-import { contactBudgetOptions, contactForm, contactServiceOptions } from "@/content/contact";
+import type {
+  ContactField,
+  ContactFormState,
+} from "@/app/actions/contact-schema";
+import {
+  contactBudgetOptions,
+  contactForm,
+  contactNextSteps,
+  contactQuoteCopy,
+  contactServiceOptions,
+} from "@/content/contact";
+import {
+  QUOTE_CHANGE_EVENT,
+  clearStoredQuote,
+  parseStoredQuote,
+  readStoredQuoteRaw,
+  type StoredQuote,
+} from "@/components/audit/quote/handoff";
 import { Button, buttonClass } from "@/components/ui/Button";
 import { cx } from "@/components/ui/cx";
 import { Field, describedBy } from "@/components/ui/Field";
 import { Icon } from "@/components/ui/Icon";
 import { Input } from "@/components/ui/Input";
 import { PlaceholderText } from "@/components/ui/PlaceholderText";
+import { QuoteAttachment } from "./QuoteAttachment";
 
 const F = contactForm.fields;
 const ORDER: ContactField[] = [
@@ -98,11 +124,15 @@ function SelectField({ field, options, defaultValue, error, required }: SelectPr
 
 /** Reads ?service= (client-side, inside Suspense, so the page stays static under Cache Components). */
 function ServiceFromUrl(
-  props: Omit<SelectProps, "field" | "options" | "defaultValue"> & { restored?: string },
+  props: Omit<SelectProps, "field" | "options" | "defaultValue"> & {
+    restored?: string;
+    fromQuote?: string;
+  },
 ) {
   const params = useSearchParams();
   const q = params.get("service") ?? "";
-  const preset = props.restored ?? (SERVICE_VALUES.has(q) ? q : "");
+  const fromQuote = props.fromQuote && SERVICE_VALUES.has(props.fromQuote) ? props.fromQuote : "";
+  const preset = props.restored ?? (fromQuote || (SERVICE_VALUES.has(q) ? q : ""));
   return (
     <SelectField
       field="service"
@@ -122,6 +152,45 @@ function RequiredMark() {
       </span>
       <span className="sr-only"> (required)</span>
     </>
+  );
+}
+
+function subscribeQuote(onChange: () => void) {
+  window.addEventListener(QUOTE_CHANGE_EVENT, onChange);
+  window.addEventListener("storage", onChange);
+  return () => {
+    window.removeEventListener(QUOTE_CHANGE_EVENT, onChange);
+    window.removeEventListener("storage", onChange);
+  };
+}
+
+/** The quote carried over from the audit report (sessionStorage), or null. Null on the server. */
+function useStoredQuote(): StoredQuote | null {
+  const raw = useSyncExternalStore(subscribeQuote, readStoredQuoteRaw, () => null);
+  return useMemo(() => parseStoredQuote(raw), [raw]);
+}
+
+/** "What happens next" after a successful send. */
+function NextSteps({
+  steps,
+}: {
+  steps: { title: string; steps: readonly { title: string; body: string }[] };
+}) {
+  return (
+    <div className="mt-8 border-t border-line pt-7">
+      <h3 className="text-[0.9375rem] font-semibold text-ink">{steps.title}</h3>
+      <ol className="mt-4 grid gap-5 sm:grid-cols-3">
+        {steps.steps.map((st, i) => (
+          <li key={st.title} className="min-w-0">
+            <span aria-hidden className="font-serif text-lg text-muted tabular-nums">
+              {String(i + 1).padStart(2, "0")}
+            </span>
+            <p className="mt-1 text-[0.9375rem] font-medium text-ink">{st.title}</p>
+            <p className="mt-1 text-sm leading-relaxed text-pretty text-muted">{st.body}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
   );
 }
 
@@ -157,6 +226,10 @@ export function ContactForm({ honeypotName }: { honeypotName: string }) {
   );
   const bannerRef = useRef<HTMLDivElement>(null);
   const successRef = useRef<HTMLHeadingElement>(null);
+  const stored = useStoredQuote();
+  // Remembered at submit time: the stored quote is cleared once the message is sent.
+  const [sentWithQuote, setSentWithQuote] = useState(false);
+  const [quoteNote, setQuoteNote] = useState("");
 
   const failed = state && !state.ok ? state : null;
   const errors = failed?.fieldErrors ?? {};
@@ -169,6 +242,7 @@ export function ContactForm({ honeypotName }: { honeypotName: string }) {
   useEffect(() => {
     if (!state) return;
     if (state.ok) {
+      clearStoredQuote();
       successRef.current?.focus();
       return;
     }
@@ -182,7 +256,7 @@ export function ContactForm({ honeypotName }: { honeypotName: string }) {
     <div>
       {/* short status text only: always present so the change is announced; the panel below gets focus */}
       <div role="status" aria-live="polite" className="sr-only">
-        {state?.ok ? contactForm.success.title : ""}
+        {state?.ok ? contactForm.success.title : quoteNote}
       </div>
 
       {state?.ok ? (
@@ -200,6 +274,7 @@ export function ContactForm({ honeypotName }: { honeypotName: string }) {
           <p className="mt-4 max-w-lg text-[1.0625rem] leading-relaxed text-pretty text-muted">
             <PlaceholderText value={contactForm.success.body} />
           </p>
+          <NextSteps steps={sentWithQuote ? contactQuoteCopy.nextSteps : contactNextSteps} />
           <div className="mt-8">
             <Button href={contactForm.success.cta.href} icon="arrow-right">
               {contactForm.success.cta.label}
@@ -211,6 +286,7 @@ export function ContactForm({ honeypotName }: { honeypotName: string }) {
       {state?.ok ? null : (
         <form
           action={formAction}
+          onSubmit={() => setSentWithQuote(stored !== null)}
           noValidate
           aria-labelledby="contact-form-title"
           className="relative rounded-panel bg-white p-5 shadow-paper sm:p-8 lg:p-10"
@@ -240,6 +316,17 @@ export function ContactForm({ honeypotName }: { honeypotName: string }) {
                   : failed.message || contactForm.errors.generic}
               </p>
             </div>
+          ) : null}
+
+          {stored ? (
+            <QuoteAttachment
+              quote={stored}
+              onRemove={() => {
+                clearStoredQuote();
+                setQuoteNote(contactQuoteCopy.removed);
+                document.getElementById(id("message"))?.focus();
+              }}
+            />
           ) : null}
 
           <p className="mb-6 text-sm text-muted">
@@ -364,7 +451,13 @@ export function ContactForm({ honeypotName }: { honeypotName: string }) {
                 />
               }
             >
-              <ServiceFromUrl restored={values.service} error={err("service")} />
+              <ServiceFromUrl
+                // remount once the stored quote is read after hydration, so its service is preselected
+                key={stored ? "quote" : "plain"}
+                restored={values.service}
+                fromQuote={stored?.service}
+                error={err("service")}
+              />
             </Suspense>
 
             <SelectField
@@ -387,13 +480,18 @@ export function ContactForm({ honeypotName }: { honeypotName: string }) {
               className="sm:col-span-2"
             >
               <textarea
+                // remount once the stored quote is read after hydration, so the prefill applies
+                key={stored ? "quote" : "plain"}
                 id={id("message")}
                 name="message"
                 required
                 rows={6}
                 maxLength={4000}
                 placeholder={F.message.placeholder}
-                defaultValue={values.message}
+                defaultValue={
+                  values.message ??
+                  (stored ? contactQuoteCopy.message(stored.summary.site) : undefined)
+                }
                 aria-invalid={err("message") ? true : undefined}
                 aria-describedby={describedBy(id("message"), {
                   help: F.message.help,

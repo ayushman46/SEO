@@ -219,3 +219,29 @@ export const pricingIndiaComparison = {
 /** Short note under the rupee tier grid. */
 export const pricingNoteInr =
   "Prices are in Indian rupees for businesses in India. Fix sprints are quoted in rupees by email before any work starts, and you pay nothing until you agree to the quote.";
+
+/* ------------------------------------------------------------------ */
+/* Pricing page repairs (T022, research change 11). Additive.          */
+/* ------------------------------------------------------------------ */
+
+/** Taxes line shown next to the tier grids. */
+export const pricingTaxNote = "Prices exclude applicable taxes. We show the total including tax in writing before you pay.";
+
+/** "What happens after you order": three short steps under the tiers. */
+export const pricingOrderSteps = {
+  title: "What happens after you order",
+  steps: [
+    {
+      title: "You get a quote",
+      body: "Instantly from your free audit report, or by email after you tell us about your site.",
+    },
+    {
+      title: "A person confirms it",
+      body: "Fixed prices stay fixed. Where a price is a starting price, we confirm the final number within 1 business day.",
+    },
+    {
+      title: "Work starts when you agree",
+      body: "You pay nothing until you accept the quote in writing.",
+    },
+  ],
+} as const;

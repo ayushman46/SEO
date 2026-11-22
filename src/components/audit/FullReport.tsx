@@ -3,10 +3,15 @@ import type { AuditResult, CoreWebVitals, PageSummary } from "@/lib/audit/types"
 import { auditResultCopy } from "@/content/audit";
 import { Badge } from "@/components/ui/Badge";
 import { cx } from "@/components/ui/cx";
+import { auditAiCopy, auditQuoteCopy } from "@/content/audit";
+import { toTicketsMarkdown } from "@/lib/audit/export";
+import { AiFullSection, AiUnavailableNote } from "./AiReading";
 import { CheckGrid } from "./CheckGrid";
+import { ExportBar } from "./ExportBar";
 import { displayUrl, formatMetric, formatNumber, groupIssues, rateMetric, safeHref, type MetricKey, type Rating } from "./format";
 import { IssueCard } from "./IssueCard";
 import { auditUi } from "./labels";
+import { QuotePanel } from "./quote/QuotePanel";
 
 const ratingTone: Record<Rating, string> = {
   good: "bg-pass-soft text-pass",
@@ -180,10 +185,13 @@ export function FullReport({
   result,
   headingRef,
   headingId,
+  badgeLabel = auditUi.fullReportUnlocked,
 }: {
   result: AuditResult;
   headingRef?: Ref<HTMLHeadingElement>;
   headingId: string;
+  /** status line above the title; /sample-report passes its own */
+  badgeLabel?: string;
 }) {
   const groups = groupIssues(result.issues);
   const ids = {
@@ -192,10 +200,16 @@ export function FullReport({
     pages: `${headingId}-pages`,
     checks: `${headingId}-checks`,
     notes: `${headingId}-notes`,
+    ai: `${headingId}-ai`,
+    export: `${headingId}-export`,
+    quote: `${headingId}-quote`,
   };
+  const ai = result.ai ?? null;
   const hasNotes = result.notes.length > 0 || result.truncated;
   const toc = [
     { id: ids.issues, label: auditUi.allIssuesTitle, count: result.issues.length },
+    ...(result.issues.length ? [{ id: ids.quote, label: auditQuoteCopy.title }] : []),
+    ...(ai ? [{ id: ids.ai, label: auditAiCopy.fullTitle }] : []),
     { id: ids.cwv, label: auditUi.cwvTitle },
     { id: ids.pages, label: auditUi.pagesTitle, count: result.pages.length },
     { id: ids.checks, label: auditUi.checksTitle, count: result.checks.length },
@@ -206,11 +220,12 @@ export function FullReport({
     <section aria-labelledby={headingId} className="grid gap-10 lg:grid-cols-[12rem_minmax(0,1fr)] lg:gap-14 xl:grid-cols-[14rem_minmax(0,1fr)]">
       <div className="lg:col-span-2">
         <Badge tone="pass" dot>
-          {auditUi.fullReportUnlocked}
+          {badgeLabel}
         </Badge>
         <h3 id={headingId} ref={headingRef} tabIndex={-1} className="mt-4 font-serif text-display-sm text-ink scroll-mt-28 rounded-sm focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">
           {auditUi.fullReportTitle}
         </h3>
+        <ExportBar result={result} headingId={ids.export} className="mt-6" />
       </div>
 
       <nav aria-label={auditUi.fullReportTitle} className="hidden lg:block">
@@ -257,7 +272,12 @@ export function FullReport({
                         <ul className="space-y-3">
                           {s.issues.map((issue) => (
                             <li key={issue.id}>
-                              <IssueCard issue={issue} hostname={result.hostname} headingLevel={6} />
+                              <IssueCard
+                                issue={issue}
+                                hostname={result.hostname}
+                                headingLevel={6}
+                                ticket={toTicketsMarkdown({ ...result, issues: [issue] })}
+                              />
                             </li>
                           ))}
                         </ul>
@@ -269,6 +289,19 @@ export function FullReport({
             );
           })}
         </div>
+
+        {result.issues.length ? <QuotePanel headingId={ids.quote} diyHref={`#${ids.issues}`} headingLevel={4} /> : null}
+
+        {ai ? (
+          <div>
+            <SubHeading id={ids.ai}>{auditAiCopy.fullTitle}</SubHeading>
+            <div className="mt-5">
+              <AiFullSection ai={ai} hostname={result.hostname} idPrefix={ids.ai} />
+            </div>
+          </div>
+        ) : (
+          <AiUnavailableNote className="rounded-xl bg-white px-4 py-3 shadow-[inset_0_0_0_1px_var(--color-line)]" />
+        )}
 
         <div>
           <SubHeading id={ids.cwv}>{auditUi.cwvTitle}</SubHeading>

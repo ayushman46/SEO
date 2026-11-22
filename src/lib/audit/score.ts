@@ -28,6 +28,8 @@ export const CHECK_WEIGHTS: Record<string, number> = {
   "seo.image-alt": 5, // image search + accessibility
   "seo.open-graph": 4, // social previews, indirect
   "seo.lang": 3, // small hygiene signal
+  "seo.soft-404": 4, // T020: junk URLs returning 200 waste crawl budget and mislead agents (one request)
+  "seo.bing-indexnow": 3, // T020: Bing feeds Copilot; weak, partly invisible signals → low, never "fail"
 
   // ── GEO ── (can AI assistants read, understand and quote the site?)
   "geo.ai-crawlers": 20, // blocked AI search bots = no AI visibility at all
@@ -41,6 +43,9 @@ export const CHECK_WEIGHTS: Record<string, number> = {
   "geo.raw-html-facts": 8, // T016: JS-only shells hide everything from non-rendering AI crawlers
   "geo.fact-consistency": 6, // T016: struck/hidden/conflicting facts get quoted; noisy signals → modest
   "geo.content-format": 5, // T016: key facts only in images/PDFs; we can't read them, so modest
+  "geo.snippet-eligibility": 8, // T020: nosnippet/max-snippet/data-nosnippet remove pages from AI Overviews eligibility
+  "geo.review-signals": 3, // T020: correlational, vendor-run evidence → low
+  "geo.ai-crawler-probe": 8, // T016: live labelled-UA probe; firewall blocks hide the site from AI despite robots.txt
   "geo.ai-clarity": 11, // LLM reading of the site (≈11% of GEO); "unavailable" without a key → excluded
 
   // ── Performance ── (single PSI-backed check)

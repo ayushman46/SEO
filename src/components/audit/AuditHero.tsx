@@ -1,5 +1,7 @@
 import Image from "next/image";
+import Link from "next/link";
 import { auditPage } from "@/content/audit";
+import { sampleReportLinks } from "@/content/sample-report";
 import { TornFrame } from "@/components/collage/TornFrame";
 import { tornRect } from "@/components/collage/torn";
 import { Container } from "@/components/ui/Container";
@@ -53,8 +55,19 @@ export function AuditHero() {
           {auditPage.title}
         </h1>
         <p className="mx-auto mt-6 max-w-2xl text-[1.0625rem] leading-relaxed text-pretty text-muted sm:text-lg">{auditPage.intro}</p>
-        <p className="mt-4 text-xs text-muted">
-          {u.label} <time dateTime={u.iso}>{u.display}</time>
+        <p className="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-muted">
+          <span>
+            {u.label} <time dateTime={u.iso}>{u.display}</time>
+          </span>
+          <span aria-hidden className="text-line-strong">
+            ·
+          </span>
+          <Link
+            href={sampleReportLinks.href}
+            className="rounded-sm text-sm font-medium text-accent-ink underline decoration-accent-ink/30 underline-offset-4 hover:decoration-accent-ink"
+          >
+            {sampleReportLinks.hero}
+          </Link>
         </p>
       </Container>
     </header>

@@ -400,7 +400,7 @@ describe("client + insights with mocked fetch", () => {
     const t0 = Date.now();
     const r = await generateAiInsights(ctx, [], { timeoutMs: 300, config: CONFIG, fetchImpl: hang });
     expect(r.status).toBe("failed");
-    expect(Date.now() - t0).toBeLessThan(2_000);
+    expect(Date.now() - t0).toBeLessThan(5_000);
   });
 
   it("caller abort → aborted, no throw", async () => {

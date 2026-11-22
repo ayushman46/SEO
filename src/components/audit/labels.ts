@@ -28,11 +28,21 @@ export const auditUi = {
   noTopIssues: "We found no issues worth flagging on the pages we checked.",
   lockedHint: "Unlock with your email to see the details and fixes.",
   checksTitle: "Checks",
-  checkStatus: { pass: "Pass", warn: "Needs work", fail: "Fail", unavailable: "Not checked" },
-  checkCounts: (pass: number, warn: number, fail: number) =>
-    `${pass} passed · ${warn} need work · ${fail} failed`,
+  checkStatus: { pass: "Pass", warn: "Needs work", fail: "Fail", unavailable: "Not run" },
+  checkCounts: (pass: number, warn: number, fail: number, notRun = 0) =>
+    `${pass} passed · ${warn} need work · ${fail} failed${notRun > 0 ? ` · ${notRun} not run` : ""}`,
+  otherChecks: "Other",
+  /** Used only when the engine sends an empty label (new checks keep working before copy lands). */
+  checkLabelFallback: {
+    "geo.ai-clarity": "AI clarity",
+    "geo.content-format": "Facts as plain text",
+    "geo.fact-consistency": "Consistent facts",
+    "geo.raw-html-facts": "Facts without JavaScript",
+    "geo.ai-crawler-probe": "AI crawler access test",
+  } as Record<string, string>,
   fullReportTitle: "Full report",
   fullReportUnlocked: "Unlocked. Every issue and every fix is below.",
+  howWeScore: "How we score",
   allIssuesTitle: "All issues",
   categoryIssues: (label: string, n: number) => `${label} issues (${n})`,
   noIssues: "No issues found in this category.",
@@ -71,6 +81,7 @@ export const auditUi = {
   retryIn: (mins: number, at: string) =>
     mins <= 1 ? `You can try again in about a minute (around ${at}).` : `You can try again in about ${mins} minutes (around ${at}).`,
   unlockRateLimited: "Too many unlock attempts. Please wait a little before trying again.",
+  lockedPrefix: "Locked:",
   privacyLinkText: "privacy policy",
   opensInNewTab: "(opens in a new tab)",
 } as const;

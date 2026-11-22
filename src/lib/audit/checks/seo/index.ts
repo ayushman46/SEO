@@ -8,6 +8,7 @@ import { langCheck } from "./lang";
 import { metaDescriptionCheck } from "./meta-description";
 import { openGraphCheck } from "./open-graph";
 import { robotsTxtCheck } from "./robots-txt";
+import { bingIndexNowCheck } from "./bing-indexnow";
 import { sitemapCheck } from "./sitemap";
 import { structuredDataCheck } from "./structured-data";
 import { titleCheck } from "./title";
@@ -27,4 +28,5 @@ export const SEO_CHECKS: Check[] = [
   imageAltCheck,
   openGraphCheck,
   langCheck,
+  bingIndexNowCheck,
 ];

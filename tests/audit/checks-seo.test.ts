@@ -24,7 +24,7 @@ describe("a well-built site passes every SEO check", () => {
     const ctx = makeCtx({
       pages: [page(goodHome())],
       robots: "User-agent: *\nAllow: /\nSitemap: https://acme.example.com/sitemap.xml",
-      sitemap: `<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${HOME}</loc></url></urlset>`,
+      sitemap: `<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${HOME}</loc><lastmod>${new Date().toISOString().slice(0, 10)}</lastmod></url></urlset>`,
     });
     for (const check of SEO_CHECKS) {
       const o = check(ctx);

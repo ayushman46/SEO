@@ -4,6 +4,8 @@ import { answerReadyCheck } from "./answer-ready";
 import { contentFormatCheck } from "./content-format";
 import { factConsistencyCheck } from "./fact-consistency";
 import { rawHtmlFactsCheck } from "./raw-html-facts";
+import { reviewSignalsCheck } from "./review-signals";
+import { snippetEligibilityCheck } from "./snippet-eligibility";
 import { authorCheck } from "./author";
 import { datesCheck } from "./dates";
 import { entityConsistencyCheck } from "./entity-consistency";
@@ -23,4 +25,6 @@ export const GEO_CHECKS: Check[] = [
   contentFormatCheck,
   factConsistencyCheck,
   rawHtmlFactsCheck,
+  snippetEligibilityCheck,
+  reviewSignalsCheck,
 ];

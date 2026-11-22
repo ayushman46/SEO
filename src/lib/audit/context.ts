@@ -102,3 +102,44 @@ export function plural(n: number, one: string, many?: string): string {
 export type AiPhase =
   | { status: "ok"; insights: AiInsights; local: boolean }
   | { status: "skipped" | "failed"; reason: "no_key" | "no_time" | "aborted" | "error" };
+
+/* ── Crawler probe (T016 C, ADR-017) ── */
+
+export type ProbeTargetKind = "page" | "robots" | "llms";
+
+export interface ProbeTarget {
+  url: string;
+  kind: ProbeTargetKind;
+  /** status the crawler (seenhqbot) got for this URL */
+  baselineStatus: number | null;
+  /** body size the crawler got (chars), when known */
+  baselineSize: number | null;
+}
+
+export interface ProbeResponse {
+  method: "HEAD" | "GET";
+  status: number;
+  headers: Record<string, string>;
+  /** first part of the body (GET only, capped) */
+  body: string;
+  size: number;
+}
+
+export interface BotProbe {
+  /** robots.txt product token, e.g. "GPTBot" */
+  bot: string;
+  url: string;
+  kind: ProbeTargetKind;
+  /** null = not tested (time ran out, network error) */
+  response: ProbeResponse | null;
+}
+
+export type CrawlerProbe =
+  | { status: "ok"; targets: ProbeTarget[]; probes: BotProbe[]; skippedByRobots: { bot: string; url: string }[] }
+  | { status: "inconclusive"; baselineStatus: number }
+  | { status: "skipped"; reason: "not_run" | "no_time" | "aborted" | "error" };
+
+/* ── Soft-404 probe (T020 N6) ── */
+export type Soft404Probe =
+  | { status: "ok"; url: string; statusCode: number; location: string | null; title: string | null }
+  | { status: "skipped"; reason: "not_run" | "no_time" | "aborted" | "error" | "robots" };

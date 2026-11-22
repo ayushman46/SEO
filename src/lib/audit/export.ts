@@ -34,6 +34,11 @@ export const ACCEPTANCE_TESTS: Record<string, string> = {
   "geo.content-format": "Menu, price, hours and service details are present as HTML text (not only in images or PDFs).",
   "geo.fact-consistency": "No crossed-out or hidden prices; one current value for each phone, email, address and opening hours across pages and schema; footer year is current.",
   "geo.raw-html-facts": "`curl -s <url>` (no JavaScript) returns the main text plus phone/email and other core facts as visible text.",
+  "geo.snippet-eligibility": "No page has nosnippet, max-snippet below 50 or noarchive in its robots meta tag or X-Robots-Tag header, and no prices, contact details, hours or main description sit inside data-nosnippet.",
+  "geo.review-signals": "The site links to its real review profiles, any AggregateRating/Review markup matches reviews visible on the same page, and testimonials name their source.",
+  "seo.bing-indexnow": "The homepage has the msvalidate.01 tag (or the site is verified in Bing Webmaster Tools another way), the sitemap has current lastmod dates and IndexNow is enabled.",
+  "seo.soft-404": "Requesting a made-up URL such as /this-page-does-not-exist returns HTTP 404 (or 410), not 200 or a redirect to the homepage.",
+  "geo.ai-crawler-probe": "Requests with each AI crawler's user agent get the same status (200) and content as a normal crawler on the homepage, robots.txt and key pages.",
   "geo.ai-clarity": "The homepage states in plain text what the business does, who it is for, where it operates, pricing and how to contact it.",
   "performance.cwv": "PageSpeed Insights (mobile) scores 90+ with LCP < 2.5 s, CLS < 0.1 and TBT < 200 ms.",
 };

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { auditEmailGate } from "@/content/audit";
+import { sampleReportLinks } from "@/content/sample-report";
 import type { AuditResult } from "@/lib/audit/types";
 import { Button } from "@/components/ui/Button";
 import { cx } from "@/components/ui/cx";
@@ -195,6 +196,20 @@ export function EmailGate({
           <PrivacyNote />
         </p>
       </form>
+
+      {/* New tab: the audit result only lives in this page's memory, so leaving it would lose it. */}
+      <p className="mt-6 border-t border-line pt-5 text-sm">
+        <a
+          href={sampleReportLinks.href}
+          target="_blank"
+          rel="noopener"
+          className="inline-flex items-center gap-1.5 rounded-sm font-medium text-accent-ink underline decoration-accent-ink/30 underline-offset-4 hover:decoration-accent-ink"
+        >
+          {sampleReportLinks.gate}
+          <Icon name="arrow-up-right" size={14} className="shrink-0" />
+          <span className="sr-only"> {auditUi.opensInNewTab}</span>
+        </a>
+      </p>
     </section>
   );
 }

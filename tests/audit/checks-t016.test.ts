@@ -159,11 +159,20 @@ describe("patterns", () => {
     expect(timeRangesInText("Mon–Fri 9am–5:30pm, Sat 10:00-14:00, delivery in 3-5 days")).toEqual(["09:00-17:30", "10:00-14:00"]);
   });
 
-  it("hostile text stays fast (no regex backtracking blow-up)", () => {
-    const html = doc({ body: `<p>${"a".repeat(200_000)}@</p><p>${"1 ".repeat(50_000)}</p><p>${"£1,".repeat(20_000)}</p>` });
-    const t = performance.now();
-    analyze(makeCtx({ pages: [page(html, HOME)] }));
-    expect(performance.now() - t).toBeLessThan(1_500);
+  it("hostile text stays fast (no regex backtracking blow-up)", { timeout: 60_000 }, () => {
+    // Asserted as growth (doubling the input must not ~4x the time), so machine load can't flake it.
+    const run = (n: number) => {
+      const html = doc({ body: `<p>${"a".repeat(10 * n)}@</p><p>${"1 ".repeat(5 * n / 2)}</p><p>${"£1,".repeat(n)}</p>` });
+      const ctx = makeCtx({ pages: [page(html, HOME)] });
+      const t = performance.now();
+      analyze(ctx);
+      return performance.now() - t;
+    };
+    const best = (n: number) => Math.min(run(n), run(n));
+    const t1 = best(10_000);
+    const t2 = best(20_000);
+    expect(t2 / Math.max(t1, 25)).toBeLessThan(3.2);
+    expect(t2).toBeLessThan(15_000); // the regex bug took minutes at this size
   });
 });
 

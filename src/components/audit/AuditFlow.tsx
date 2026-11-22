@@ -1,6 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useId, useRef, useState, type FormEvent, type ReactNode, type RefObject } from "react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type FormEvent,
+  type ReactNode,
+  type RefObject,
+} from "react";
 import { auditForm, auditResultCopy } from "@/content/audit";
 import type { AuditResult, PartialAuditReport } from "@/lib/audit/types";
 import { SectionTear } from "@/components/collage/SectionTear";
@@ -9,6 +19,7 @@ import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { IssueRow } from "@/components/ui/IssueRow";
 import { requestAudit, toFlowError, type FlowError } from "./api";
+import { AiPartialCard } from "./AiReading";
 import { AuditForm } from "./AuditForm";
 import { CheckGrid } from "./CheckGrid";
 import { EmailGate } from "./EmailGate";
@@ -18,6 +29,9 @@ import { FullReport } from "./FullReport";
 import { IssueCard } from "./IssueCard";
 import { auditUi } from "./labels";
 import { ProgressSteps } from "./ProgressSteps";
+import { FixTray } from "./quote/FixTray";
+import { QuotePanel } from "./quote/QuotePanel";
+import { QuoteProvider } from "./quote/QuoteContext";
 import { ScoreSummary } from "./ScoreSummary";
 
 /** The API allows ~60 s; give the network a little headroom before calling it a timeout. */
@@ -30,22 +44,38 @@ type FlowState =
   | { status: "idle" }
   | { status: "running"; url: string; run: number }
   | { status: "error"; url: string; error: FlowError }
-  | { status: "report"; url: string; partial: PartialAuditReport; sealed: string; full: AuditResult | null };
+  | {
+      status: "report";
+      url: string;
+      partial: PartialAuditReport;
+      sealed: string;
+      full: AuditResult | null;
+    };
 
 /**
  * The free-audit flow: URL form -> progress -> partial report -> email gate -> full report.
  * The sealed report and the result live only in this component's state.
  * `children` is shown below the form while idle (server-rendered explainer).
  */
-export function AuditFlow({ initialUrl = "", children }: { initialUrl?: string; children?: ReactNode }) {
+export function AuditFlow({
+  initialUrl = "",
+  children,
+}: {
+  initialUrl?: string;
+  children?: ReactNode;
+}) {
   const uid = useId();
   const initial = initialUrl.trim().slice(0, 2048);
   const initialValid = initial !== "" && looksLikeUrl(initial);
 
   const [value, setValue] = useState(initial);
-  const [fieldError, setFieldError] = useState<string | null>(initial && !initialValid ? auditForm.invalidInput : null);
+  const [fieldError, setFieldError] = useState<string | null>(
+    initial && !initialValid ? auditForm.invalidInput : null,
+  );
   // With a valid ?url= the server already renders the progress state, so auto-start causes no layout shift.
-  const [state, setState] = useState<FlowState>(initialValid ? { status: "running", url: initial, run: 0 } : { status: "idle" });
+  const [state, setState] = useState<FlowState>(
+    initialValid ? { status: "running", url: initial, run: 0 } : { status: "idle" },
+  );
   const [announcement, setAnnouncement] = useState("");
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -81,7 +111,13 @@ export function AuditFlow({ initialUrl = "", children }: { initialUrl?: string; 
       if (out.ok) {
         focusNext.current = "results";
         setAnnouncement(auditUi.resultsReady);
-        setState({ status: "report", url, partial: out.data.partial, sealed: out.data.sealed, full: null });
+        setState({
+          status: "report",
+          url,
+          partial: out.data.partial,
+          sealed: out.data.sealed,
+          full: null,
+        });
       } else if (out.error.code === "invalid_url") {
         focusNext.current = "input";
         setFieldError(out.error.message);
@@ -169,7 +205,9 @@ export function AuditFlow({ initialUrl = "", children }: { initialUrl?: string; 
     setAnnouncement(auditUi.fullReady);
     // Drop the sealed blob once it has served its purpose.
     // Only attach to the report it was unlocked for (a newer audit may have replaced it meanwhile).
-    setState((s) => (s.status === "report" && s.partial.id === result.id ? { ...s, sealed: "", full: result } : s));
+    setState((s) =>
+      s.status === "report" && s.partial.id === result.id ? { ...s, sealed: "", full: result } : s,
+    );
   }, []);
 
   const narrow = "mx-auto w-full max-w-2xl";
@@ -202,7 +240,12 @@ export function AuditFlow({ initialUrl = "", children }: { initialUrl?: string; 
       {state.status === "running" ? (
         <Container size="narrow" className="mt-10 min-h-[min(40rem,80svh)] pb-24">
           <div className={narrow}>
-            <ProgressSteps key={state.run} url={state.url} onCancel={cancel} onAnnounce={setAnnouncement} />
+            <ProgressSteps
+              key={state.run}
+              url={state.url}
+              onCancel={cancel}
+              onAnnounce={setAnnouncement}
+            />
           </div>
         </Container>
       ) : null}
@@ -255,70 +298,102 @@ function Report({
 }) {
   const finalHref = safeHref(partial.finalUrl);
   const pages = full ? full.pages.length : partial.pagesScanned;
+  // Before the email: top issues in full plus the locked titles (enough for the quote).
+  const quoteIssues = useMemo(
+    () => (full ? full.issues : [...partial.topIssues, ...partial.lockedIssues]),
+    [full, partial.topIssues, partial.lockedIssues],
+  );
+  const quoteAudit = useMemo(
+    () => ({ id: partial.id, url: partial.finalUrl, hostname: partial.hostname }),
+    [partial.id, partial.finalUrl, partial.hostname],
+  );
 
   return (
-    <section aria-labelledby={headingId} className="mt-16 sm:mt-20">
-      <SectionTear color="var(--color-paper)" seed={6} grain />
-      <div className="paper-grain bg-paper pt-8 pb-20 sm:pt-12 sm:pb-28">
-        <Container>
-          {/* Report header */}
-          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div className="min-w-0">
-              <h2
-                id={headingId}
-                ref={resultsHeadingRef}
-                tabIndex={-1}
-                className="scroll-mt-28 rounded-sm focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
-              >
-                <span className="mb-3 flex items-center gap-2.5 text-kicker font-semibold text-muted uppercase">
-                  <span aria-hidden className="h-px w-6 bg-ink/30" />
-                  {auditUi.reportFor}
-                </span>
-                <span className="block font-serif text-display-md text-ink [overflow-wrap:anywhere]">{partial.hostname}</span>
-              </h2>
-            </div>
-            <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted">
-              {finalHref ? (
-                <a
-                  href={finalHref}
-                  target="_blank"
-                  rel="noopener noreferrer nofollow"
-                  className="max-w-full truncate rounded-sm text-accent-ink underline decoration-accent-ink/30 underline-offset-4 hover:decoration-accent-ink"
+    <QuoteProvider issues={quoteIssues} pagesScanned={pages} audit={quoteAudit}>
+      <section aria-labelledby={headingId} className="mt-16 sm:mt-20">
+        <SectionTear color="var(--color-paper)" seed={6} grain />
+        <div className="paper-grain bg-paper pt-8 pb-20 sm:pt-12 sm:pb-28">
+          <Container>
+            {/* Report header */}
+            <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+              <div className="min-w-0">
+                <h2
+                  id={headingId}
+                  ref={resultsHeadingRef}
+                  tabIndex={-1}
+                  className="scroll-mt-28 rounded-sm focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
                 >
-                  {partial.finalUrl}
-                  <span className="sr-only"> {auditUi.opensInNewTab}</span>
-                </a>
-              ) : null}
-              {finalHref ? (
+                  <span className="mb-3 flex items-center gap-2.5 text-kicker font-semibold text-muted uppercase">
+                    <span aria-hidden className="h-px w-6 bg-ink/30" />
+                    {auditUi.reportFor}
+                  </span>
+                  <span className="block font-serif text-display-md text-ink [overflow-wrap:anywhere]">
+                    {partial.hostname}
+                  </span>
+                </h2>
+              </div>
+              <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted">
+                {finalHref ? (
+                  <a
+                    href={finalHref}
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                    className="max-w-full truncate rounded-sm text-accent-ink underline decoration-accent-ink/30 underline-offset-4 hover:decoration-accent-ink"
+                  >
+                    {partial.finalUrl}
+                    <span className="sr-only"> {auditUi.opensInNewTab}</span>
+                  </a>
+                ) : null}
+                {finalHref ? (
+                  <span aria-hidden className="text-line-strong">
+                    ·
+                  </span>
+                ) : null}
+                <span>{auditUi.pagesScanned(pages)}</span>
                 <span aria-hidden className="text-line-strong">
                   ·
                 </span>
-              ) : null}
-              <span>{auditUi.pagesScanned(pages)}</span>
-              <span aria-hidden className="text-line-strong">·</span>
-              <span>{auditUi.seconds(partial.durationMs)}</span>
-            </p>
-          </div>
-
-          {partial.truncated && !full ? (
-            <p className="mt-6 rounded-xl bg-medium-soft px-4 py-3 text-sm leading-relaxed text-medium">{auditResultCopy.truncatedNote}</p>
-          ) : null}
-
-          <ScoreSummary scores={partial.scores} issueCounts={partial.issueCounts} className="mt-8" />
-
-          {full ? (
-            <div className="mt-16 sm:mt-20">
-              <FullReport result={full} headingId={`${headingId}-full`} headingRef={fullHeadingRef} />
+                <span>{auditUi.seconds(partial.durationMs)}</span>
+              </p>
             </div>
-          ) : (
-            <PartialBody headingId={headingId} partial={partial} sealed={sealed} onUnlocked={onUnlocked} onRestart={onRestart} />
-          )}
 
-          <NextSteps headingId={`${headingId}-next`} onReset={onReset} />
-        </Container>
-      </div>
-      <SectionTear color="var(--color-paper)" seed={10} flip grain />
-    </section>
+            {partial.truncated && !full ? (
+              <p className="mt-6 rounded-xl bg-medium-soft px-4 py-3 text-sm leading-relaxed text-medium">
+                {auditResultCopy.truncatedNote}
+              </p>
+            ) : null}
+
+            <ScoreSummary
+              scores={partial.scores}
+              issueCounts={partial.issueCounts}
+              className="mt-8"
+            />
+
+            {full ? (
+              <div className="mt-16 sm:mt-20">
+                <FullReport
+                  result={full}
+                  headingId={`${headingId}-full`}
+                  headingRef={fullHeadingRef}
+                />
+              </div>
+            ) : (
+              <PartialBody
+                headingId={headingId}
+                partial={partial}
+                sealed={sealed}
+                onUnlocked={onUnlocked}
+                onRestart={onRestart}
+              />
+            )}
+
+            <NextSteps headingId={`${headingId}-next`} onReset={onReset} />
+            <FixTray id={`${headingId}-fixlist`} />
+          </Container>
+        </div>
+        <SectionTear color="var(--color-paper)" seed={10} flip grain />
+      </section>
+    </QuoteProvider>
   );
 }
 
@@ -335,12 +410,21 @@ function PartialBody({
   onUnlocked: (r: AuditResult) => void;
   onRestart: () => void;
 }) {
-  const ids = { top: `${headingId}-top`, locked: `${headingId}-locked`, checks: `${headingId}-checks` };
+  const ids = {
+    ai: `${headingId}-ai`,
+    top: `${headingId}-top`,
+    locked: `${headingId}-locked`,
+    checks: `${headingId}-checks`,
+    gate: `${headingId}-gate`,
+    quote: `${headingId}-quote`,
+  };
   const h3 = "font-serif text-display-sm text-ink";
 
   return (
     <div className="mt-14 grid gap-12 sm:mt-16 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-x-12 xl:grid-cols-[minmax(0,1fr)_24rem] xl:gap-x-16">
       <div className="min-w-0 space-y-12">
+        <AiPartialCard ai={partial.ai} headingId={ids.ai} gateHref={`#${ids.gate}`} />
+
         <section aria-labelledby={ids.top}>
           <h3 id={ids.top} className={h3}>
             {auditResultCopy.topIssuesTitle}
@@ -358,11 +442,17 @@ function PartialBody({
           )}
         </section>
 
+        {partial.topIssues.length + partial.lockedIssues.length > 0 ? (
+          <QuotePanel headingId={ids.quote} diyHref={`#${ids.top}`} headingLevel={3} />
+        ) : null}
+
         {partial.lockedIssues.length > 0 ? (
           <section aria-labelledby={ids.locked}>
             <h3 id={ids.locked} className={`${h3} flex items-baseline gap-3`}>
               {auditResultCopy.lockedIssuesTitle}
-              <span className="font-sans text-sm font-medium text-muted tabular-nums">{partial.lockedIssues.length}</span>
+              <span className="font-sans text-sm font-medium text-muted tabular-nums">
+                {partial.lockedIssues.length}
+              </span>
             </h3>
             <p className="mt-2 text-[0.9375rem] text-muted">{auditUi.lockedHint}</p>
             <ul className="mt-5 space-y-2">
@@ -375,7 +465,11 @@ function PartialBody({
       </div>
 
       <div className="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1">
-        <div className="lg:sticky lg:top-28">
+        <div
+          id={ids.gate}
+          tabIndex={-1}
+          className="scroll-mt-28 rounded-panel focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent lg:sticky lg:top-28"
+        >
           <EmailGate sealed={sealed} onUnlocked={onUnlocked} onRestart={onRestart} />
         </div>
       </div>

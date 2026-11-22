@@ -12,7 +12,8 @@ import { auditUi } from "./labels";
  * so this is an honest approximation of where a typical audit spends its time;
  * the last step holds until the response arrives.
  */
-const STEP_AT = [0, 2, 5, 12, 26];
+// One entry per step in auditProgressSteps (6 since the AI reading step was added).
+const STEP_AT = [0, 2, 5, 12, 22, 32];
 const SLOW_AFTER = 40;
 
 function stepFor(elapsed: number): number {

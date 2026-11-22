@@ -4,7 +4,7 @@ import type { LegalDoc } from "./types";
 export const privacyMeta = {
   metaTitle: "Privacy policy: how we handle your data",
   metaDescription:
-    "How seenhq handles the data behind our free audit, report unlock and contact form: what we collect, why, who processes it, and how to have it deleted.",
+    "How seenhq handles data from the free audit, its AI reading, report unlock and contact form: what we collect, why, who processes it and how to delete it.",
 };
 
 export const termsMeta = {
@@ -15,7 +15,7 @@ export const termsMeta = {
 
 export const privacy = {
   title: "Privacy policy",
-  updated: "2026-11-22",
+  updated: "2026-11-23",
   sections: [
     {
       heading: "Who we are",
@@ -27,7 +27,7 @@ export const privacy = {
     {
       heading: "What we collect and why",
       body: [
-        "When you run an audit: the website address you enter and the results of the audit (scores, checks, issues and a summary of the pages we scanned). We keep these so we can show you the report and improve the service.",
+        "When you run an audit: the website address you enter and the results of the audit (scores, checks, issues, a summary of the pages we scanned and, when it runs, the AI reading of those pages and its drafts). We keep these so we can show you the report and improve the service.",
         "When you unlock a full report: your email address, the audit it belongs to, the website address and score, a record that you ticked the consent box, and the browser's user-agent string. Ticking that box is required to unlock the report; it covers storing your email with the report and contacting you about it. You can withdraw it at any time (see \"Your rights\").",
         "When you use the contact form: your name, email, and any business name, website, service, budget and message you choose to send. We use this only to reply to your enquiry and to deliver any work you ask for.",
         "For all of the above we also store a one-way, salted hash of your IP address. We use it to limit abuse (for example, too many audits per hour). We do not store your IP address itself.",
@@ -37,7 +37,16 @@ export const privacy = {
       heading: "What we fetch from the websites you audit",
       body: [
         "When you enter a website address, our crawler (user agent \"seenhqbot\") fetches publicly available pages from that site: the address you entered (normally the homepage), robots.txt, the sitemap, llms.txt and up to five internal pages. We always read the page you asked us to audit; for the internal pages we skip anything the site's robots.txt disallows for seenhqbot. We never submit forms and never access password-protected areas.",
+        "As part of the crawler access test, we also send a small number of simulated requests to public pages of that site whose user agent names the AI crawler being simulated and is labelled as a seenhq test. These requests come from our servers, not from OpenAI, Anthropic, Perplexity, Google or any other AI company. Details are on our crawler page at /bot.",
         "We also send the address you entered to Google PageSpeed Insights to measure performance. Google processes that request under its own terms and privacy policy.",
+      ],
+    },
+    {
+      heading: "AI analysis of the websites you audit",
+      body: [
+        "When the AI reading runs, we send text from the public pages we fetched from the audited website to NVIDIA's hosted model API, where an open-weight language model analyses it and returns the result to us. What we send: each page's address, title, meta description, headings and visible text, shortened to a fixed length, plus technical facts our own checks found (such as robots.txt and structured data results). NVIDIA processes these requests under its own terms and privacy policy.",
+        "We never send your email address, your contact form messages, your IP address or any other information about you as a visitor to NVIDIA or to any AI model. Only content the audited website already publishes to everyone is sent.",
+        "If the AI reading is unavailable or too slow, the audit finishes without it.",
       ],
     },
     {
@@ -50,7 +59,7 @@ export const privacy = {
     {
       heading: "Who processes your data",
       body: [
-        "We use a small number of service providers to run seenhq: our hosting provider (Vercel), which also provides our cookie-free analytics and server logs; if we store data, our database provider; if we send email notifications, our email provider; and Google PageSpeed Insights for performance checks.",
+        "We use a small number of service providers to run seenhq: our hosting provider (Vercel), which also provides our cookie-free analytics and server logs; if we store data, our database provider; if we send email notifications, our email provider; Google PageSpeed Insights for performance checks; and NVIDIA's hosted model API for the AI reading of audited public pages (it receives page text only, never visitor data).",
         "We do not sell your personal data and we do not share it with anyone for their own marketing.",
       ],
     },
@@ -85,7 +94,7 @@ export const privacy = {
 
 export const terms = {
   title: "Terms of service",
-  updated: "2026-11-22",
+  updated: "2026-11-23",
   sections: [
     {
       heading: "About these terms",
@@ -98,6 +107,8 @@ export const terms = {
       body: [
         "The audit is an automated check of publicly available pages. It is a guide, not a guarantee: automated checks can miss things or flag issues that do not matter for your site, and third-party data such as Google PageSpeed Insights may be unavailable or vary between runs.",
         "Scores and recommendations are our opinion of good practice at the time of the audit. Search engines and AI answer engines change often and decide for themselves what to rank, show or cite.",
+        "The AI reading and its drafts (titles, descriptions, llms.txt, schema and paragraphs) are generated by a language model. They are one model's reading of your public pages, not what ChatGPT, Gemini, Perplexity or any other assistant says about you, and they may contain errors or omissions. Review and correct every AI-generated reading or draft before you rely on it or publish it.",
+        "The AI crawler test is simulated from our servers. Sites that verify crawler IP addresses may treat the real crawlers differently, in either direction.",
       ],
     },
     {

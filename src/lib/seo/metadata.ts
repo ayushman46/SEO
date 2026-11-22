@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { site } from "@/content/site";
-import { homeMeta } from "@/content/home";
+import { homeMeta, sampleReportMeta } from "@/content/home";
 import { servicesPage } from "@/content/services";
 import { pricingPage } from "@/content/pricing";
 import { aboutPage } from "@/content/about";
 import { contactPage } from "@/content/contact";
 import { auditPage } from "@/content/audit";
 import { privacyMeta, termsMeta } from "@/content/legal";
+import { methodologyPage } from "@/content/methodology";
+import { botPage } from "@/content/bot";
 
 export const TITLE_SUFFIX = " · seenhq";
 export const OG_IMAGE = {
@@ -135,6 +137,17 @@ export const pageMetadata = {
   pricing: buildMetadata({ title: pricingPage.metaTitle, description: pricingPage.metaDescription, path: "/pricing" }),
   about: buildMetadata({ title: aboutPage.metaTitle, description: aboutPage.metaDescription, path: "/about" }),
   contact: buildMetadata({ title: contactPage.metaTitle, description: contactPage.metaDescription, path: "/contact" }),
+  methodology: buildMetadata({
+    title: methodologyPage.metaTitle,
+    description: methodologyPage.metaDescription,
+    path: "/methodology",
+  }),
+  sampleReport: buildMetadata({
+    title: sampleReportMeta.metaTitle,
+    description: sampleReportMeta.metaDescription,
+    path: "/sample-report",
+  }),
+  bot: buildMetadata({ title: botPage.metaTitle, description: botPage.metaDescription, path: "/bot" }),
   privacy: buildMetadata({ title: privacyMeta.metaTitle, description: privacyMeta.metaDescription, path: "/privacy" }),
   terms: buildMetadata({ title: termsMeta.metaTitle, description: termsMeta.metaDescription, path: "/terms" }),
 } satisfies Record<string, Metadata>;
@@ -147,6 +160,9 @@ export const publicRoutes = [
   { path: "/pricing", priority: 0.8, changeFrequency: "monthly" },
   { path: "/about", priority: 0.6, changeFrequency: "yearly" },
   { path: "/contact", priority: 0.6, changeFrequency: "yearly" },
+  { path: "/sample-report", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/methodology", priority: 0.6, changeFrequency: "monthly" },
+  { path: "/bot", priority: 0.3, changeFrequency: "yearly" },
   { path: "/privacy", priority: 0.2, changeFrequency: "yearly" },
   { path: "/terms", priority: 0.2, changeFrequency: "yearly" },
 ] as const;

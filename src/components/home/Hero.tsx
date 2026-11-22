@@ -1,5 +1,6 @@
 import { Fragment } from "react";
 import { home } from "@/content/home";
+import { sampleReportLinks } from "@/content/sample-report";
 import { HeroCollage } from "@/components/collage/HeroCollage";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
@@ -41,9 +42,12 @@ export function Hero() {
         <div className="mx-auto mt-10 max-w-2xl text-left">
           <AuditUrlForm />
         </div>
-        <div className="mt-6 flex justify-center">
+        <div className="mt-6 flex flex-col items-center justify-center gap-x-8 gap-y-3 sm:flex-row">
           <Button href={hero.secondaryCta.href} variant="link" icon="arrow-right">
             {hero.secondaryCta.label}
+          </Button>
+          <Button href={sampleReportLinks.href} variant="link" icon="arrow-right">
+            {sampleReportLinks.hero}
           </Button>
         </div>
       </Container>

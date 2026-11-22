@@ -94,3 +94,33 @@ export const contactNextSteps = {
     cta: { label: "Run a free audit", href: "/audit" },
   },
 };
+
+/**
+ * Quote carried over from the audit report (T022). Shown above the form when a visitor
+ * clicks "Request this fix"; nothing personal travels in the URL.
+ */
+export const contactQuoteCopy = {
+  title: "Your quote",
+  intro: (site: string) => `From the free audit of ${site}. It is sent with your message; you can still change anything.`,
+  totalLabel: "Total",
+  remove: "Remove quote",
+  removed: "Quote removed. Your message will be sent without it.",
+  message: (site: string) => `Please fix the items in my quote for ${site}.`,
+  nextSteps: {
+    title: "What happens next",
+    steps: [
+      {
+        title: "A person checks your quote",
+        body: "We compare it with your audit. Where a price is a starting price, we confirm the final number within 1 business day.",
+      },
+      {
+        title: "You get the quote in writing",
+        body: "By email, with what is covered, what is not, and what access we need from you.",
+      },
+      {
+        title: "Nothing starts until you agree",
+        body: "You pay nothing until you accept the quote. Prices exclude applicable taxes.",
+      },
+    ],
+  },
+} as const;

@@ -4,7 +4,10 @@ import { Badge } from "@/components/ui/Badge";
 import { cx } from "@/components/ui/cx";
 import { displayUrl, safeHref } from "./format";
 import { auditUi } from "./labels";
+import { CopyButton } from "./CopyButton";
 import { RichText } from "./RichText";
+import { IssueActions } from "./quote/IssueActions";
+import { auditQuoteCopy } from "@/content/audit";
 
 const effortDots: Record<Effort, number> = { quick: 1, moderate: 2, involved: 3 };
 
@@ -76,15 +79,19 @@ export function IssueCard({
   hostname,
   headingLevel = 4,
   urlsOpen = false,
+  ticket,
   className,
 }: {
   issue: AuditIssue;
   hostname?: string;
   headingLevel?: 3 | 4 | 5 | 6;
   urlsOpen?: boolean;
+  /** Markdown ticket for just this issue (full report): adds a "Copy as ticket" button to the fix steps */
+  ticket?: string;
   className?: string;
 }) {
   const H = `h${headingLevel}` as "h3" | "h4" | "h5" | "h6";
+  const fixId = `fix-${issue.id.replace(/[^a-z0-9]+/gi, "-")}`;
   return (
     <article className={cx("rounded-card bg-white p-5 shadow-paper ring-1 ring-ink/[0.04] sm:p-7", className)}>
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
@@ -107,8 +114,15 @@ export function IssueCard({
         <span className="sr-only">{auditUi.whyItMatters}: </span>
         <RichText text={issue.description} />
       </p>
-      <div className="mt-5 rounded-xl bg-paper p-4 shadow-[inset_0_0_0_1px_var(--color-line)] sm:p-5">
-        <p className="text-kicker font-semibold text-ink-2 uppercase">{auditUi.howToFix}</p>
+      <div
+        id={fixId}
+        tabIndex={-1}
+        className="mt-5 scroll-mt-28 rounded-xl bg-paper p-4 shadow-[inset_0_0_0_1px_var(--color-line)] focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:p-5"
+      >
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-kicker font-semibold text-ink-2 uppercase">{auditUi.howToFix}</p>
+          {ticket ? <CopyButton text={ticket} label={`${auditQuoteCopy.copyTicket}: ${issue.title}`} /> : null}
+        </div>
         <p className="mt-2 text-[0.9375rem] leading-relaxed text-pretty text-ink-2 [overflow-wrap:anywhere]">
           <RichText text={issue.howToFix} />
         </p>
@@ -116,6 +130,7 @@ export function IssueCard({
       <div className="mt-4">
         <AffectedUrls urls={issue.affectedUrls} hostname={hostname} open={urlsOpen} />
       </div>
+      <IssueActions issue={issue} fixStepsId={fixId} />
     </article>
   );
 }

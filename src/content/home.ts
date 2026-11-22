@@ -5,7 +5,7 @@ export const home = {
     eyebrow: "SEO + GEO audits for startups and local businesses",
     title: "Be seen by people and by the machines they ask.",
     subtitle:
-      "seenhq checks your website for Google and for AI answer engines like ChatGPT, Perplexity and Gemini. Paste your address, get a scored report in about a minute, and fix what holds you back.",
+      "seenhq checks your website for Google and for AI answer engines like ChatGPT, Perplexity and Gemini. Paste your address to get scores, a separate AI model's reading of your pages and a ranked list of fixes, in about a minute.",
     primaryCta: { label: "Run a free audit", href: "/audit" },
     secondaryCta: { label: "See services", href: "/services" },
   },
@@ -74,25 +74,35 @@ export const home = {
       id: "geo",
       label: "GEO",
       title: "Ready to be read and cited by AI",
-      body: "GEO (Generative Engine Optimization) is making your site easy for AI answer engines to read, trust and quote. We check the signals that make a site easier for them to use as a source.",
+      body: "GEO (Generative Engine Optimization) is making your site easy for AI answer engines to read, trust and quote. We check the signals that make a site easier for them to use as a source, and have a language model read your pages to see how clearly they describe you.",
       bullets: [
         {
           icon: "bot",
           title: "AI crawler access",
-          body: "Which AI bots your robots.txt allows or blocks, from GPTBot to Google-Extended.",
-        },
-        {
-          icon: "file",
-          title: "llms.txt",
-          body: "Whether you offer AI tools a short, plain-text guide to your most important pages.",
+          body: "Which AI bots your robots.txt allows or blocks, plus a simulated fetch as those bots that names the layer refusing them, such as a firewall or CDN.",
         },
         {
           icon: "sparkles",
-          title: "Answer-ready content",
-          body: "Clear definitions, short summaries, FAQs and lists that an engine can lift into an answer.",
+          title: "How an AI model reads you",
+          body: "A language model reads your pages and reports how it would describe you, which core facts are clear, vague or missing, and which customer questions you answer. It is one model's reading, not what ChatGPT or Gemini say.",
         },
         {
           icon: "eye",
+          title: "Facts a crawler can actually see",
+          body: "Whether your name, prices, hours and contact details are in the plain HTML, or only appear after JavaScript runs or inside an image or PDF.",
+        },
+        {
+          icon: "list",
+          title: "Old, hidden and conflicting facts",
+          body: "Crossed-out prices, hidden text, and phone numbers or opening hours that differ from page to page.",
+        },
+        {
+          icon: "file",
+          title: "llms.txt and answer-ready content",
+          body: "A short plain-text guide for AI tools, plus clear definitions, summaries and FAQs an engine can lift into an answer.",
+        },
+        {
+          icon: "shield",
           title: "Identity and trust signals",
           body: "Structured data that states who you are (Organization or LocalBusiness schema), a consistent name, authors and visible dates.",
         },
@@ -130,17 +140,17 @@ export const home = {
         {
           icon: "list",
           title: "Prioritised by impact",
-          body: "Critical issues first, then the fixes that move your score the most.",
-        },
-        {
-          icon: "clock",
-          title: "Effort labelled",
-          body: "Quick wins, moderate jobs and involved work, so you can plan your week.",
+          body: "Critical issues first, each labelled as a quick fix, a moderate job or involved work, so you can plan your week.",
         },
         {
           icon: "file",
-          title: "Copy-paste snippets",
-          body: "Where it helps, the exact tag, rule or schema to add.",
+          title: "Copy-paste snippets and drafts",
+          body: "The exact tag, rule or schema to add, plus AI-drafted titles, llms.txt and schema built only from facts on your site. Review them before you publish.",
+        },
+        {
+          icon: "link",
+          title: "Hand-off for your developer",
+          body: "Export the list as Markdown tickets, or as one prompt you can give a coding agent.",
         },
         {
           icon: "sparkles",
@@ -161,11 +171,11 @@ export const home = {
       },
       {
         title: "Get your scores in about a minute",
-        body: "An overall score plus separate SEO, GEO and Performance scores, with your top three issues shown straight away.",
+        body: "An overall score plus separate SEO, GEO and Performance scores, your top three issues, and a short reading of how an AI model describes your business.",
       },
       {
         title: "Unlock the full report with your email",
-        body: "Enter your email to see every issue, every check and every fix. Work through it yourself, or ask us to handle it.",
+        body: "Enter your email to see every issue, check and fix, plus ready-to-paste drafts. Export it as developer tickets or one prompt for a coding agent, or ask us to handle it.",
       },
     ],
   },
@@ -173,7 +183,7 @@ export const home = {
   sampleReport: {
     kicker: "What you get",
     title: "A report written for people, not just developers",
-    body: "Each issue says what is wrong, why it matters for search and AI answers, and exactly how to fix it. Pages, checks and Core Web Vitals are all laid out in one place.",
+    body: "Each issue says what is wrong, why it matters for search and AI answers, and exactly how to fix it. Pages, checks, Core Web Vitals and the AI reading are laid out in one place.",
     note: "Illustrative sample report",
   },
 
@@ -216,7 +226,11 @@ export const home = {
     },
     {
       q: "What does the free seenhq audit check?",
-      a: "The free audit checks your homepage and up to five internal pages for SEO basics, GEO readiness and mobile performance. That includes titles, headings, canonicals, robots.txt, sitemap, structured data, AI crawler access, llms.txt, answer-ready content and Google PageSpeed Insights results. It usually finishes in about a minute.",
+      a: "The free audit checks your homepage and up to five internal pages for SEO basics, GEO readiness and mobile performance. That includes titles, headings, canonicals, robots.txt, sitemap, structured data, AI crawler access, llms.txt, answer-ready content and Google PageSpeed Insights results. It also flags key facts that exist only in images, PDFs or JavaScript, crossed-out or conflicting prices, phone numbers and hours, snippet settings that keep pages out of AI Overviews, missing pages that don't return 404, Bing readiness and review signals, and it runs a simulated AI-crawler test. It usually finishes in about a minute.",
+    },
+    {
+      q: "Does the audit use AI?",
+      a: "Yes, for one part. Most checks are fixed rules that read your HTML, robots.txt and sitemap. The AI reading is separate: an open-weight language model hosted on NVIDIA's API reads the text of the pages we fetch and reports how an AI model would describe your business, which of seven core facts are clear, vague or missing, and which customer questions you answer. It also drafts a title, meta description, llms.txt, Organization schema and an answer-ready paragraph, using only facts from your site. It is one model's reading of your pages, not what ChatGPT, Gemini or Perplexity say about you, and it can be wrong, so review every draft before you use it.",
     },
     {
       q: "Why do you ask for my email to see the full report?",
@@ -247,5 +261,12 @@ export const home = {
 export const homeMeta = {
   metaTitle: "seenhq: SEO and GEO audits for Google and AI search",
   metaDescription:
-    "Free SEO and GEO audit for startups and local businesses. See how Google, ChatGPT, Perplexity and AI Overviews read your site, and fix what holds you back.",
+    "Free SEO and GEO audit for startups and local businesses. Check what Google and AI answer engines need from your site, and get a ranked list of fixes.",
+};
+
+/** Meta for /sample-report (an illustrative report, built by frontend from sample data). */
+export const sampleReportMeta = {
+  metaTitle: "Sample audit report: see every check and fix",
+  metaDescription:
+    "An illustrative seenhq audit report: SEO, GEO and speed scores, the AI reading, every check with its fix, and the export for your developer.",
 };
