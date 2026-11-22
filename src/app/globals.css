@@ -1,26 +1,250 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/*
+ * seenhq design tokens. Light mode only in v1, but every color is a CSS
+ * variable so a dark palette is a swap later (ADR-004).
+ * Documented in docs/DESIGN_SYSTEM.md.
+ */
+@theme {
+  /* Surfaces */
+  --color-white: #ffffff;
+  --color-paper: #f7f6f2;
+  --color-paper-2: #efede6;
+  --color-paper-edge: #fbfaf6;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* Ink */
+  --color-ink: #121212;
+  --color-ink-2: #2b2b29;
+  --color-muted: #5f5e58;
+  --color-faint: #8b8a83;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  /* Hairlines */
+  --color-line: #e4e1d8;
+  --color-line-strong: #cfcbc0;
+
+  /* Accent: one electric blue. #1E7BF5 is the brand blue for fills, rings and
+     data; 600 is the button fill (white text 4.7:1); ink is the text-safe blue
+     (5.7:1 on white, 5.3:1 on paper). */
+  --color-accent: #1e7bf5;
+  --color-accent-600: #1a6fe8;
+  --color-accent-700: #155fcc;
+  --color-accent-800: #114fad;
+  --color-accent-ink: #1360d6;
+  --color-accent-soft: #e6f0fe;
+
+  /* Night sky */
+  --color-night: #070b19;
+  --color-night-2: #0d1630;
+  --color-night-3: #17234a;
+  --color-night-ink: #f3f1ea;
+  --color-night-muted: #b9bccb;
+  --color-night-line: #2a3560;
+
+  /* Status (report UI). Text colors are AA on their soft backgrounds. */
+  --color-critical: #b42318;
+  --color-critical-soft: #fee4e2;
+  --color-high: #b54708;
+  --color-high-soft: #fff1e0;
+  --color-medium: #7a5a00;
+  --color-medium-soft: #fff6d6;
+  --color-low: #475467;
+  --color-low-soft: #eef0f3;
+  --color-pass: #067647;
+  --color-pass-soft: #e3f7ec;
+
+  /* Type */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-serif: var(--font-instrument), "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+
+  --text-display-xl: clamp(2.75rem, 1.6rem + 5.2vw, 6.5rem);
+  --text-display-xl--line-height: 0.95;
+  --text-display-xl--letter-spacing: -0.025em;
+  --text-display-lg: clamp(2.25rem, 1.4rem + 3.6vw, 4.75rem);
+  --text-display-lg--line-height: 1;
+  --text-display-lg--letter-spacing: -0.02em;
+  --text-display-md: clamp(2rem, 1.35rem + 2.4vw, 3.5rem);
+  --text-display-md--line-height: 1.04;
+  --text-display-md--letter-spacing: -0.018em;
+  --text-display-sm: clamp(1.625rem, 1.3rem + 1.2vw, 2.25rem);
+  --text-display-sm--line-height: 1.1;
+  --text-display-sm--letter-spacing: -0.012em;
+  --text-kicker: 0.75rem;
+  --text-kicker--line-height: 1rem;
+  --text-kicker--letter-spacing: 0.14em;
+
+  /* Radii */
+  --radius-pill: 999px;
+  --radius-card: 1.25rem;
+  --radius-panel: 1.75rem;
+  --radius-control: 0.875rem;
+
+  /* Shadows: soft, paper-like (warm, low, wide). */
+  --shadow-paper: 0 1px 0 rgb(18 18 18 / 0.04), 0 2px 6px -2px rgb(60 48 20 / 0.12), 0 10px 24px -12px rgb(60 48 20 / 0.18);
+  --shadow-float: 0 1px 0 rgb(18 18 18 / 0.04), 0 8px 18px -8px rgb(18 30 60 / 0.22), 0 28px 60px -24px rgb(18 30 60 / 0.35);
+  --shadow-pill: 0 1px 0 rgb(18 18 18 / 0.04), 0 6px 20px -8px rgb(18 30 60 / 0.28);
+  --shadow-inset-line: inset 0 0 0 1px var(--color-line);
+
+  /* Motion */
+  --ease-paper: cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-twinkle: twinkle 4.5s ease-in-out infinite;
+
+  @keyframes twinkle {
+    0%,
+    100% {
+      opacity: 0.25;
+    }
+    50% {
+      opacity: 1;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+:root {
+  --nav-h: 5rem;
+  /* Paper grain, ~0.5 KB, used on paper sections. */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.3 0 0 0 0 0.25 0 0 0 0 0.15 0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  color-scheme: light;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    scroll-padding-top: calc(var(--nav-h) + 1rem);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    background: var(--color-white);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
+  }
+
+  ::selection {
+    background: var(--color-accent-soft);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  summary {
+    list-style: none;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+}
+
+@layer components {
+  .skip-link {
+    position: fixed;
+    left: 1rem;
+    top: 1rem;
+    z-index: 100;
+    transform: translateY(-200%);
+    border-radius: var(--radius-pill);
+    background: var(--color-ink);
+    color: var(--color-white);
+    padding: 0.75rem 1.25rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+  .skip-link:focus-visible {
+    transform: none;
+  }
+
+  .paper-grain {
+    background-image: var(--grain);
+    background-size: 160px 160px;
+  }
+
+  /* Starfield twinkle only when motion is welcome. */
+  .star-twinkle {
+    opacity: 0.6;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .star-twinkle {
+      animation: var(--animate-twinkle);
+    }
+  }
+}
+
+/* Mobile menu sheet (native <dialog>). Lock page scroll while open. */
+html:has(dialog.menu-sheet[open]) {
+  overflow: hidden;
+}
+dialog.menu-sheet {
+  max-width: none;
+  max-height: none;
+}
+dialog.menu-sheet::backdrop {
+  background: rgb(7 11 25 / 0.45);
+  backdrop-filter: blur(2px);
+}
+@media (prefers-reduced-motion: no-preference) {
+  dialog.menu-sheet[open] {
+    animation: sheet-in 260ms var(--ease-paper);
+  }
+}
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+}
+
+/* Reveal: only elements the script marks as pending (below the fold, motion
+   allowed) start hidden, so no-JS and reduced-motion users always see content. */
+[data-reveal="pending"] {
+  opacity: 0;
+  transform: translateY(18px);
+}
+[data-reveal="pending"][data-reveal-variant="tear"] {
+  opacity: 1;
+  transform: none;
+  clip-path: inset(0 0 100% 0);
+}
+[data-reveal="done"][data-reveal-variant="tear"] {
+  /* end outside the box so shadows are not clipped */
+  clip-path: inset(-12% -12% -12% -12%);
+}
+[data-reveal="done"] {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 700ms var(--ease-paper),
+    transform 900ms var(--ease-paper),
+    clip-path 1000ms var(--ease-paper);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+@media print {
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

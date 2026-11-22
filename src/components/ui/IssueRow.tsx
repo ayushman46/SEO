@@ -1,0 +1,87 @@
+import type { AuditIssue, Category, Effort, Severity } from "@/lib/audit/types";
+import { Badge } from "./Badge";
+import { cx } from "./cx";
+import { Icon } from "./Icon";
+
+export const severityLabel: Record<Severity, string> = {
+  critical: "Critical",
+  high: "High",
+  medium: "Medium",
+  low: "Low",
+};
+
+export const effortLabel: Record<Effort, string> = {
+  quick: "Quick win",
+  moderate: "Moderate",
+  involved: "Involved",
+};
+
+export const categoryLabel: Record<Category, string> = {
+  seo: "SEO",
+  geo: "GEO",
+  performance: "Performance",
+};
+
+const effortDots: Record<Effort, number> = { quick: 1, moderate: 2, involved: 3 };
+
+export type IssueRowData = Pick<AuditIssue, "title" | "severity" | "category"> &
+  Partial<Pick<AuditIssue, "effort" | "impact">>;
+
+/** Severity pill + title + effort (+ category, + recoverable points). `locked` for gated teasers. */
+export function IssueRow({
+  issue,
+  locked = false,
+  dense = false,
+  as: Tag = "div",
+  className,
+}: {
+  issue: IssueRowData;
+  locked?: boolean;
+  dense?: boolean;
+  as?: "div" | "li";
+  className?: string;
+}) {
+  return (
+    <Tag
+      className={cx(
+        "flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl bg-white shadow-[inset_0_0_0_1px_var(--color-line)]",
+        dense ? "px-3 py-2.5" : "px-4 py-3 sm:flex-nowrap",
+        className,
+      )}
+    >
+      <Badge tone={issue.severity} dot className="w-[4.75rem] justify-center">
+        {severityLabel[issue.severity]}
+      </Badge>
+      <span className={cx("min-w-0 flex-1 text-sm leading-snug font-medium", locked ? "text-muted" : "text-ink")}>
+        {locked ? (
+          <span className="inline-flex items-center gap-1.5">
+            <Icon name="lock" size={14} className="shrink-0" />
+            <span className="sr-only">Locked: </span>
+            {issue.title}
+          </span>
+        ) : (
+          issue.title
+        )}
+      </span>
+      <span className="flex shrink-0 items-center gap-3 text-xs text-muted">
+        <span className="rounded-md bg-paper px-1.5 py-0.5 font-medium text-ink-2">{categoryLabel[issue.category]}</span>
+        {issue.effort ? (
+          <span className="inline-flex items-center gap-1.5">
+            <span aria-hidden className="flex gap-0.5">
+              {[1, 2, 3].map((n) => (
+                <span
+                  key={n}
+                  className={cx("h-2.5 w-1 rounded-full", n <= effortDots[issue.effort!] ? "bg-ink-2" : "bg-line-strong")}
+                />
+              ))}
+            </span>
+            {effortLabel[issue.effort]}
+          </span>
+        ) : null}
+        {typeof issue.impact === "number" ? (
+          <span className="font-medium text-accent-ink tabular-nums">+{issue.impact} pts</span>
+        ) : null}
+      </span>
+    </Tag>
+  );
+}
