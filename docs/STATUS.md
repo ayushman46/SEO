@@ -1,5 +1,12 @@
 # Status log (newest on top)
 
+## 2026-11-23 02:45 IST: v1.1 reviewed, fixed, on preview; WAITING for founder yes to deploy production
+- **Committed + pushed (39c92d4):** all R3 review findings fixed (1 critical ReDoS, 1 high label trust, 14 others). 605 tests x3, typecheck, lint, build green. New pages a11y/best-practices/SEO 100 locally.
+- **Preview (v1.1 final candidate):** https://seenhq-klvcg209z-ayushs-projects-32c1d225.vercel.app. All routes 200; real audit of wikipedia.org through the deployed API: 200 in 2.0 s, 31 checks.
+- **Production (https://seenhq.vercel.app) is still v1.** The harness blocked `vercel deploy --prod` without a fresh founder approval. Next step when the founder says yes: `npx vercel deploy --prod --yes`, smoke test routes + audit + quote hand-off, PageSpeed Insights on /, /audit, /sample-report, /methodology, then write docs/LAUNCH_REPORT.md v1.1 section.
+- **Founder actions:** approve production deploy; NVIDIA_API_KEY (AI reading is off without it; then run one real audit and tune prompts); decide Fix sprint fixed vs "From"; contact email; Bing verification; optional DATABASE_URL + npm run db:migrate (0001 + 0002), PAGESPEED_API_KEY, ADMIN_PASSWORD.
+- **Backlog candidates (docs/MARKET_RESEARCH_3_FULL.md, CONVERSION_RESEARCH.md):** payment link (Razorpay/UPI), follow-up emails, platform-aware fix steps, re-audit diff + change alerts (need DB), white-label reports, competitor comparison, AI shopping feed readiness.
+
 ## 2026-11-23 01:50 IST: v1.1 built, on preview, under review
 - **Committed + pushed (fc8c945):** AI reading (NVIDIA, off until NVIDIA_API_KEY is set), 9 new checks (content-format, fact-consistency, raw-html-facts, ai-crawler-probe, snippet-eligibility, review-signals, bing-indexnow, soft-404, ai-clarity), export (tickets / agent prompt), instant quote + order hand-off to contact form, /methodology, /bot, /sample-report, logo marquee, copy + legal updates. 547 tests, typecheck, lint, build green. Browser-checked locally: logo strip, sample report, real audit of python.org (79), quote panel, hand-off to /contact.
 - **Preview:** https://seenhq-ido5sx3ub-ayushs-projects-32c1d225.vercel.app
