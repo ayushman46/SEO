@@ -31,6 +31,7 @@ import { BARE_DOMAIN, HTML_TAG, INSTRUCTION_PATTERNS, MD_LINK_DEST, OBFUSCATED_E
 import { DELIM_WORDS } from "@/lib/audit/ai/prompt";
 import { stripThinking } from "@/lib/audit/ai/client";
 import { TITLE_RE } from "@/lib/audit/net/soft404";
+import { PLATFORM_REGEXES } from "@/lib/audit/platform";
 
 const HOME = "https://acme.example.com/";
 const BASE_LIMIT_MS = 1_500;
@@ -284,12 +285,15 @@ describe("R3 regex sweep: adversarial inputs stay linear", { timeout: 300_000 },
     requestBlocked: fill("request blocked "),
     copyright: fill("© 2020 "),
     ignore: fill("ignore the "),
+    goDaddy: fill("go daddy website "),
+    commaSpaces: `a${fill(",  ")}`,
   };
   const REGEXES: Record<string, RegExp> = {
     PRICE_RE, PHONE_RE, EMAIL_RE, TIME_RANGE_RE, STREET_RE, STRUCK_CLASS, TESTIMONIAL_CLASS, ATTRIBUTION_TAIL,
     COPYRIGHT_RE, SCHEMA_HOURS_RE, DAY_HOURS, ENABLE_JS, VISIBLE_REVIEWS, CHALLENGE_BODY, LASTMOD_RE,
     HTML_TAG, URL_RE, BARE_DOMAIN, MD_LINK_DEST, OBFUSCATED_EMAIL, DELIM_WORDS, TITLE_RE,
     ...Object.fromEntries(INSTRUCTION_PATTERNS.map((re, i) => [`INSTRUCTION_PATTERNS[${i}]`, re])),
+    ...Object.fromEntries(Object.entries(PLATFORM_REGEXES).map(([k, re]) => [`PLATFORM_REGEXES.${k}`, re])),
   };
   const worst = (fn: (s: string) => unknown) => {
     let max = 0;

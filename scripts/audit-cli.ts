@@ -49,6 +49,12 @@ async function main() {
       console.log(`  cwv     score ${v.performanceScore} · LCP ${v.lcpMs} ms · CLS ${v.cls} · TBT ${v.tbtMs} ms · INP ${v.inpMs ?? "n/a"} ms`);
     }
     console.log(`  issues  ${JSON.stringify(partial.issueCounts)}`);
+    const platformNote = result.notes.find((n) => n.startsWith("Detected platform: "));
+    const withSteps = result.issues.filter((i) => /\n\n(On|In|If your site runs on|If you use) [^:\n]{1,60}: /.test(i.howToFix));
+    console.log(
+      `  platform ${platformNote ? platformNote.slice("Detected platform: ".length).split(". ")[0].replace(/\.$/, "") : "not detected"}` +
+        (withSteps.length ? ` · platform steps on ${withSteps.length} ${withSteps.length === 1 ? "fix" : "fixes"}:${withSteps.map((i) => i.id).join(", ")}` : ""),
+    );
     console.log("\nChecks:");
     for (const c of result.checks) {
       console.log(`  [${c.status.padEnd(11)}] ${c.id.padEnd(26)} ${c.score.toFixed(2)}  ${c.summary}`);

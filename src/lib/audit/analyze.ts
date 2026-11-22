@@ -12,6 +12,8 @@ import { crawlerProbeOutcome } from "./checks/geo/crawler-probe";
 import { soft404Outcome } from "./checks/seo/soft-404";
 import { isIndexable } from "./checks/seo/indexability";
 import { computeScores, finalize } from "./score";
+import { detectCloudflare, detectPlatform } from "./platform";
+import { augmentIssues, platformNotes, type PlatformContext } from "./platform-fixes";
 
 const MAX_TITLE_CHARS = 300;
 const MAX_DESCRIPTION_CHARS = 500;
@@ -89,8 +91,19 @@ export function assemble(
   // Network-backed SEO check goes at the end of the SEO block.
   outcomes.splice(SEO_CHECKS.length, 0, soft404Result);
 
-  const { checks, issues } = finalize(outcomes);
+  const finalized = finalize(outcomes);
+  const { checks } = finalized;
   const scores = computeScores(checks);
+  // T024: append verified platform steps to matching fixes (text only; scores and impact unchanged).
+  let issues = finalized.issues;
+  try {
+    const pc: PlatformContext = { platform: detectPlatform(ctx), cloudflare: detectCloudflare(ctx) };
+    const a = augmentIssues(issues, pc);
+    issues = a.issues;
+    notes.push(...platformNotes(pc, a.count, a.augmented));
+  } catch {
+    /* platform steps are optional: keep the generic fixes */
+  }
 
   const pages: PageSummary[] = ctx.pages.map((p) => ({
     // Cap page-controlled strings so a hostile page can't bloat the stored/sealed result.
