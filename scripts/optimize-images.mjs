@@ -16,6 +16,9 @@ const jobs = [
   // Hero sky: landscape crop from the top of a tall CC0 sky photo. The hero box is
   // full-bleed and 120% tall (parallax), so on phones it renders ~1100 CSS px wide.
   { out: "sky-hero.webp", src: "sky-bright.jpg", extract: { left: 0, top: 250, width: 3840, height: 2160 }, width: 2880, quality: 74 },
+  // Phone-portrait art direction of the same hero sky (T011): the slice a portrait phone
+  // actually sees (centre ~1300 px of the 3840 px crop), so phones decode ~1.9 Mpx, not 4.7.
+  { out: "sky-hero-portrait.webp", src: "sky-bright.jpg", extract: { left: 1270, top: 250, width: 1300, height: 2160 }, width: 1080, quality: 74 },
   // Sizes below are >= 2x the largest rendered CSS width (see docs/ASSETS.md).
   // Collage card sky: deep blue cumulus (max 576 px rendered).
   { out: "sky-cumulus.webp", src: "sky-cumulus.jpg", width: 1400, quality: 64 },
@@ -54,6 +57,37 @@ for (const job of jobs) {
   const meta = await sharp(file).metadata();
   const flag = size > MAX_BYTES ? "  <-- OVER 300 KB" : "";
   console.log(`${job.out.padEnd(20)} ${meta.width}x${meta.height}  ${(size / 1024).toFixed(1)} KB${flag}`);
+}
+
+// ---------------------------------------------------------------------------
+// Paper grain tile (T011): seeded two-octave noise in warm brown with 0-21/255 alpha,
+// 128 px, lossless WebP. Replaces an SVG feTurbulence data URI (expensive to raster).
+// ---------------------------------------------------------------------------
+{
+  const W = 128;
+  const buf = Buffer.alloc(W * W * 4);
+  let s = 20261122 >>> 0;
+  const rnd = () => {
+    s = (s + 0x6d2b79f5) >>> 0;
+    let t = s;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  const coarse = Float32Array.from({ length: (W / 2) * (W / 2) }, () => rnd());
+  for (let y = 0; y < W; y++) {
+    for (let x = 0; x < W; x++) {
+      const v = rnd() * 0.67 + coarse[(y >> 1) * (W / 2) + (x >> 1)] * 0.33;
+      const o = (y * W + x) * 4;
+      buf[o] = 77;
+      buf[o + 1] = 64;
+      buf[o + 2] = 38;
+      buf[o + 3] = Math.round(v * 7) * 3;
+    }
+  }
+  const file = path.join(OUT, "grain.webp");
+  await sharp(buf, { raw: { width: W, height: W, channels: 4 } }).webp({ lossless: true, effort: 6 }).toFile(file);
+  console.log(`${"grain.webp".padEnd(20)} ${W}x${W}  ${((await stat(file)).size / 1024).toFixed(1)} KB`);
 }
 
 // ---------------------------------------------------------------------------

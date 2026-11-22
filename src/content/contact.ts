@@ -61,15 +61,15 @@ export const contactForm = {
   submittingLabel: "Sending…",
   success: {
     title: "Thanks, your message is in.",
-    body: "We will reply by email within [PLACEHOLDER: 2 working days]. In the meantime, you can run a free audit of your site.",
+    body: "We reply within two working days. In the meantime, you can run a free audit of your site.",
     cta: { label: "Run a free audit", href: "/audit" },
   },
   errors: {
-    generic: "Something went wrong sending your message. Please try again, or email us directly.",
+    generic: "Something went wrong sending your message. Please try again in a few minutes.",
     rateLimited: "You have sent several messages in a short time. Please wait a while and try again.",
     fieldsInvalid: "Please check the highlighted fields.",
   },
-  directEmailLabel: "Prefer email? Write to",
+  directEmailLabel: "Prefer email? Use the contact form and we'll reply by email.",
 } as const;
 
 /** "What happens next" panel beside the contact form (added by frontend-designer for T006; content-seo may refine). */
@@ -82,7 +82,7 @@ export const contactNextSteps = {
     },
     {
       title: "You get a reply by email",
-      body: "We reply within [PLACEHOLDER: 2 working days] with questions, next steps and a fixed quote for the work.",
+      body: "We reply within two working days with questions, next steps and a fixed quote for the work.",
     },
     {
       title: "Nothing starts until you agree",

@@ -240,7 +240,7 @@ export default function DesignPreviewPage() {
 
       <Block title="Placeholder copy">
         <p className="text-lg">
-          <PlaceholderText value="From $49 [PLACEHOLDER]" /> · <PlaceholderText value="[PLACEHOLDER: City, Country]" />
+          Demo only (no live copy uses it): <PlaceholderText value="[PLACEHOLDER: example marker]" />
         </p>
       </Block>
 

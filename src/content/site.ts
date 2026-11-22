@@ -1,15 +1,16 @@
 import type { SiteConfig } from "./types";
 
 /**
- * Sitewide config. Anything containing "[PLACEHOLDER" must be replaced by the founder before launch.
+ * Sitewide config. contactEmail is intentionally empty: visitors reach us through the /contact form.
+ * UI and JSON-LD must treat an empty contactEmail as "no public email".
  */
 export const site = {
   name: "seenhq",
   tagline: "Be seen by people and by the machines they ask.",
   description:
     "seenhq audits your website for Google and AI answer engines like ChatGPT and Perplexity, then fixes what stops you from being found, cited and chosen.",
-  contactEmail: "hello@seenhq.example [PLACEHOLDER]",
-  location: "[PLACEHOLDER: City, Country]",
+  contactEmail: "",
+  location: "Remote, worldwide",
   nav: [
     { label: "Free audit", href: "/audit" },
     { label: "Services", href: "/services" },

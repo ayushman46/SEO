@@ -1,6 +1,14 @@
 "use client";
 
-import { useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useId,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type ReactNode,
+} from "react";
 import { cx } from "./cx";
 
 export type TabItem = {
@@ -11,6 +19,27 @@ export type TabItem = {
   /** Optional illustration shown beside the panel; swaps with the active tab. */
   aside?: ReactNode;
 };
+
+const TabsAsideContext = createContext<{ active: string | undefined; items: TabItem[] } | null>(
+  null,
+);
+
+/**
+ * Place inside a Tabs `asideFrame` to show the active item's aside there. Lets
+ * one shared illustration (e.g. a collage) host per-tab content, instead of
+ * server-rendering and hydrating one full illustration per tab.
+ */
+export function TabsAsideSlot() {
+  const ctx = useContext(TabsAsideContext);
+  if (!ctx) return null;
+  return ctx.items.map((item) =>
+    item.aside ? (
+      <div key={item.id} hidden={item.id !== ctx.active}>
+        {item.aside}
+      </div>
+    ) : null,
+  );
+}
 
 /**
  * Segmented blue tab bar (WAI-ARIA tabs, automatic activation).
@@ -23,6 +52,7 @@ export function Tabs({
   defaultId,
   className,
   layout = "stack",
+  asideFrame,
 }: {
   items: TabItem[];
   /** Accessible name for the tablist. */
@@ -31,6 +61,8 @@ export function Tabs({
   className?: string;
   /** "split" puts panels left and asides right from lg up. */
   layout?: "stack" | "split";
+  /** Shared aside wrapper containing a <TabsAsideSlot />; replaces the per-item aside list. */
+  asideFrame?: ReactNode;
 }) {
   const uid = useId();
   const [active, setActive] = useState(defaultId ?? items[0]?.id);
@@ -107,18 +139,27 @@ export function Tabs({
 
   if (layout === "split" && hasAside) {
     return (
-      <div className={cx("grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-16", className)}>
+      <div
+        className={cx(
+          "grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-16",
+          className,
+        )}
+      >
         <div className="min-w-0">
           {tablist}
           <div className="mt-10">{panels}</div>
         </div>
         <div className="min-w-0">
-          {items.map((item) =>
-            item.aside ? (
-              <div key={item.id} hidden={item.id !== active}>
-                {item.aside}
-              </div>
-            ) : null,
+          {asideFrame ? (
+            <TabsAsideContext value={{ active, items }}>{asideFrame}</TabsAsideContext>
+          ) : (
+            items.map((item) =>
+              item.aside ? (
+                <div key={item.id} hidden={item.id !== active}>
+                  {item.aside}
+                </div>
+              ) : null,
+            )
           )}
         </div>
       </div>

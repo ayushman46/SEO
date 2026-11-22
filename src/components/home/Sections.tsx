@@ -127,15 +127,18 @@ export function HowItWorks() {
 
 /* ---------- Services teaser ---------- */
 
+/** Leading price token: "$49", "From $199", "₹2,999/month", "$29/month". */
+const PRICE_TOKEN = /^(From\s+)?[$₹][\d,]+(?:\.\d+)?(\/month)?/;
+
 /**
- * "$49 [PLACEHOLDER] as part of the Full audit" -> the amount (+ placeholder tag)
- * on one unbreakable line, and any qualifier on its own muted line beneath, so
- * long price strings never wrap mid-phrase at any width.
+ * "$49 as part of the Full audit" -> the amount ("$49") on one unbreakable line,
+ * and any qualifier on its own muted line beneath, so long price strings never
+ * wrap mid-phrase at any width. Strings without a leading price render as is.
  */
 function PriceLine({ value }: { value: string }) {
-  const m = /^(.*?\[PLACEHOLDER[^\]]*\])\s*(.*)$/.exec(value);
-  const amount = (m ? m[1] : value).trim();
-  const qualifier = m?.[2].trim();
+  const m = PRICE_TOKEN.exec(value.trim());
+  const amount = m ? m[0] : value.trim();
+  const qualifier = m ? value.trim().slice(m[0].length).trim() : "";
   return (
     <span className="mt-auto block pt-6">
       <span className="flex flex-col gap-1.5 border-t border-line pt-5">
@@ -145,7 +148,7 @@ function PriceLine({ value }: { value: string }) {
             m ? "whitespace-nowrap" : "text-pretty",
           )}
         >
-          <PlaceholderText value={amount} />
+          {amount}
         </span>
         {qualifier ? (
           <span className="text-[0.8125rem] leading-snug text-pretty text-muted">{qualifier}</span>

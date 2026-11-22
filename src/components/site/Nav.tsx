@@ -21,7 +21,7 @@ export function Nav() {
   return (
     <header className="pointer-events-none sticky top-0 z-50 h-(--nav-h)">
       <Container size="wide" className="flex h-full items-center justify-between gap-3">
-        <div className="pointer-events-auto flex items-center gap-1 rounded-pill bg-white/95 py-1.5 pr-1.5 pl-3.5 shadow-pill ring-1 ring-ink/[0.06] backdrop-blur-md supports-[backdrop-filter]:bg-white/85">
+        <div className="pointer-events-auto flex items-center gap-1 rounded-pill bg-white/95 py-1.5 pr-1.5 pl-3.5 shadow-pill ring-1 ring-ink/[0.06]">
           <Link href="/" aria-label="seenhq home" className="mr-1 rounded-lg py-1 pr-2">
             <Logo />
           </Link>
@@ -46,7 +46,7 @@ export function Nav() {
           {contact ? (
             <Link
               href={contact.href}
-              className="hidden h-11 items-center rounded-pill bg-white/95 px-5 text-[0.9375rem] font-medium text-ink shadow-pill ring-1 ring-ink/[0.06] backdrop-blur-md transition-colors hover:bg-white sm:inline-flex"
+              className="hidden h-11 items-center rounded-pill bg-white/95 px-5 text-[0.9375rem] font-medium text-ink shadow-pill ring-1 ring-ink/[0.06] transition-colors hover:bg-white sm:inline-flex"
             >
               {contact.label}
             </Link>

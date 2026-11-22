@@ -13,7 +13,7 @@ export const metadata = pageMetadata.contact;
 
 export default function ContactPage() {
   const u = lastUpdated();
-  const email = stripPlaceholder(site.contactEmail);
+  const email = stripPlaceholder(site.contactEmail).trim();
 
   return (
     <>
@@ -61,14 +61,16 @@ export default function ContactPage() {
 
               <div className="mt-10 rounded-card bg-white p-6 shadow-[inset_0_0_0_1px_var(--color-line)]">
                 <p className="text-sm text-muted">{contactForm.directEmailLabel}</p>
-                <p className="mt-1.5 text-lg font-medium break-all text-ink">
-                  <a
-                    href={`mailto:${email}`}
-                    className="rounded-sm underline decoration-ink/25 underline-offset-[5px] hover:decoration-ink"
-                  >
-                    <PlaceholderText value={site.contactEmail} />
-                  </a>
-                </p>
+                {email ? (
+                  <p className="mt-1.5 text-lg font-medium break-all text-ink">
+                    <a
+                      href={`mailto:${email}`}
+                      className="rounded-sm underline decoration-ink/25 underline-offset-[5px] hover:decoration-ink"
+                    >
+                      {email}
+                    </a>
+                  </p>
+                ) : null}
                 <div className="mt-6 border-t border-line pt-5">
                   <p className="text-[0.9375rem] leading-relaxed text-pretty text-muted">{contactNextSteps.auditPrompt.body}</p>
                   <Button href={contactNextSteps.auditPrompt.cta.href} variant="link" icon="arrow-right" className="mt-3">

@@ -44,7 +44,9 @@ export function IssueRow({
   return (
     <Tag
       className={cx(
-        "flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl bg-white shadow-[inset_0_0_0_1px_var(--color-line)]",
+        "flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl shadow-[inset_0_0_0_1px_var(--color-line)]",
+        // Locked teasers read as "dimmed" through a paper fill, never opacity, so text keeps AA contrast.
+        locked ? "bg-paper" : "bg-white",
         dense ? "px-3 py-2.5" : "px-4 py-3 sm:flex-nowrap",
         className,
       )}
@@ -52,7 +54,12 @@ export function IssueRow({
       <Badge tone={issue.severity} dot className="w-[4.75rem] justify-center">
         {severityLabel[issue.severity]}
       </Badge>
-      <span className={cx("min-w-0 flex-1 text-sm leading-snug font-medium", locked ? "text-muted" : "text-ink")}>
+      <span
+        className={cx(
+          "min-w-0 flex-1 text-sm leading-snug font-medium",
+          locked ? "text-muted" : "text-ink",
+        )}
+      >
         {locked ? (
           <span className="inline-flex items-center gap-1.5">
             <Icon name="lock" size={14} className="shrink-0" />
@@ -64,14 +71,24 @@ export function IssueRow({
         )}
       </span>
       <span className="flex shrink-0 items-center gap-3 text-xs text-muted">
-        <span className="rounded-md bg-paper px-1.5 py-0.5 font-medium text-ink-2">{categoryLabel[issue.category]}</span>
+        <span
+          className={cx(
+            "rounded-md px-1.5 py-0.5 font-medium text-ink-2",
+            locked ? "bg-white" : "bg-paper",
+          )}
+        >
+          {categoryLabel[issue.category]}
+        </span>
         {issue.effort ? (
           <span className="inline-flex items-center gap-1.5">
             <span aria-hidden className="flex gap-0.5">
               {[1, 2, 3].map((n) => (
                 <span
                   key={n}
-                  className={cx("h-2.5 w-1 rounded-full", n <= effortDots[issue.effort!] ? "bg-ink-2" : "bg-line-strong")}
+                  className={cx(
+                    "h-2.5 w-1 rounded-full",
+                    n <= effortDots[issue.effort!] ? "bg-ink-2" : "bg-line-strong",
+                  )}
                 />
               ))}
             </span>

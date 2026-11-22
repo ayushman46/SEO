@@ -69,8 +69,12 @@ export async function POST(request: Request): Promise<Response> {
   try {
     normalized = normalizeAuditUrl(parsed.data.url);
   } catch (error) {
-    const code = auditErrorCode(error);
-    return auditErrorResponse(code ?? "invalid_url");
+    const code = auditErrorCode(error) ?? "invalid_url";
+    // The engine's invalid_url messages are user-facing and specific (scheme, port, credentials).
+    if (code === "invalid_url" && error instanceof Error && error.name === "AuditError" && error.message) {
+      return jsonError(400, code, error.message);
+    }
+    return auditErrorResponse(code);
   }
 
   const ip = getClientIp(request.headers);

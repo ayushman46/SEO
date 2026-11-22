@@ -1,7 +1,53 @@
-import Image from "next/image";
+import Image, { getImageProps } from "next/image";
+import { preload } from "react-dom";
 import { Parallax } from "./Parallax";
 import { TornFrame } from "./TornFrame";
 import { tornRect } from "./torn";
+
+/**
+ * Art-directed sky: phones in portrait get a portrait crop of the same photo
+ * (the slice they would see anyway), so they download and decode ~1 Mpx instead
+ * of the 2880 px landscape. Both variants are preloaded at high priority, each
+ * only for its own media query.
+ */
+const PORTRAIT_MEDIA = "(max-width: 640px) and (orientation: portrait)";
+const LANDSCAPE_MEDIA = "(min-width: 641px), (orientation: landscape)";
+
+function skyProps() {
+  const portrait = getImageProps({
+    src: "/images/sky-hero-portrait.webp",
+    alt: "",
+    fill: true,
+    sizes: "100vw",
+    quality: 75,
+  }).props;
+  const landscape = getImageProps({
+    src: "/images/sky-hero.webp",
+    alt: "",
+    fill: true,
+    // The box is full-bleed and 120% of the hero height (parallax), so with
+    // object-cover it is height-bound below ~1500 px: about 1060-1240 CSS px wide.
+    sizes: "(min-width: 1280px) 100vw, (orientation: portrait) 1240px, 1080px",
+    quality: 75,
+    loading: "eager",
+    fetchPriority: "high",
+  }).props;
+  preload(portrait.src, {
+    as: "image",
+    imageSrcSet: portrait.srcSet,
+    imageSizes: portrait.sizes,
+    fetchPriority: "high",
+    media: PORTRAIT_MEDIA,
+  });
+  preload(landscape.src, {
+    as: "image",
+    imageSrcSet: landscape.srcSet,
+    imageSizes: landscape.sizes,
+    fetchPriority: "high",
+    media: LANDSCAPE_MEDIA,
+  });
+  return { portrait, landscape };
+}
 
 /**
  * Full-bleed hero collage: a CC0 sky photo as the paper, a hole torn in its
@@ -12,23 +58,21 @@ import { tornRect } from "./torn";
  */
 export function HeroCollage() {
   const bottomTear = tornRect({ seed: 21, steps: 60, amp: 4.2, edges: { bottom: true } });
+  const sky = skyProps();
 
   return (
     <div className="relative isolate -mt-(--nav-h) h-[clamp(27rem,68svh,44rem)] overflow-clip">
       {/* Sky paper with torn bottom edge */}
       <div className="absolute inset-0" style={{ clipPath: bottomTear }}>
         <Parallax speed={-0.07} className="absolute inset-x-0 -top-[10%] -bottom-[10%]">
-          <Image
-            src="/images/sky-hero.webp"
-            alt=""
-            fill
-            preload
-            // The box is full-bleed and 120% of the hero height (parallax), so with
-            // object-cover it is height-bound below ~1500 px: about 1060-1240 CSS px wide.
-            sizes="(min-width: 1280px) 100vw, (orientation: portrait) 1240px, 1080px"
-            quality={75}
-            className="object-cover object-[50%_35%]"
-          />
+          <picture>
+            <source
+              media={PORTRAIT_MEDIA}
+              srcSet={sky.portrait.srcSet}
+              sizes={sky.portrait.sizes}
+            />
+            <img {...sky.landscape} alt="" className="object-cover object-[50%_35%]" />
+          </picture>
         </Parallax>
         {/* gentle top shade so the white nav pills always separate from bright cloud */}
         <div

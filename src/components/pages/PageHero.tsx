@@ -64,6 +64,7 @@ export function PageHero({
               alt=""
               fill
               preload
+              fetchPriority="high"
               sizes="100vw"
               quality={70}
               className="object-cover object-[50%_30%]"

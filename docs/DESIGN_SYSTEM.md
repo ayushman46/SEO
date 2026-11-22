@@ -8,7 +8,7 @@ All colors are CSS variables (light mode only in v1; dark is a palette swap late
 
 | Group | Tokens | Notes |
 |---|---|---|
-| Surfaces | `white` #fff, `paper` #F7F6F2, `paper-2` #EFEDE6, `paper-edge` #FBFAF6 | Paper sections get `.paper-grain`. |
+| Surfaces | `white` #fff, `paper` #F7F6F2, `paper-2` #EFEDE6, `paper-edge` #FBFAF6 | Paper sections get `.paper-grain` (a 128 px pre-rendered WebP noise tile, never an SVG filter). |
 | Ink | `ink` #121212, `ink-2` #2B2B29, `muted` #5F5E58, `faint` #8B8A83 | `muted` is 6.3:1 on paper. `faint` is for placeholders/icons only, never body text. |
 | Lines | `line` #E4E1D8, `line-strong` #CFCBC0 | Hairlines, 1px. |
 | Accent | `accent` #1E7BF5, `accent-600` #1A6FE8, `accent-700` #155FCC, `accent-800` #114FAD, `accent-ink` #1360D6, `accent-soft` #E6F0FE | `accent` = brand blue for fills, rings, data, focus. White text sits on `accent-600` (4.7:1). Blue text uses `accent-ink` (5.7:1 white, 5.3:1 paper). Never use `accent` for small text. |
@@ -49,7 +49,7 @@ Sky blues come from photography, never from UI fills.
 | `site/SiteChrome` | server | Skip link + Nav + `<main id="main">` + Footer. Used by the `(marketing)` layout and the root 404. |
 | `collage/torn.ts` | util | Seeded torn outlines as CSS `polygon()`: `tornRectPair`, `tornEllipsePair` (rim + cut-out share one tear), `tornBand`, `tornRect`. |
 | `collage/TornFrame` | server | Torn cut-out on a paper rim with grain and paper/float drop-shadow. `shape="rect" | "ellipse"`, `rotate`, `edges`. |
-| `collage/Parallax` | client | Moves an inner layer by `speed` × scroll offset; listens only while on screen; off under reduced motion. |
+| `collage/Parallax` | client | Moves an inner layer by `speed` × scroll offset. One shared controller for every instance (one IntersectionObserver, one passive scroll listener only while a layer is on screen, one rAF that reads all rects then writes all transforms). No `will-change`; the at-rest offset is a 2D translate (no layer), 3D only once the user scrolls. Off under reduced motion. |
 | `collage/HeroCollage`, `collage/FeatureCollage` (+ `FloatingCard`), `collage/SectionTear` | server | Compositions. Mock UI cards are labelled "Illustrative" and `aria-hidden`. |
 
 ## Imagery rules
@@ -70,3 +70,15 @@ reduced motion disables parallax, reveals, count-ups, twinkle and smooth scroll.
 ## Don'ts
 No customer logos, testimonials, user counts or "most popular" badges. No engine logos. No Sign in. No sky-blue UI fills.
 No default shadcn look: no gray-50 cards with 1px gray-200 borders and Inter-only headings.
+
+## Performance rules (T011)
+
+Measured on mobile Lighthouse: most main-thread "Other" time was the renderer waiting on GPU raster, not JS. Keep it that way:
+
+- No `will-change` on large layers; no `backdrop-filter` on sticky/fixed chrome.
+- No SVG `feTurbulence` (or other SVG filters) as CSS backgrounds; use small raster tiles.
+- Animate only `opacity`/`transform` on whole layers (the night-sky twinkle animates three star layers, not 40 SVG circles).
+- Batch decorative SVG into a few `<path>`s instead of hundreds of nodes; every DOM node is also hydrated.
+- Shared illustrations across tabs: one collage, swap only the card (`Tabs` `asideFrame` + `TabsAsideSlot`).
+- Read all layout first, then write (see `whenBelowFold` in `ui/Reveal`), never per-element read/write during hydration.
+- Hero sky is art-directed: phones in portrait get `sky-hero-portrait.webp`; LCP images use `fetchPriority="high"`.

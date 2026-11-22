@@ -30,7 +30,14 @@ export function SampleReport() {
           <figure className="relative">
             <figcaption className="mb-4 flex justify-center lg:justify-end">
               <Badge tone="outline">
-                <svg aria-hidden viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <svg
+                  aria-hidden
+                  viewBox="0 0 16 16"
+                  className="size-3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                >
                   <circle cx="8" cy="8" r="6.25" />
                   <path d="M8 7.25v4M8 4.75v.5" strokeLinecap="round" />
                 </svg>
@@ -41,7 +48,10 @@ export function SampleReport() {
               {/* header */}
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-5">
                 <div className="flex min-w-0 items-center gap-3">
-                  <span aria-hidden className="grid size-9 shrink-0 place-items-center rounded-lg bg-paper font-serif text-lg text-ink">
+                  <span
+                    aria-hidden
+                    className="grid size-9 shrink-0 place-items-center rounded-lg bg-paper font-serif text-lg text-ink"
+                  >
                     y
                   </span>
                   <div className="min-w-0">
@@ -64,7 +74,13 @@ export function SampleReport() {
 
               {/* scores */}
               <div className="grid items-center gap-5 py-6 sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-8">
-                <ScoreRing value={r.scores.overall} label="Overall" size={124} stroke={9} className="justify-self-center" />
+                <ScoreRing
+                  value={r.scores.overall}
+                  label="Overall"
+                  size={124}
+                  stroke={9}
+                  className="justify-self-center"
+                />
                 <div className="grid grid-cols-3 gap-2 sm:gap-4">
                   {(
                     [
@@ -73,9 +89,14 @@ export function SampleReport() {
                       ["Performance", r.scores.performance],
                     ] as const
                   ).map(([label, value]) => (
-                    <div key={label} className="flex flex-col items-center gap-2 rounded-xl bg-paper px-1 py-3 text-center">
+                    <div
+                      key={label}
+                      className="flex flex-col items-center gap-2 rounded-xl bg-paper px-1 py-3 text-center"
+                    >
                       <ScoreRing value={value} label={label} size={58} stroke={5} />
-                      <span className="text-[0.6875rem] font-medium text-muted sm:text-xs">{label}</span>
+                      <span className="text-[0.6875rem] font-medium text-muted sm:text-xs">
+                        {label}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -88,14 +109,16 @@ export function SampleReport() {
                   <IssueRow key={issue.id} as="li" issue={issue} />
                 ))}
               </ul>
-              <ul className="relative mt-2 space-y-2" aria-label="More issues, unlocked with your email">
+              <ul
+                className="relative mt-2 space-y-2"
+                aria-label="More issues, unlocked with your email"
+              >
                 {r.lockedIssues.map((issue) => (
                   <IssueRow
                     key={issue.id}
                     as="li"
                     locked
                     issue={{ ...issue, effort: sampleEffort[issue.id] }}
-                    className="opacity-70"
                   />
                 ))}
               </ul>

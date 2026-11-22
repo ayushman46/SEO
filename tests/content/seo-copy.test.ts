@@ -1,8 +1,11 @@
+import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { site } from "@/content/site";
 import { home, homeMeta } from "@/content/home";
 import { services, servicesClosing, servicesPage } from "@/content/services";
 import {
+  pricingHighlightLabel,
   pricingClosing,
   pricingFaq,
   pricingFaqHeading,
@@ -18,8 +21,8 @@ import {
   pricingNoteInr,
   pricingTiersInr,
 } from "@/content/pricing";
-import { aboutPage, aboutSections } from "@/content/about";
-import { contactForm, contactPage, contactServiceOptions } from "@/content/contact";
+import { aboutClosing, aboutPage, aboutSections } from "@/content/about";
+import { contactForm, contactNextSteps, contactPage, contactServiceOptions } from "@/content/contact";
 import { auditEmailGate, auditErrors, auditFlowCopy, auditPage, auditProgressSteps } from "@/content/audit";
 import { privacy, privacyMeta, terms, termsMeta } from "@/content/legal";
 import { TITLE_SUFFIX, buildMetadata, pageMetadata, rootMetadata, siteUrl } from "@/lib/seo/metadata";
@@ -27,6 +30,7 @@ import {
   breadcrumbLd,
   faqLd,
   innerPageLd,
+  founderName,
   offerCatalogLd,
   organizationLd,
   serializeJsonLd,
@@ -73,7 +77,10 @@ const allCopy = JSON.stringify({
   aboutSections,
   contactPage,
   contactForm,
+  contactNextSteps,
   contactServiceOptions,
+  aboutClosing,
+  pricingHighlightLabel,
   auditPage,
   auditEmailGate,
   auditErrors,
@@ -137,7 +144,8 @@ describe("content rules", () => {
     const geo = services.find((s) => s.slug === "geo-audit")!;
     const full = pricingTiers.find((t) => t.name === "Full audit")!;
     expect(seo.priceFrom).toBe(geo.priceFrom);
-    expect(seo.priceFrom.startsWith(full.price.replace(" [PLACEHOLDER]", ""))).toBe(true);
+    expect(seo.priceFrom).toBe("$49 as part of the Full audit");
+    expect(full.price).toBe("$49");
     expect(full.price).not.toMatch(/^From/);
     for (const s of [seo, geo]) expect(s.description).toContain("Full audit");
   });
@@ -153,14 +161,17 @@ describe("content rules", () => {
       "local-ai-setup",
       "ai-crawler-unblock",
     ]);
-    for (const s of services) expect(s.priceFrom).toContain("[PLACEHOLDER");
+    for (const s of services) expect(s.priceFrom).toMatch(/\$\d/);
   });
 
-  it("new prices match the agreed placeholders", () => {
+  it("service prices are the agreed list prices", () => {
     const price = (slug: string) => services.find((s) => s.slug === slug)!.priceFrom;
-    expect(price("ai-fact-check")).toBe("From $69 [PLACEHOLDER]");
-    expect(price("local-ai-setup")).toBe("$149 [PLACEHOLDER] per location");
-    expect(price("ai-crawler-unblock")).toBe("$149 [PLACEHOLDER]");
+    expect(price("technical-fixes")).toBe("From $199");
+    expect(price("content-entity")).toBe("From $149");
+    expect(price("monitoring")).toBe("$29/month");
+    expect(price("ai-fact-check")).toBe("From $69");
+    expect(price("local-ai-setup")).toBe("$149 per location");
+    expect(price("ai-crawler-unblock")).toBe("$149");
   });
 
   it("service descriptions carry no placeholders, so Service JSON-LD keeps them", () => {
@@ -229,8 +240,21 @@ describe("content rules", () => {
     expect(contactServiceOptions.map((o) => o.value)).toEqual([...services.map((s) => s.slug), "not-sure"]);
   });
 
-  it("paid prices are placeholder-marked", () => {
-    for (const t of pricingTiers.filter((t) => t.price !== "$0")) expect(t.price).toContain("[PLACEHOLDER");
+  it("USD tier prices are the agreed list prices", () => {
+    expect(pricingTiers.map((t) => [t.name, t.price])).toEqual([
+      ["Free audit", "$0"],
+      ["Full audit", "$49"],
+      ["Fix sprint", "From $199"],
+      ["Monitoring", "$29"],
+    ]);
+  });
+
+  it("pricing states taxes and the written quote, with no GST claim", () => {
+    const line =
+      "Prices are per site and exclude applicable taxes. We confirm scope and a fixed quote in writing before any paid work starts.";
+    expect(pricingPage.intro).toContain(line);
+    expect(pricingIndiaHeading.intro).toContain(line);
+    expect(allCopy).not.toMatch(/\bGST\b/);
   });
 
   it("INR tiers parallel the USD tiers by name, order and everything but price", () => {
@@ -243,20 +267,15 @@ describe("content rules", () => {
     expect(pricingTiersInr.find((t) => t.name === "Free audit")!.price).toBe("₹0");
   });
 
-  it("all paid INR prices and India extras are placeholder-marked", () => {
-    for (const t of pricingTiersInr.filter((t) => t.price !== "₹0")) expect(t.price).toContain("[PLACEHOLDER");
-    expect(pricingIndiaExtras.map((x) => x.name)).toEqual([
-      "AI fact-check & fix",
-      "Local AI visibility setup",
-      "AI crawler unblock",
-      "Hindi / Hinglish AI answer check",
+  it("INR prices and India extras are the agreed list prices, with no Hindi add-on", () => {
+    expect(pricingTiersInr.map((t) => t.price)).toEqual(["₹0", "₹3,999", "From ₹14,999", "₹1,999"]);
+    expect(pricingIndiaExtras.map((x) => [x.name, x.price])).toEqual([
+      ["AI fact-check & fix", "From ₹4,999"],
+      ["Local AI visibility setup", "₹9,999 per location"],
+      ["AI crawler unblock", "₹9,999"],
     ]);
-    for (const x of pricingIndiaExtras) {
-      expect(x.price).toContain("₹");
-      expect(x.price).toContain("[PLACEHOLDER");
-    }
-    expect(pricingIndiaNotes.some((n) => /UPI/.test(n) && n.includes("[PLACEHOLDER"))).toBe(true);
-    expect(pricingIndiaNotes.some((n) => /GST/.test(n) && n.includes("[PLACEHOLDER"))).toBe(true);
+    expect(allCopy).not.toMatch(/Hindi|Hinglish/);
+    expect(pricingIndiaNotes).toContain("Pay by bank transfer, UPI or card. We send an invoice before work starts.");
     expect(pricingIndiaNotes).toContain("No retainer and no minimum term");
     expect(pricingIndiaComparison.source.href).toMatch(/^https:\/\//);
     expect(currencyLabels.usd).toContain("$");
@@ -272,10 +291,60 @@ describe("content rules", () => {
     expect(names).toContain("Do you offer pricing in rupees?");
   });
 
-  it("INR offers never leak into the OfferCatalog while placeholder-marked", () => {
+  it("INR prices never leak into the OfferCatalog", () => {
     const json = JSON.stringify(offerCatalogLd(pricingTiersInr));
     expect(json).not.toContain("[PLACEHOLDER");
     expect(json).not.toContain("₹");
+    expect(json).not.toContain('"price"');
+    expect(json).not.toContain("INR");
+  });
+
+  it("USD offers publish numeric prices in USD", () => {
+    const offers = offerCatalogLd(pricingTiers).itemListElement as Array<Record<string, unknown>>;
+    expect(offers.map((o) => [o.name, o.price, o.priceCurrency])).toEqual([
+      ["Free audit", 0, "USD"],
+      ["Full audit", 49, "USD"],
+      ["Fix sprint", 199, "USD"],
+      ["Monitoring", 29, "USD"],
+    ]);
+    for (const o of offers) expect(typeof o.price).toBe("number");
+    expect(offers[2].priceSpecification).toMatchObject({ minPrice: 199, priceCurrency: "USD" });
+    expect(offers[3].priceSpecification).toMatchObject({ price: 29, priceCurrency: "USD", unitText: "MONTH" });
+  });
+
+  it("payment, refund, cancellation, reply time and governing law use the agreed neutral wording", () => {
+    const termsText = terms.sections.flatMap((x) => x.body).join(" ");
+    expect(termsText).toContain("if we haven't started the work, you get a full refund.");
+    expect(termsText).toContain("Once work has started, we'll agree a fair partial refund based on what's been delivered.");
+    expect(termsText).toContain(
+      "Monitoring can be cancelled any time by email and stops at the end of the month you have paid for.",
+    );
+    expect(termsText).toContain("These terms are governed by the laws of India, and the competent courts in India");
+    const pay = pricingFaq.find((f) => f.q === "How do I pay?")!.a;
+    expect(pay).toContain("Pay by bank transfer, UPI or card.");
+    expect(pay).toContain(
+      "Payment is due before work starts for one-time services; monitoring is billed monthly in advance",
+    );
+    expect(contactForm.success.body).toContain("We reply within two working days.");
+    expect(contactNextSteps.steps[1].body).toContain("We reply within two working days");
+  });
+
+  it("names no person, address, company registration or public email", () => {
+    expect(site.contactEmail).toBe("");
+    // The only address allowed is the contact form's example input placeholder.
+    expect(allCopy.replaceAll("you@company.com", "")).not.toMatch(/[\w.+-]+@[\w-]+\.[\w.]+/);
+    expect(aboutSections.map((x) => x.title)).not.toContain("Who is behind seenhq");
+    expect(founderName).toBe("");
+    const org = organizationLd();
+    expect(org).not.toHaveProperty("email");
+    expect(org).not.toHaveProperty("founder");
+    expect(JSON.stringify(org.contactPoint)).not.toContain("email");
+    const privacyText = privacy.sections.flatMap((x) => x.body).join(" ");
+    expect(privacyText).toContain(
+      "We keep audit records, leads and contact messages for up to 24 months, then delete them, or sooner if you ask.",
+    );
+    expect(privacyText).toContain("within 30 days");
+    expect(privacyText).toMatch(/Vercel/);
   });
 
   it("home has 4 tabs, 3 steps and 6-9 FAQs", () => {
@@ -290,6 +359,30 @@ describe("content rules", () => {
       expect(auditErrors).toHaveProperty(code);
     }
     expect(auditProgressSteps).toHaveLength(5);
+  });
+});
+
+describe("no placeholders left", () => {
+  it("no exported copy contains a [PLACEHOLDER marker", () => {
+    expect(allCopy).not.toContain("[PLACEHOLDER");
+    expect(allCopy).not.toMatch(/placeholder"?:\s*true/i);
+  });
+
+  it("no file in src/content contains a [PLACEHOLDER marker (types.ts is Fable's contract docs)", () => {
+    const dir = join(process.cwd(), "src", "content");
+    const files = readdirSync(dir).filter((f) => /\.tsx?$/.test(f) && f !== "types.ts");
+    expect(files.length).toBeGreaterThan(5);
+    for (const f of files) expect(readFileSync(join(dir, f), "utf8"), f).not.toContain("[PLACEHOLDER");
+  });
+
+  it("src/lib/seo only mentions [PLACEHOLDER inside the stripping helpers", () => {
+    const dir = join(process.cwd(), "src", "lib", "seo");
+    for (const f of readdirSync(dir).filter((x) => /\.tsx?$/.test(x))) {
+      const lines = readFileSync(join(dir, f), "utf8")
+        .split("\n")
+        .filter((l) => l.includes("[PLACEHOLDER"));
+      for (const l of lines) expect(l, f).toMatch(/includes\("\[PLACEHOLDER"\)|still contains "\[PLACEHOLDER"/);
+    }
   });
 });
 

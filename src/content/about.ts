@@ -21,15 +21,11 @@ export const aboutSections: { title: string; body: string }[] = [
   },
   {
     title: "Who we work with",
-    body: "Startups and SaaS teams who need their product understood by the tools their buyers use, and local businesses such as clinics, studios, cafés and trades who want to be the answer when someone nearby asks.",
+    body: "Startups and SaaS teams who need their product understood by the tools their buyers use, and local businesses such as clinics, studios, cafés and trades who want to be the answer when someone nearby asks. We work remotely with clients worldwide, with a focus on India.",
   },
   {
     title: "How we work",
     body: "Plain language, fixed scope and honest limits. We tell you what we found, what it is worth fixing and what it will cost before we start. We never promise rankings or AI citations, because nobody can.",
-  },
-  {
-    title: "Who is behind seenhq",
-    body: "seenhq is run by [PLACEHOLDER: founder name], [PLACEHOLDER: one or two sentences on background and why you care about search and AI visibility]. Based in [PLACEHOLDER: City, Country].",
   },
 ];
 

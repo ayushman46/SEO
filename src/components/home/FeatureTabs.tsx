@@ -7,7 +7,7 @@ import { cx } from "@/components/ui/cx";
 import { Icon } from "@/components/ui/Icon";
 import { IssueRow } from "@/components/ui/IssueRow";
 import { ScoreRing } from "@/components/ui/ScoreRing";
-import { Tabs, type TabItem } from "@/components/ui/Tabs";
+import { Tabs, TabsAsideSlot, type TabItem } from "@/components/ui/Tabs";
 
 export function FeatureList({ items, className }: { items: FeatureItem[]; className?: string }) {
   return (
@@ -19,7 +19,9 @@ export function FeatureList({ items, className }: { items: FeatureItem[]; classN
           </span>
           <div className="min-w-0">
             <h4 className="text-[0.9875rem] font-semibold text-ink">{item.title}</h4>
-            <p className="mt-1.5 text-[0.9375rem] leading-relaxed text-pretty text-muted">{item.body}</p>
+            <p className="mt-1.5 text-[0.9375rem] leading-relaxed text-pretty text-muted">
+              {item.body}
+            </p>
           </div>
         </li>
       ))}
@@ -80,7 +82,10 @@ function GeoCard() {
     <FloatingCard title="AI crawler access">
       <ul className="divide-y divide-line">
         {rows.map(([label, status]) => (
-          <li key={label} className="flex items-center justify-between gap-2 py-1.5 text-[0.8125rem] first:pt-0 last:pb-0">
+          <li
+            key={label}
+            className="flex items-center justify-between gap-2 py-1.5 text-[0.8125rem] first:pt-0 last:pb-0"
+          >
             <span className="font-mono text-[0.78rem] text-ink-2">{label}</span>
             <StatusDot status={status} />
           </li>
@@ -103,9 +108,16 @@ function PerformanceCard() {
       <div className="flex items-end justify-between gap-2.5" style={{ height: 112 }}>
         {bars.map(([label, h, active]) => (
           <div key={label} className="flex h-full flex-1 flex-col items-center justify-end gap-2">
-            {active ? <span className="text-[0.6875rem] font-semibold whitespace-nowrap text-accent-ink tabular-nums">3.9 s</span> : null}
+            {active ? (
+              <span className="text-[0.6875rem] font-semibold whitespace-nowrap text-accent-ink tabular-nums">
+                3.9 s
+              </span>
+            ) : null}
             <span
-              className={cx("w-full rounded-t-md rounded-b-sm", active ? "bg-accent" : "bg-paper-2")}
+              className={cx(
+                "w-full rounded-t-md rounded-b-sm",
+                active ? "bg-accent" : "bg-paper-2",
+              )}
               style={{ height: `${h}%` }}
             />
           </div>
@@ -113,7 +125,13 @@ function PerformanceCard() {
       </div>
       <div className="mt-2 flex justify-between gap-2.5">
         {bars.map(([label, , active]) => (
-          <span key={label} className={cx("flex-1 text-center text-[0.6875rem] font-medium", active ? "text-ink" : "text-muted")}>
+          <span
+            key={label}
+            className={cx(
+              "flex-1 text-center text-[0.6875rem] font-medium",
+              active ? "text-ink" : "text-muted",
+            )}
+          >
             {label}
           </span>
         ))}
@@ -126,9 +144,36 @@ function FixesCard() {
   return (
     <FloatingCard title="Fix first">
       <ul className="space-y-2">
-        <IssueRow as="li" dense issue={{ severity: "critical", title: "Unblock AI crawlers", category: "geo", effort: "quick" }} />
-        <IssueRow as="li" dense issue={{ severity: "high", title: "Add meta descriptions", category: "seo", effort: "quick" }} />
-        <IssueRow as="li" dense issue={{ severity: "medium", title: "Compress hero image", category: "performance", effort: "moderate" }} />
+        <IssueRow
+          as="li"
+          dense
+          issue={{
+            severity: "critical",
+            title: "Unblock AI crawlers",
+            category: "geo",
+            effort: "quick",
+          }}
+        />
+        <IssueRow
+          as="li"
+          dense
+          issue={{
+            severity: "high",
+            title: "Add meta descriptions",
+            category: "seo",
+            effort: "quick",
+          }}
+        />
+        <IssueRow
+          as="li"
+          dense
+          issue={{
+            severity: "medium",
+            title: "Compress hero image",
+            category: "performance",
+            effort: "moderate",
+          }}
+        />
       </ul>
     </FloatingCard>
   );
@@ -142,7 +187,7 @@ const cards: Record<string, () => ReactElement> = {
 };
 
 export function FeatureTabs() {
-  const items: TabItem[] = home.tabs.map((tab, i) => {
+  const items: TabItem[] = home.tabs.map((tab) => {
     const Card = cards[tab.id] ?? SeoCard;
     return {
       id: tab.id,
@@ -150,15 +195,13 @@ export function FeatureTabs() {
       content: (
         <div>
           <h3 className="max-w-xl font-serif text-display-sm text-balance text-ink">{tab.title}</h3>
-          <p className="mt-4 max-w-xl text-[1.0625rem] leading-relaxed text-pretty text-muted">{tab.body}</p>
+          <p className="mt-4 max-w-xl text-[1.0625rem] leading-relaxed text-pretty text-muted">
+            {tab.body}
+          </p>
           <FeatureList items={tab.bullets} className="mt-9" />
         </div>
       ),
-      aside: (
-        <FeatureCollage seed={9 + i * 13}>
-          <Card />
-        </FeatureCollage>
-      ),
+      aside: <Card />,
     };
   });
 
@@ -168,7 +211,17 @@ export function FeatureTabs() {
         <h2 id="features-title" className="sr-only">
           What the audit checks
         </h2>
-        <Tabs items={items} label="Audit areas" layout="split" />
+        {/* One shared collage; only the floating card swaps with the tab. */}
+        <Tabs
+          items={items}
+          label="Audit areas"
+          layout="split"
+          asideFrame={
+            <FeatureCollage seed={9}>
+              <TabsAsideSlot />
+            </FeatureCollage>
+          }
+        />
       </Container>
     </section>
   );

@@ -17,17 +17,24 @@ export const websiteId = () => `${siteUrl()}/#website`;
 
 /**
  * Social / directory profiles for Organization.sameAs.
- * [PLACEHOLDER] Founder: add real profile URLs (LinkedIn, X, GitHub, Google Business Profile…). Leave empty until then.
+ * Add real profile URLs here (LinkedIn, X, GitHub, Google Business Profile…) once they exist. Empty means none are published.
  */
 export const sameAsProfiles: string[] = [];
 
-/** [PLACEHOLDER] Founder: set your real name to publish a founder Person node. Leave empty until then. */
+/** A real founder name publishes a founder Person node. Intentionally empty: no person is named on the site. */
 export const founderName: string = "";
 
 /** Square brand logo served from public/logo.png (512×512). */
 export const LOGO = { path: "/logo.png", width: 512, height: 512 } as const;
 
+/** The public contact email, or null when none is set (empty) or it is still a placeholder. */
+function publicEmail(): string | null {
+  const email = site.contactEmail.trim();
+  return email && !isPlaceholder(email) ? email : null;
+}
+
 export function organizationLd(): JsonLdNode {
+  const email = publicEmail();
   const node: JsonLdNode = {
     "@context": CONTEXT,
     "@type": "Organization",
@@ -56,10 +63,10 @@ export function organizationLd(): JsonLdNode {
       contactType: "customer support",
       url: absoluteUrl("/contact"),
       availableLanguage: ["English"],
-      ...(isPlaceholder(site.contactEmail) ? {} : { email: site.contactEmail }),
+      ...(email ? { email } : {}),
     },
   };
-  if (!isPlaceholder(site.contactEmail)) node.email = site.contactEmail;
+  if (email) node.email = email;
   if (sameAsProfiles.length > 0) node.sameAs = sameAsProfiles;
   if (founderName && !isPlaceholder(founderName)) node.founder = { "@type": "Person", name: founderName };
   return node;
@@ -96,30 +103,47 @@ export function serviceLd(service: Service): JsonLdNode {
   };
 }
 
-/** Parses "$49" / "From $199" into a number. Returns null for placeholder-marked or unparseable prices. */
-function publishablePrice(price: string): number | null {
+/**
+ * Parses a US dollar display price ("$49", "From $199") into a number.
+ * Returns null for placeholder-marked, non-USD (e.g. "₹3,999") or unparseable prices.
+ */
+export function publishableUsdPrice(price: string): number | null {
   if (isPlaceholder(price)) return null;
-  const m = price.replace(/,/g, "").match(/\$(\d+(?:\.\d+)?)/);
+  const m = price.replace(/,/g, "").match(/^\s*(?:From\s+)?\$(\d+(?:\.\d+)?)/i);
   return m ? Number(m[1]) : null;
 }
 
-/** OfferCatalog for /pricing. Tiers keep name/description; a price is only published once it is no longer a placeholder. */
+/** Offer price fields for a USD tier: a numeric price, plus a minimum ("From") or monthly price specification. */
+function offerPriceFields(tier: PricingTier): Record<string, unknown> {
+  const price = publishableUsdPrice(tier.price);
+  if (price === null) return {};
+  const fields: Record<string, unknown> = { price, priceCurrency: "USD" };
+  if (/^\s*From\b/i.test(tier.price)) {
+    fields.priceSpecification = { "@type": "PriceSpecification", minPrice: price, priceCurrency: "USD" };
+  } else if (/month/i.test(tier.cadence)) {
+    fields.priceSpecification = { "@type": "UnitPriceSpecification", price, priceCurrency: "USD", unitText: "MONTH" };
+  }
+  return fields;
+}
+
+/**
+ * OfferCatalog for /pricing. Only USD prices are published (as numbers, priceCurrency USD);
+ * tiers priced in any other currency keep name/description but carry no price.
+ */
 export function offerCatalogLd(tiers: readonly PricingTier[]): JsonLdNode {
   return {
     "@context": CONTEXT,
     "@type": "OfferCatalog",
     name: `${site.name} pricing`,
     url: absoluteUrl("/pricing"),
-    itemListElement: tiers.map((tier) => {
-      const price = publishablePrice(tier.price);
-      return {
-        "@type": "Offer",
-        name: tier.name,
-        description: tier.description,
-        seller: { "@id": organizationId() },
-        ...(price === null ? {} : { price, priceCurrency: "USD" }),
-      };
-    }),
+    itemListElement: tiers.map((tier) => ({
+      "@type": "Offer",
+      name: tier.name,
+      description: tier.description,
+      url: absoluteUrl("/pricing"),
+      seller: { "@id": organizationId() },
+      ...offerPriceFields(tier),
+    })),
   };
 }
 

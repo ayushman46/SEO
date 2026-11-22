@@ -91,14 +91,44 @@ function unwatch(el: Element) {
   stop();
 }
 
-/**
- * True when `el` may start hidden and animate in: IntersectionObserver exists,
- * motion is allowed, and the element starts below the viewport.
+/*
+ * Batched fold check. Every Reveal / ScoreRing mounts in the same commit; checking
+ * each one inline (read rect, then mark pending) interleaves reads and writes and
+ * forces a full style + layout per element during hydration. Instead, checks are
+ * queued and run in one microtask: all rects are read first, then every callback
+ * (which writes) runs.
  */
-export function canAnimateIn(el: Element) {
-  if (typeof window === "undefined" || typeof IntersectionObserver === "undefined") return false;
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
-  return el.getBoundingClientRect().top >= window.innerHeight;
+type FoldCheck = { el: Element; run: () => void; cancelled: boolean };
+let foldQueue: FoldCheck[] = [];
+
+function flushFold() {
+  const queue = foldQueue;
+  foldQueue = [];
+  const live = queue.filter((c) => !c.cancelled);
+  if (!live.length) return;
+  if (
+    typeof IntersectionObserver === "undefined" ||
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  )
+    return;
+  const vh = window.innerHeight;
+  const below = live.filter((c) => c.el.getBoundingClientRect().top >= vh);
+  for (const c of below) if (!c.cancelled) c.run();
+}
+
+/**
+ * Runs `cb` (batched with every other check in this commit) only if `el` may
+ * start hidden and animate in. `cb` may return a cleanup. Returns a cleanup.
+ */
+export function whenBelowFold(el: Element, cb: () => (() => void) | void) {
+  let cleanup: (() => void) | void;
+  const check: FoldCheck = { el, cancelled: false, run: () => (cleanup = cb()) };
+  if (!foldQueue.length) queueMicrotask(flushFold);
+  foldQueue.push(check);
+  return () => {
+    check.cancelled = true;
+    cleanup?.();
+  };
 }
 
 /**
@@ -131,18 +161,19 @@ export function Reveal({
 
   useEffect(() => {
     const el = ref.current;
-    if (!el || !canAnimateIn(el)) return;
-
-    el.dataset.reveal = "pending";
-    const cleanup = watchReveal(el, (animate) => {
-      // Without the attribute the element is plain, fully visible content with no transition.
-      if (animate) el.dataset.reveal = "done";
-      else delete el.dataset.reveal;
+    if (!el) return;
+    return whenBelowFold(el, () => {
+      el.dataset.reveal = "pending";
+      const cleanup = watchReveal(el, (animate) => {
+        // Without the attribute the element is plain, fully visible content with no transition.
+        if (animate) el.dataset.reveal = "done";
+        else delete el.dataset.reveal;
+      });
+      return () => {
+        cleanup();
+        delete el.dataset.reveal;
+      };
     });
-    return () => {
-      cleanup();
-      delete el.dataset.reveal;
-    };
   }, []);
 
   return (

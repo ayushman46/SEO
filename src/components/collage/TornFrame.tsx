@@ -45,11 +45,14 @@ export function TornFrame({
     ? tornEllipsePair({ seed, amp: a, rim: rim ? rw : 0 })
     : tornRectPair({ seed, amp: a, rim: rim ? rw : 0, edges });
 
+  // One drop-shadow per frame (not a stacked contact + ambient pair): every filter
+  // pass is an offscreen surface plus a blur, and stacked pairs on every scrap doubled
+  // the GPU raster work at load (T011).
   const filter =
     shadow === "paper"
-      ? "drop-shadow(0 1px 1px rgb(60 48 20 / 0.18)) drop-shadow(0 10px 18px rgb(30 34 60 / 0.22))"
+      ? "drop-shadow(0 6px 10px rgb(40 38 50 / 0.24))"
       : shadow === "float"
-        ? "drop-shadow(0 2px 2px rgb(20 30 60 / 0.2)) drop-shadow(0 22px 34px rgb(20 30 60 / 0.32))"
+        ? "drop-shadow(0 14px 22px rgb(20 30 60 / 0.34))"
         : undefined;
 
   return (

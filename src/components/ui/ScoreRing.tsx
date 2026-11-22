@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { cx } from "./cx";
-import { canAnimateIn, watchReveal } from "./Reveal";
+import { watchReveal, whenBelowFold } from "./Reveal";
 
 /**
  * SVG score ring with a count-up. Renders the final value on the server; the
@@ -43,43 +43,43 @@ export function ScoreRing({
     const num = numRef.current;
     const tickEl = tickRef.current;
     if (!animate || value === null || !wrap || !arc || !num || !tickEl) return;
-    if (!canAnimateIn(wrap)) return;
-
-    // Server HTML already holds the final value. The count-up never touches nodes
-    // React owns: it hides the React-rendered number, writes into an empty overlay
-    // span, and drives the arc through an inline style. Releasing simply removes
-    // those overrides, so whatever React rendered last (the current value) shows.
-    const release = () => {
-      arc.style.removeProperty("stroke-dashoffset");
-      num.style.removeProperty("visibility");
-      tickEl.textContent = "";
-    };
-    arc.style.strokeDashoffset = String(c);
-    num.style.visibility = "hidden";
-    tickEl.textContent = "0";
-    let raf = 0;
-    const cleanup = watchReveal(wrap, (shouldAnimate) => {
-      if (!shouldAnimate) return release();
-      const start = performance.now();
-      const dur = 1300;
-      const tick = (now: number) => {
-        const t = Math.min(1, (now - start) / dur);
-        const eased = 1 - Math.pow(1 - t, 3);
-        if (t < 1) {
-          arc.style.strokeDashoffset = String(c * (1 - (v / 100) * eased));
-          tickEl.textContent = String(Math.round(v * eased));
-          raf = requestAnimationFrame(tick);
-        } else {
-          release();
-        }
+    return whenBelowFold(wrap, () => {
+      // Server HTML already holds the final value. The count-up never touches nodes
+      // React owns: it hides the React-rendered number, writes into an empty overlay
+      // span, and drives the arc through an inline style. Releasing simply removes
+      // those overrides, so whatever React rendered last (the current value) shows.
+      const release = () => {
+        arc.style.removeProperty("stroke-dashoffset");
+        num.style.removeProperty("visibility");
+        tickEl.textContent = "";
       };
-      raf = requestAnimationFrame(tick);
+      arc.style.strokeDashoffset = String(c);
+      num.style.visibility = "hidden";
+      tickEl.textContent = "0";
+      let raf = 0;
+      const cleanup = watchReveal(wrap, (shouldAnimate) => {
+        if (!shouldAnimate) return release();
+        const start = performance.now();
+        const dur = 1300;
+        const tick = (now: number) => {
+          const t = Math.min(1, (now - start) / dur);
+          const eased = 1 - Math.pow(1 - t, 3);
+          if (t < 1) {
+            arc.style.strokeDashoffset = String(c * (1 - (v / 100) * eased));
+            tickEl.textContent = String(Math.round(v * eased));
+            raf = requestAnimationFrame(tick);
+          } else {
+            release();
+          }
+        };
+        raf = requestAnimationFrame(tick);
+      });
+      return () => {
+        cleanup();
+        cancelAnimationFrame(raf);
+        release();
+      };
     });
-    return () => {
-      cleanup();
-      cancelAnimationFrame(raf);
-      release();
-    };
   }, [animate, value, c, v]);
 
   const night = tone === "night";
@@ -124,10 +124,7 @@ export function ScoreRing({
       <div aria-hidden className="absolute inset-0 grid place-items-center text-center">
         <div className="flex flex-col items-center leading-none">
           <span
-            className={cx(
-              "grid font-serif tabular-nums",
-              night ? "text-night-ink" : "text-ink",
-            )}
+            className={cx("grid font-serif tabular-nums", night ? "text-night-ink" : "text-ink")}
             style={{ fontSize: size * 0.34 }}
           >
             <span ref={numRef} className="[grid-area:1/1]">

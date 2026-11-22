@@ -7,7 +7,7 @@ export const pricingPage = {
   kicker: "Pricing",
   title: "Simple prices for small teams and local businesses",
   intro:
-    "The seenhq audit is free. The Full audit and Monitoring have one fixed price per site. A fix sprint depends on how much needs fixing, so its price is a starting point: you get a fixed quote by email before any work starts, and you pay nothing until you agree to it. Monitoring can be cancelled any month.",
+    "The seenhq audit is free. The Full audit and Monitoring have one fixed price per site. A fix sprint depends on how much needs fixing, so its price is a starting point: you get a fixed quote by email before any work starts, and you pay nothing until you agree to it. Monitoring can be cancelled any month. Prices are per site and exclude applicable taxes. We confirm scope and a fixed quote in writing before any paid work starts.",
 } satisfies PageCopy;
 
 export const pricingTiers = [
@@ -26,23 +26,23 @@ export const pricingTiers = [
   },
   {
     name: "Full audit",
-    price: "$49 [PLACEHOLDER]",
+    price: "$49",
     cadence: "one-time",
     description:
       "Our SEO audit and GEO audit in one review by a person, at one fixed price per site, with a written plan you can act on.",
     features: [
       "Everything in the free audit",
-      "Covers up to 50 pages [PLACEHOLDER], not just six",
+      "Covers up to 50 pages, not just six",
       "A person reads your key pages and checks what a script can't judge",
       "A written plan: what to fix first, what can wait, what to ignore",
-      "A short call or written walkthrough [PLACEHOLDER]",
+      "A written walkthrough of your report, with a short call if you want one",
     ],
     cta: { label: "Request a full audit", href: "/contact?service=seo-audit" },
     highlighted: true,
   },
   {
     name: "Fix sprint",
-    price: "From $199 [PLACEHOLDER]",
+    price: "From $199",
     cadence: "one-time",
     description: "We implement the highest-impact fixes from your audit for you, at a price agreed before we start.",
     features: [
@@ -56,7 +56,7 @@ export const pricingTiers = [
   },
   {
     name: "Monitoring",
-    price: "$29 [PLACEHOLDER]",
+    price: "$29",
     cadence: "/month",
     description: "Once a month we re-audit your site and email you a short written report on what changed.",
     features: [
@@ -76,7 +76,7 @@ export const pricingFaq = [
   },
   {
     q: "What does the Full audit add to the free audit?",
-    a: "The free audit is automated: it runs a fixed set of checks on your homepage and up to five more pages. In the Full audit a person reviews a much larger part of your site and judges what a script can't, such as whether a page really answers the question a customer would ask. You get a written plan that says what to fix first, what can wait and what to ignore, plus a walkthrough.",
+    a: "The free audit is automated: it runs a fixed set of checks on your homepage and up to five more pages. In the Full audit a person reviews a much larger part of your site and judges what a script can't, such as whether a page really answers the question a customer would ask. You get a written plan that says what to fix first, what can wait and what to ignore, plus a written walkthrough of your report, with a short call if you want one.",
   },
   {
     q: "Is seenhq affordable for a local business?",
@@ -104,11 +104,11 @@ export const pricingFaq = [
   },
   {
     q: "Is there a minimum term for monitoring?",
-    a: "There is no minimum term [PLACEHOLDER]. Monitoring is billed monthly and you can cancel any month by emailing us.",
+    a: "No. There is no minimum term. Monitoring is billed monthly in advance, and it can be cancelled any time by email and stops at the end of the month you have paid for.",
   },
   {
     q: "How do I pay?",
-    a: "After we agree the scope by email, we send an invoice [PLACEHOLDER: payment method]. Work starts once it is paid.",
+    a: "Pay by bank transfer, UPI or card. Once we have agreed the scope by email, we send an invoice before work starts. Payment is due before work starts for one-time services; monitoring is billed monthly in advance.",
   },
   {
     q: "Do you offer pricing in rupees?",
@@ -143,7 +143,7 @@ export const pricingClosing = {
 
 /* ------------------------------------------------------------------ */
 /* India pricing in rupees (T010). Additive: the USD exports above are */
-/* unchanged. Paid INR prices stay placeholder-marked until confirmed. */
+/* unchanged. INR prices are display-only and never published as JSON-LD. */
 /* ------------------------------------------------------------------ */
 
 /** Labels for the currency switch on /pricing. */
@@ -158,59 +158,53 @@ export const currencyLabels = {
 
 const inrPrices: Record<string, string> = {
   "Free audit": "₹0",
-  "Full audit": "₹3,999 [PLACEHOLDER]",
-  "Fix sprint": "From ₹14,999 [PLACEHOLDER]",
-  Monitoring: "₹1,999 [PLACEHOLDER]",
+  "Full audit": "₹3,999",
+  "Fix sprint": "From ₹14,999",
+  Monitoring: "₹1,999",
 };
 
 /** The same tiers as `pricingTiers`, in the same order, priced in Indian rupees. Only the price differs. */
-export const pricingTiersInr = pricingTiers.map((tier) => ({
-  ...tier,
-  price: inrPrices[tier.name] ?? `${tier.price} [PLACEHOLDER: INR price]`,
-})) satisfies PricingTier[];
+export const pricingTiersInr = pricingTiers.map((tier) => {
+  const price = inrPrices[tier.name];
+  if (!price) throw new Error(`Missing INR price for tier "${tier.name}"`);
+  return { ...tier, price };
+}) satisfies PricingTier[];
 
 /** Heading and intro for the rupee price set (the #india-pricing section). */
 export const pricingIndiaHeading = {
   kicker: "India",
   title: "India pricing in rupees",
   intro:
-    "The same plans for businesses in India, priced in rupees. You get the same work and the same written plan as on the US dollar prices.",
+    "The same plans for businesses in India, priced in rupees. You get the same work and the same written plan as on the US dollar prices. Prices are per site and exclude applicable taxes. We confirm scope and a fixed quote in writing before any paid work starts.",
 } as const;
 
-/** "India extras": rupee prices for the AI-facing services, plus an optional Hindi / Hinglish add-on. */
+/** "India extras": rupee prices for the AI-facing services. */
 export const pricingIndiaExtras = [
   {
     name: "AI fact-check & fix",
-    price: "From ₹4,999 [PLACEHOLDER]",
+    price: "From ₹4,999",
     description: "We compare what AI assistants say about you with your real facts and correct the sources behind wrong answers.",
     href: "/services#ai-fact-check",
   },
   {
     name: "Local AI visibility setup",
-    price: "₹9,999 [PLACEHOLDER] per location",
+    price: "₹9,999 per location",
     description: "We complete and align your business profiles, such as Google, Bing Places and the directories your customers use.",
     href: "/services#local-ai-setup",
   },
   {
     name: "AI crawler unblock",
-    price: "₹9,999 [PLACEHOLDER]",
+    price: "₹9,999",
     description: "We find out why AI crawlers are turned away from your site and fix what is in your control.",
     href: "/services#ai-crawler-unblock",
-  },
-  {
-    name: "Hindi / Hinglish AI answer check",
-    price: "₹2,999 [PLACEHOLDER] add-on",
-    description:
-      "Your most important customer questions asked in English, Hindi and Hinglish, checked by a native Hindi reader [PLACEHOLDER: confirm reviewer].",
-    href: "/contact",
   },
 ] satisfies PriceExtra[];
 
 /** Short notes under the rupee prices. Keep these honest; see docs/MARKET_RESEARCH.md. */
 export const pricingIndiaNotes = [
-  "Pay by UPI, card or bank transfer [PLACEHOLDER]",
+  "Pay by bank transfer, UPI or card. We send an invoice before work starts.",
   "No retainer and no minimum term",
-  "Prices exclude GST [PLACEHOLDER: confirm GST registration and rate]",
+  "Prices are per site and exclude applicable taxes",
 ] as const;
 
 /**

@@ -8,39 +8,72 @@ import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 
-/** Deterministic starfield (server-rendered SVG, ~140 stars, no image request). */
+/** A circle as path data, so a whole group of stars is one DOM node. */
+const dot = (x: number, y: number, r: number) =>
+  `M${(x - r).toFixed(1)} ${y.toFixed(1)}a${r.toFixed(2)} ${r.toFixed(2)} 0 1 0 ${(2 * r).toFixed(2)} 0a${r.toFixed(2)} ${r.toFixed(2)} 0 1 0 ${(-2 * r).toFixed(2)} 0`;
+
+const TWINKLE_GROUPS = 3;
+const OPACITY_STEPS = [0.45, 0.6, 0.75, 0.9];
+
+/**
+ * Deterministic starfield (server-rendered SVG, ~140 stars, no image request).
+ * Stars are batched into a handful of <path>s (static ones by opacity step) instead
+ * of 140 <circle>s, and the twinkling stars sit in three separate <svg> layers whose
+ * opacity animates as a whole: a composited animation, so the night sky no longer
+ * repaints every frame.
+ */
 function Stars() {
   const rand = mulberry32(2026);
-  const stars = Array.from({ length: 140 }, (_, i) => {
+  const steady: string[][] = OPACITY_STEPS.map(() => []);
+  const twinkling: string[][] = Array.from({ length: TWINKLE_GROUPS }, () => []);
+  for (let i = 0; i < 140; i++) {
     const x = rand() * 1000;
     const y = rand() * 640;
     const big = rand() < 0.08;
     const r = big ? 1.3 + rand() * 0.9 : 0.35 + rand() * 0.75;
     const twinkle = rand() < 0.28;
-    const delay = (rand() * 4.5).toFixed(2);
-    return { i, x, y, r, twinkle, delay, o: 0.35 + rand() * 0.6 };
-  });
+    const delay = rand() * 4.5;
+    const o = 0.35 + rand() * 0.6;
+    if (twinkle) {
+      twinkling[Math.min(TWINKLE_GROUPS - 1, Math.floor((delay / 4.5) * TWINKLE_GROUPS))].push(
+        dot(x, y, r),
+      );
+    } else {
+      const step = OPACITY_STEPS.reduce(
+        (best, v, k) => (Math.abs(v - o) < Math.abs(OPACITY_STEPS[best] - o) ? k : best),
+        0,
+      );
+      steady[step].push(dot(x, y, r));
+    }
+  }
+  const svgProps = {
+    "aria-hidden": true,
+    focusable: "false",
+    viewBox: "0 0 1000 640",
+    preserveAspectRatio: "xMidYMid slice",
+  } as const;
   return (
-    <svg
-      aria-hidden
-      className="absolute inset-0 h-full w-full"
-      viewBox="0 0 1000 640"
-      preserveAspectRatio="xMidYMid slice"
-      focusable="false"
-    >
-      {stars.map((s) => (
-        <circle
-          key={s.i}
-          cx={s.x.toFixed(1)}
-          cy={s.y.toFixed(1)}
-          r={s.r.toFixed(2)}
-          fill="#fff"
-          opacity={s.twinkle ? undefined : s.o.toFixed(2)}
-          className={s.twinkle ? "star-twinkle" : undefined}
-          style={s.twinkle ? { animationDelay: `${s.delay}s` } : undefined}
-        />
-      ))}
-    </svg>
+    <>
+      <svg {...svgProps} className="absolute inset-0 h-full w-full">
+        {steady.map((d, k) =>
+          d.length ? (
+            <path key={k} d={d.join("")} fill="#fff" fillOpacity={OPACITY_STEPS[k]} />
+          ) : null,
+        )}
+      </svg>
+      {twinkling.map((d, k) =>
+        d.length ? (
+          <svg
+            key={k}
+            {...svgProps}
+            className="star-twinkle absolute inset-0 h-full w-full"
+            style={{ animationDelay: `${((k * 4.5) / TWINKLE_GROUPS).toFixed(2)}s` }}
+          >
+            <path d={d.join("")} fill="#fff" />
+          </svg>
+        ) : null,
+      )}
+    </>
   );
 }
 

@@ -20,8 +20,8 @@ export const privacy = {
     {
       heading: "Who we are",
       body: [
-        "seenhq is operated by [PLACEHOLDER: legal entity name], [PLACEHOLDER: registered address]. In this policy, \"seenhq\", \"we\" and \"us\" mean that entity.",
-        "If you have any question about this policy or your data, email us at [PLACEHOLDER: privacy contact email].",
+        "This website and its services are operated under the seenhq name. In this policy, \"seenhq\", \"we\" and \"us\" mean the operator of seenhq.",
+        "If you have any question about this policy or your data, contact us via the contact form at /contact and we will reply by email.",
       ],
     },
     {
@@ -50,28 +50,28 @@ export const privacy = {
     {
       heading: "Who processes your data",
       body: [
-        "We use a small number of service providers to run seenhq: Vercel (hosting and analytics), our database provider [PLACEHOLDER: e.g. Neon], our email provider [PLACEHOLDER: e.g. Resend] for sending replies and notifications, and Google PageSpeed Insights for performance checks.",
+        "We use a small number of service providers to run seenhq: our hosting provider (Vercel), which also provides our cookie-free analytics and server logs; if we store data, our database provider; if we send email notifications, our email provider; and Google PageSpeed Insights for performance checks.",
         "We do not sell your personal data and we do not share it with anyone for their own marketing.",
       ],
     },
     {
       heading: "How long we keep it",
       body: [
-        "We keep audit results, report unlocks and contact messages for [PLACEHOLDER: retention period, e.g. 24 months] after your last interaction with us, unless you ask us to delete them sooner or we need to keep them longer to meet a legal obligation.",
+        "We keep audit records, leads and contact messages for up to 24 months, then delete them, or sooner if you ask.",
       ],
     },
     {
       heading: "Your rights",
       body: [
-        "You can ask us for a copy of the personal data we hold about you, ask us to correct it, or ask us to delete it. Email [PLACEHOLDER: privacy contact email] from the address you used and we will act on it within 30 days.",
-        "You can withdraw your consent to be contacted about your report at any time by replying to any email from us or writing to the address above.",
+        "You can ask us for a copy of the personal data we hold about you, ask us to correct it, or ask us to delete it. Contact us via the contact form at /contact, using the email address you gave us, and we will act on it within 30 days.",
+        "You can withdraw your consent to be contacted about your report at any time by replying to any email from us or contacting us via the contact form at /contact.",
         "Depending on where you live, you may also have the right to complain to your local data protection authority.",
       ],
     },
     {
       heading: "Security",
       body: [
-        "Data is sent over HTTPS and stored in a database that only our server can access. Full audit reports held in your browser are encrypted. No system is perfectly secure, but we limit what we collect so there is less to protect.",
+        "Data is sent over HTTPS. Where we store it in a database, only our server can access that database. Full audit reports held in your browser are encrypted. No system is perfectly secure, but we limit what we collect so there is less to protect.",
       ],
     },
     {
@@ -90,7 +90,7 @@ export const terms = {
     {
       heading: "About these terms",
       body: [
-        "These terms apply to your use of the seenhq website, the free audit and any paid services. seenhq is operated by [PLACEHOLDER: legal entity name], [PLACEHOLDER: registered address]. By using the site you agree to these terms.",
+        "These terms apply to your use of the seenhq website, the free audit and any paid services. This website and its services are operated under the seenhq name. By using the site you agree to these terms.",
       ],
     },
     {
@@ -111,7 +111,9 @@ export const terms = {
       heading: "Paid services",
       body: [
         "Paid services such as full audits, fix sprints, content work and monitoring are agreed by email before work starts. The agreed scope, price and timing in that email, together with these terms, form our agreement.",
-        "Payment terms: [PLACEHOLDER: payment method, due date and refund policy]. Monitoring is billed monthly and can be cancelled any month by email; cancellation takes effect [PLACEHOLDER: when cancellation takes effect, e.g. at the end of the current billing month].",
+        "Payment: we send an invoice before work starts, and you can pay by bank transfer, UPI or card. Payment is due before work starts for one-time services; monitoring is billed monthly in advance. Prices exclude applicable taxes.",
+        "Refunds: if we haven't started the work, you get a full refund. Once work has started, we'll agree a fair partial refund based on what's been delivered.",
+        "Monitoring can be cancelled any time by email and stops at the end of the month you have paid for.",
         "Where we make changes to your website, you are responsible for giving us appropriate access and for keeping your own backups.",
       ],
     },
@@ -137,13 +139,13 @@ export const terms = {
     {
       heading: "Governing law",
       body: [
-        "These terms are governed by the laws of [PLACEHOLDER: jurisdiction], and the courts of [PLACEHOLDER: jurisdiction] have jurisdiction over any dispute.",
+        "These terms are governed by the laws of India, and the competent courts in India have jurisdiction over any dispute.",
       ],
     },
     {
       heading: "Changes and contact",
       body: [
-        "We may update these terms from time to time. The date at the top shows when they last changed. Questions? Email [PLACEHOLDER: contact email].",
+        "We may update these terms from time to time. The date at the top shows when they last changed. Questions? Use the contact form at /contact and we'll reply by email.",
       ],
     },
   ],

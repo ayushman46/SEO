@@ -20,16 +20,16 @@ export const services = [
     tagline: "A person reviews what's holding your rankings back.",
     description: `An SEO audit is a structured check of how well search engines can crawl, index and understand your website. We go well beyond the free tool's six pages, review your key pages by hand and turn the findings into a short, written, prioritised plan. ${FULL_AUDIT_NOTE}`,
     deliverables: [
-      "Review of up to 50 pages [PLACEHOLDER], not just the six the free audit reads",
+      "Review of up to 50 pages, not just the six the free audit reads",
       "Manual check of titles, headings, internal links and indexing",
       "Structured data and social sharing (Open Graph) check",
       "Core Web Vitals summary with the likely causes",
       "A written plan: what to fix first, what can wait and what to ignore",
-      "A short call or written walkthrough [PLACEHOLDER]",
+      "A written walkthrough of your report, with a short call if you want one",
     ],
     forWho:
       "Founders and owners who want to know exactly what to fix, and in what order, before spending on content or ads.",
-    priceFrom: "$49 [PLACEHOLDER] as part of the Full audit",
+    priceFrom: "$49 as part of the Full audit",
   },
   {
     slug: "geo-audit",
@@ -45,7 +45,7 @@ export const services = [
     ],
     forWho:
       "SaaS teams and local businesses that rank on Google but want their site to be easy for AI assistants to read and quote.",
-    priceFrom: "$49 [PLACEHOLDER] as part of the Full audit",
+    priceFrom: "$49 as part of the Full audit",
   },
   {
     slug: "technical-fixes",
@@ -62,7 +62,7 @@ export const services = [
     ],
     forWho:
       "Teams without a developer to spare, and businesses on website builders who would rather not touch the code.",
-    priceFrom: "From $199 [PLACEHOLDER]",
+    priceFrom: "From $199",
   },
   {
     slug: "content-entity",
@@ -78,7 +78,7 @@ export const services = [
     ],
     forWho:
       "Businesses whose pages look good but don't say plainly what they do, for whom, and where.",
-    priceFrom: "From $149 [PLACEHOLDER]",
+    priceFrom: "From $149",
   },
   {
     slug: "monitoring",
@@ -93,7 +93,7 @@ export const services = [
       "Cancel any month by email",
     ],
     forWho: "Anyone who has fixed their site once and wants to keep it that way.",
-    priceFrom: "$29/month [PLACEHOLDER]",
+    priceFrom: "$29/month",
   },
   {
     slug: "ai-fact-check",
@@ -109,11 +109,11 @@ export const services = [
       "Up to 5 correction requests to third-party pages that carry a wrong fact, plus feedback filed inside each assistant",
       "A re-test after 30 days with a before-and-after sheet",
       "What we don't promise: third-party sites may ignore correction requests, an assistant may keep repeating an old fact for a while, and we ask from our own location with your city named in the question, so your customers may see different answers",
-      "The check alone is $69 [PLACEHOLDER]; fixing plus the 30-day re-test is from $199 [PLACEHOLDER] per location or product, confirmed before we start",
+      "The check alone is $69; fixing plus the 30-day re-test is from $199 per location or product, confirmed before we start",
     ],
     forWho:
       "Local businesses whose hours, phone number, address or open status are stated wrongly by AI assistants, SaaS and startup founders whose pricing, plans or features are, and anyone who has never checked.",
-    priceFrom: "From $69 [PLACEHOLDER]",
+    priceFrom: "From $69",
   },
   {
     slug: "local-ai-setup",
@@ -129,11 +129,11 @@ export const services = [
       "Website checks: LocalBusiness structured data, a clear services, location and FAQ section, and AI crawlers not blocked",
       "A review plan: your review count and recency against 3 competitors, which review sites show up for your trade and city, and ready-to-use wording for asking customers, with no incentives and no filtering out of unhappy customers (Yelp does not allow asking for reviews, so the plan leaves it out)",
       "Help claiming your ChatGPT business profile, only where OpenAI allows it",
-      "$149 [PLACEHOLDER] for one location; each extra location is priced the same",
+      "$149 for one location; each extra location is priced the same",
     ],
     forWho:
       "Clinics, salons, restaurants, studios and trades with one or a few locations that have only ever set up a Google Business Profile and hear that customers now ask AI assistants for the best option nearby.",
-    priceFrom: "$149 [PLACEHOLDER] per location",
+    priceFrom: "$149 per location",
   },
   {
     slug: "ai-crawler-unblock",
@@ -148,11 +148,11 @@ export const services = [
       "One access policy that separates AI training crawlers from AI search and user-requested fetchers, based on a short questionnaire",
       "A retest after the fix and again two weeks later, because some blocks come and go, plus a check in Google Search Console that Google itself is not blocked",
       "What we don't promise: a host can refuse to lift a block, robots.txt is a request that crawlers may ignore, and allowing crawlers does not protect your content from AI training",
-      "$149 [PLACEHOLDER]; changes to how a custom JavaScript app renders its pages are quoted separately",
+      "$149; changes to how a custom JavaScript app renders its pages are quoted separately",
     ],
     forWho:
       "Startup and SaaS founders and small businesses on Cloudflare or a managed host who never chose to block AI crawlers and cannot tell which layer is doing it.",
-    priceFrom: "$149 [PLACEHOLDER]",
+    priceFrom: "$149",
   },
 ] satisfies Service[];
 

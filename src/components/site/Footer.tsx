@@ -8,7 +8,8 @@ import { Logo } from "./Logo";
 const year = contentUpdated.slice(0, 4);
 
 export function Footer() {
-  const emailIsReal = !hasPlaceholder(site.contactEmail);
+  const email = site.contactEmail.trim();
+  const emailIsReal = email !== "" && !hasPlaceholder(email);
   return (
     <footer className="relative mt-auto">
       {/* torn paper edge into the footer */}
@@ -23,11 +24,13 @@ export function Footer() {
               <p className="mt-5 font-serif text-[1.625rem] leading-tight text-ink-2">{site.tagline}</p>
               <p className="mt-5 text-sm text-muted">
                 {emailIsReal ? (
-                  <a href={`mailto:${site.contactEmail}`} className="underline decoration-ink/25 underline-offset-4 hover:decoration-ink">
-                    {site.contactEmail}
+                  <a href={`mailto:${email}`} className="underline decoration-ink/25 underline-offset-4 hover:decoration-ink">
+                    {email}
                   </a>
                 ) : (
-                  <PlaceholderText value={site.contactEmail} />
+                  <Link href="/contact" className="underline decoration-ink/25 underline-offset-4 hover:decoration-ink">
+                    Contact us
+                  </Link>
                 )}
               </p>
             </div>

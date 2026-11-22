@@ -55,6 +55,8 @@ const nextConfig: NextConfig = {
     },
   },
   poweredByHeader: false,
+  // Keep server-only DB driver out of the client asset graph (QA T012).
+  serverExternalPackages: ["postgres"],
   images: {
     formats: ["image/avif", "image/webp"],
   },
