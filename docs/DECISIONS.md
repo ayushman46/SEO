@@ -2,6 +2,10 @@
 
 Newest on top. One short entry each.
 
+## ADR-012 — Static CSP with 'unsafe-inline' scripts in v1 (architect-backend)
+CSP is a static header from `next.config.ts` `headers()`, not per-request nonces. Nonces force every page to render dynamically, which defeats Cache Components' static shells for the marketing pages. Cost: `script-src 'self' 'unsafe-inline'` (+ `'unsafe-eval'` in dev only) weakens XSS protection, so we rely on React's escaping and never render untrusted HTML. Allowed origins: `https://va.vercel-scripts.com` (Vercel Analytics), `https://vitals.vercel-insights.com` (connect). `img-src 'self' data: blob:` means no third-party images (e.g. audited sites' favicons) unless added here. `frame-ancestors 'none'` + `X-Frame-Options: DENY`. HSTS and `upgrade-insecure-requests` in production only. Revisit with nonces / SRI if we add user-generated content.
+Related Next 16 constraint: with `cacheComponents: true` the `dynamic` and `runtime` route segment exports are not allowed, so `/api/audit` sets only `maxDuration = 60` and `/admin` reads `headers()` inside `<Suspense>` instead of `dynamic = "force-dynamic"`.
+
 ## ADR-011 — No user auth in v1 (founder decision, 2026-11-22 18:40 IST)
 Founder removed auth from v1: "the website won't need it; if needed we'll add it later."
 Consequences: dashboard (projects, history) cut to BACKLOG. Full report is gated behind an **email** (lead capture) instead of signup. Admin is a single page behind HTTP Basic auth with one `ADMIN_PASSWORD` env var — no accounts, no roles.
@@ -20,7 +24,7 @@ No job queue in v1. `POST /api/audit` runs homepage + up to 5 internal pages wit
 Only http/https on ports 80/443. Hostname resolved via DNS; every resolved address checked against private/reserved ranges (IPv4 + IPv6 incl. mapped addresses, loopback, link-local, CGNAT, metadata 169.254.169.254). The socket connects to the **validated IP** (custom `lookup`) to defeat DNS rebinding. Redirects followed manually and re-validated.
 
 ## ADR-006 — Rate limiting
-Postgres fixed-window counter table when `DATABASE_URL` exists, in-memory fallback otherwise. Audit: 5 per IP per hour. Unlock/contact: 10 per IP per hour. IPs are stored only as salted SHA-256 hashes.
+Postgres fixed-window counter table when `DATABASE_URL` exists, in-memory fallback otherwise. Audit: 5 per IP per hour. Unlock: 10 per IP per hour. Contact: 5 per IP per hour. IPs are stored only as salted SHA-256 hashes.
 
 ## ADR-005 — Dependencies beyond the brief
 - `cheerio` — HTML parsing for the audit engine (fast, server-only).
