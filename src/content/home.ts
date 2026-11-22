@@ -74,7 +74,7 @@ export const home = {
       id: "geo",
       label: "GEO",
       title: "Ready to be read and cited by AI",
-      body: "GEO (Generative Engine Optimization) is making your site easy for AI answer engines to read, trust and quote. We check the signals those engines rely on.",
+      body: "GEO (Generative Engine Optimization) is making your site easy for AI answer engines to read, trust and quote. We check the signals that make a site easier for them to use as a source.",
       bullets: [
         {
           icon: "bot",
@@ -93,8 +93,8 @@ export const home = {
         },
         {
           icon: "eye",
-          title: "Entity and trust signals",
-          body: "Organization or LocalBusiness schema, a consistent name, authors and visible dates.",
+          title: "Identity and trust signals",
+          body: "Structured data that states who you are (Organization or LocalBusiness schema), a consistent name, authors and visible dates.",
         },
       ],
     },
@@ -180,7 +180,7 @@ export const home = {
   servicesTeaser: {
     kicker: "Services",
     title: "Prefer it done for you?",
-    body: "Five focused services, from a deeper SEO or GEO audit to hands-on technical fixes, content and entity work, and monthly monitoring. Fixed scope, plain pricing.",
+    body: "Five focused services: a Full audit that covers SEO and GEO together, hands-on technical fixes, content and entity work, and monthly monitoring. Fixed scope, plain pricing.",
   },
 
   pricingTeaser: {
@@ -193,7 +193,7 @@ export const home = {
   nightSky: {
     kicker: "After dark",
     title: "The answer is written before anyone visits your site.",
-    body: "When someone asks an AI assistant for the best tool, clinic or café near them, the engine has already decided which sources to trust. seenhq shows you whether yours is one of them, and what to change if it isn't.",
+    body: "When someone asks an AI assistant for the best tool, clinic or café near them, the engine has already decided which sources to trust. The free audit shows whether your site gives those engines what they need to read, understand and quote you, and what to change if it doesn't. It checks readiness; it does not track what the engines say about you.",
     cta: { label: "Check my site", href: "/audit" },
   },
 
@@ -204,11 +204,11 @@ export const home = {
     },
     {
       q: "How is GEO different from SEO?",
-      a: "SEO helps your pages rank in a list of search results; GEO helps your content get quoted inside an AI-written answer. Most of the foundations are shared, such as crawlable pages, fast load times and clear titles. GEO adds extra weight on direct answers, entity clarity and letting AI crawlers in.",
+      a: "SEO helps your pages rank in a list of search results; GEO helps your content get quoted inside an AI-written answer. Most of the foundations are shared, such as crawlable pages, fast load times and clear titles. GEO adds extra weight on direct answers, a clear and consistent identity for your business, and letting AI crawlers in.",
     },
     {
       q: "What are Google AI Overviews?",
-      a: "Google AI Overviews are AI-generated summaries that appear at the top of some Google search results, with links to the sources they draw on. Being one of those linked sources depends on the same signals our GEO checks look at: crawlable, well-structured pages that answer the question clearly.",
+      a: "Google AI Overviews are AI-generated summaries that appear at the top of some Google search results, with links to the sources they draw on. Google decides which sources to link. Pages that are crawlable, well structured and answer the question clearly are easier to use as a source, and that is what our GEO checks look at.",
     },
     {
       q: "What is llms.txt?",
@@ -220,7 +220,7 @@ export const home = {
     },
     {
       q: "Why do you ask for my email to see the full report?",
-      a: "Your scores and top three issues are free with no strings. To see every issue and fix, we ask for your email. We use it to keep a record of your report and, only if you agree, to follow up about it. No password, no card and nothing to install.",
+      a: "Your scores and top three issues are free with no strings. To see every issue and fix, we ask for your email and for your agreement that we may store it with the report and contact you about it. You can ask us to delete it at any time. No password, no card and nothing to install.",
     },
     {
       q: "Is seenhq useful for a local business, not just a startup?",

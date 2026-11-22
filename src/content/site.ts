@@ -66,3 +66,6 @@ export const site = {
 
 /** Last time the marketing copy was reviewed (ISO date). Used for sitemap lastModified and visible "updated" dates. */
 export const contentUpdated = "2026-11-22";
+
+/** Visible label for the "Last updated" line pages render next to contentUpdated. */
+export const lastUpdatedLabel = "Last updated";

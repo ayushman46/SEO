@@ -7,7 +7,7 @@ export const pricingPage = {
   kicker: "Pricing",
   title: "Simple prices for small teams and local businesses",
   intro:
-    "The seenhq audit is free. If you want a deeper review, hands-on fixes or ongoing monitoring, pick the option that fits. One-time prices are paid once, and monitoring can be cancelled any month.",
+    "The seenhq audit is free. The Full audit and Monitoring have one fixed price per site. A fix sprint depends on how much needs fixing, so its price is a starting point: you get a fixed quote by email before any work starts, and you pay nothing until you agree to it. Monitoring can be cancelled any month.",
 } satisfies PageCopy;
 
 export const pricingTiers = [
@@ -15,7 +15,7 @@ export const pricingTiers = [
     name: "Free audit",
     price: "$0",
     cadence: "per audit",
-    description: "An automated SEO, GEO and performance check of your homepage and up to five pages.",
+    description: "An automated SEO, GEO and performance check of your homepage and up to five more pages.",
     features: [
       "Overall, SEO, GEO and Performance scores",
       "Top three issues with fixes, shown straight away",
@@ -28,12 +28,13 @@ export const pricingTiers = [
     name: "Full audit",
     price: "$49 [PLACEHOLDER]",
     cadence: "one-time",
-    description: "A human-reviewed SEO and GEO audit with a prioritised plan you can act on.",
+    description:
+      "Our SEO audit and GEO audit in one review by a person, at one fixed price per site, with a written plan you can act on.",
     features: [
       "Everything in the free audit",
-      "Manual review of your key pages",
-      "AI answer snapshot for customer-style questions",
-      "Prioritised fix list ranked by impact and effort",
+      "Covers up to 50 pages [PLACEHOLDER], not just six",
+      "A person reads your key pages and checks what a script can't judge",
+      "A written plan: what to fix first, what can wait, what to ignore",
       "A short call or written walkthrough [PLACEHOLDER]",
     ],
     cta: { label: "Request a full audit", href: "/contact?service=seo-audit" },
@@ -41,9 +42,9 @@ export const pricingTiers = [
   },
   {
     name: "Fix sprint",
-    price: "$199 [PLACEHOLDER]",
+    price: "From $199 [PLACEHOLDER]",
     cadence: "one-time",
-    description: "We implement the highest-impact fixes from your audit for you.",
+    description: "We implement the highest-impact fixes from your audit for you, at a price agreed before we start.",
     features: [
       "Fixes for your top issues, agreed up front",
       "robots.txt, sitemap and llms.txt set up",
@@ -51,20 +52,20 @@ export const pricingTiers = [
       "Quick performance wins",
       "Before-and-after re-audit",
     ],
-    cta: { label: "Book a fix sprint", href: "/contact?service=technical-fixes" },
+    cta: { label: "Request a fix sprint", href: "/contact?service=technical-fixes" },
   },
   {
     name: "Monitoring",
     price: "$29 [PLACEHOLDER]",
     cadence: "/month",
-    description: "A monthly re-audit and summary so your site stays visible.",
+    description: "Once a month we re-audit your site and email you a short written report on what changed.",
     features: [
-      "Monthly re-audit of your key pages",
-      "Plain-English summary of changes",
-      "Alerts when search or AI crawlers get blocked",
-      "Cancel any month",
+      "Monthly re-audit of your key pages, done by us",
+      "A short plain-English email on what changed",
+      "A clear note in that email if something broke, such as search or AI crawlers being blocked",
+      "Cancel any month by email",
     ],
-    cta: { label: "Start monitoring", href: "/contact?service=monitoring" },
+    cta: { label: "Request monitoring", href: "/contact?service=monitoring" },
   },
 ] satisfies PricingTier[];
 
@@ -74,20 +75,32 @@ export const pricingFaq = [
     a: "Yes. The automated audit is free and shows your scores and top three issues straight away. To see the full list of issues and fixes, you enter your email. No card is needed.",
   },
   {
+    q: "What does the Full audit add to the free audit?",
+    a: "The free audit is automated: it runs a fixed set of checks on your homepage and up to five more pages. In the Full audit a person reviews a much larger part of your site and judges what a script can't, such as whether a page really answers the question a customer would ask. You get a written plan that says what to fix first, what can wait and what to ignore, plus a walkthrough.",
+  },
+  {
     q: "Is seenhq affordable for a local business?",
-    a: "Yes. Our prices are set for small teams and local businesses such as clinics, cafés, studios and trades, not for enterprise budgets. Most local sites need a full audit and one fix sprint, then only occasional checks.",
+    a: "Yes. Our prices are set for small teams and local businesses such as clinics, cafés, studios and trades, not for enterprise budgets. A sensible path for a local site is a Full audit, a fix sprint if you would rather not make the changes yourself, and monitoring if you want someone to check each month that nothing has broken.",
   },
   {
-    q: "What is the difference between the full audit and the fix sprint?",
-    a: "The full audit tells you what to fix and in what order; the fix sprint is us doing the fixing. Many people buy the audit, fix the quick wins themselves, and hand the rest to us.",
+    q: "What is the difference between the Full audit and the fix sprint?",
+    a: "The Full audit tells you what to fix and in what order; the fix sprint is us doing the fixing. You can buy the audit, fix the quick wins yourself, and hand the rest to us.",
   },
   {
-    q: "Can I cancel monitoring?",
-    a: "Yes. Monitoring is billed monthly and you can cancel any month by emailing us. There is no minimum term [PLACEHOLDER].",
+    q: "What does monitoring actually involve?",
+    a: "Once a month we re-audit your key pages and email you a short written report on what changed since last month and what to fix. If something has broken, such as a new firewall rule blocking AI crawlers or a redesign dropping your page titles, the report says so clearly. It is a monthly check, not real-time tracking, and you can cancel any month by email.",
+  },
+  {
+    q: "Do you offer anything beyond the audit, fix sprint and monitoring?",
+    a: "Yes. Content and entity work, where we rewrite key page sections so they answer questions clearly, add an FAQ block and make your business details consistent everywhere, is a separate fixed-scope service. It is described on the services page, and we confirm the price by email before any work starts.",
   },
   {
     q: "Do you work with website builders like Wix, Squarespace, Shopify or WordPress?",
     a: "Yes. The audit works on any public website. For fix sprints we work within what your platform allows and tell you up front if something can't be changed there.",
+  },
+  {
+    q: "Is there a minimum term for monitoring?",
+    a: "There is no minimum term [PLACEHOLDER]. Monitoring is billed monthly and you can cancel any month by emailing us.",
   },
   {
     q: "How do I pay?",

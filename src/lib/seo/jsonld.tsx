@@ -1,5 +1,5 @@
-import { site } from "@/content/site";
-import type { FaqItem, Service } from "@/content/types";
+import { contentUpdated, site } from "@/content/site";
+import type { FaqItem, PricingTier, Service } from "@/content/types";
 import { absoluteUrl, siteUrl } from "./metadata";
 
 /** A JSON-LD node. Kept loose on purpose; schema.org is large and we only emit a few types. */
@@ -8,7 +8,7 @@ export type JsonLdNode = { "@context"?: "https://schema.org"; "@type": string } 
 const CONTEXT = "https://schema.org" as const;
 
 /** True when a value is still a founder placeholder and must not be published as structured data. */
-function isPlaceholder(value: string): boolean {
+export function isPlaceholder(value: string): boolean {
   return value.includes("[PLACEHOLDER");
 }
 
@@ -21,6 +21,12 @@ export const websiteId = () => `${siteUrl()}/#website`;
  */
 export const sameAsProfiles: string[] = [];
 
+/** [PLACEHOLDER] Founder: set your real name to publish a founder Person node. Leave empty until then. */
+export const founderName: string = "";
+
+/** Square brand logo served from public/logo.png (512×512). */
+export const LOGO = { path: "/logo.png", width: 512, height: 512 } as const;
+
 export function organizationLd(): JsonLdNode {
   const node: JsonLdNode = {
     "@context": CONTEXT,
@@ -32,9 +38,9 @@ export function organizationLd(): JsonLdNode {
     slogan: site.tagline,
     logo: {
       "@type": "ImageObject",
-      url: absoluteUrl("/opengraph-image"),
-      width: 1200,
-      height: 630,
+      url: absoluteUrl(LOGO.path),
+      width: LOGO.width,
+      height: LOGO.height,
     },
     image: absoluteUrl("/opengraph-image"),
     knowsAbout: [
@@ -45,25 +51,17 @@ export function organizationLd(): JsonLdNode {
       "Core Web Vitals",
       "llms.txt",
     ],
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "customer support",
+      url: absoluteUrl("/contact"),
+      availableLanguage: ["English"],
+      ...(isPlaceholder(site.contactEmail) ? {} : { email: site.contactEmail }),
+    },
   };
+  if (!isPlaceholder(site.contactEmail)) node.email = site.contactEmail;
   if (sameAsProfiles.length > 0) node.sameAs = sameAsProfiles;
-  if (!isPlaceholder(site.contactEmail)) {
-    node.email = site.contactEmail;
-    node.contactPoint = {
-      "@type": "ContactPoint",
-      contactType: "customer support",
-      email: site.contactEmail,
-      url: absoluteUrl("/contact"),
-      availableLanguage: ["English"],
-    };
-  } else {
-    node.contactPoint = {
-      "@type": "ContactPoint",
-      contactType: "customer support",
-      url: absoluteUrl("/contact"),
-      availableLanguage: ["English"],
-    };
-  }
+  if (founderName && !isPlaceholder(founderName)) node.founder = { "@type": "Person", name: founderName };
   return node;
 }
 
@@ -76,11 +74,13 @@ export function websiteLd(): JsonLdNode {
     url: absoluteUrl("/"),
     description: site.description,
     inLanguage: "en",
+    dateModified: contentUpdated,
     publisher: { "@id": organizationId() },
+    author: { "@id": organizationId() },
   };
 }
 
-/** Service node. Prices are omitted while they are placeholders. */
+/** Service node. Prices are never included here; see offerCatalogLd for prices. */
 export function serviceLd(service: Service): JsonLdNode {
   return {
     "@context": CONTEXT,
@@ -91,20 +91,50 @@ export function serviceLd(service: Service): JsonLdNode {
     description: service.description,
     url: `${absoluteUrl("/services")}#${service.slug}`,
     provider: { "@id": organizationId() },
-    audience: { "@type": "BusinessAudience", name: service.forWho },
+    audience: { "@type": "BusinessAudience", audienceType: service.forWho },
     areaServed: "Worldwide",
   };
 }
 
+/** Parses "$49" / "From $199" into a number. Returns null for placeholder-marked or unparseable prices. */
+function publishablePrice(price: string): number | null {
+  if (isPlaceholder(price)) return null;
+  const m = price.replace(/,/g, "").match(/\$(\d+(?:\.\d+)?)/);
+  return m ? Number(m[1]) : null;
+}
+
+/** OfferCatalog for /pricing. Tiers keep name/description; a price is only published once it is no longer a placeholder. */
+export function offerCatalogLd(tiers: readonly PricingTier[]): JsonLdNode {
+  return {
+    "@context": CONTEXT,
+    "@type": "OfferCatalog",
+    name: `${site.name} pricing`,
+    url: absoluteUrl("/pricing"),
+    itemListElement: tiers.map((tier) => {
+      const price = publishablePrice(tier.price);
+      return {
+        "@type": "Offer",
+        name: tier.name,
+        description: tier.description,
+        seller: { "@id": organizationId() },
+        ...(price === null ? {} : { price, priceCurrency: "USD" }),
+      };
+    }),
+  };
+}
+
+/** FAQPage node. Items whose question or answer still contains "[PLACEHOLDER" are skipped. */
 export function faqLd(items: readonly FaqItem[]): JsonLdNode {
   return {
     "@context": CONTEXT,
     "@type": "FAQPage",
-    mainEntity: items.map((item) => ({
-      "@type": "Question",
-      name: item.q,
-      acceptedAnswer: { "@type": "Answer", text: item.a },
-    })),
+    mainEntity: items
+      .filter((item) => !isPlaceholder(item.q) && !isPlaceholder(item.a))
+      .map((item) => ({
+        "@type": "Question",
+        name: item.q,
+        acceptedAnswer: { "@type": "Answer", text: item.a },
+      })),
   };
 }
 
@@ -129,8 +159,16 @@ export function breadcrumbLd(items: readonly BreadcrumbInput[]): JsonLdNode {
   };
 }
 
-/** WebPage node with dates, so inner pages carry an explicit last-updated signal. */
-export function webPageLd(input: { name: string; description: string; path: string; dateModified: string }): JsonLdNode {
+export interface WebPageInput {
+  name: string;
+  description: string;
+  path: string;
+  /** ISO date. Defaults to the sitewide contentUpdated; legal pages pass their own `updated`. */
+  dateModified?: string;
+}
+
+/** WebPage node with author, publisher and a last-updated date. */
+export function webPageLd(input: WebPageInput): JsonLdNode {
   return {
     "@context": CONTEXT,
     "@type": "WebPage",
@@ -141,13 +179,47 @@ export function webPageLd(input: { name: string; description: string; path: stri
     inLanguage: "en",
     isPartOf: { "@id": websiteId() },
     about: { "@id": organizationId() },
-    dateModified: input.dateModified,
+    author: { "@id": organizationId() },
+    publisher: { "@id": organizationId() },
+    dateModified: input.dateModified ?? contentUpdated,
   };
 }
 
-/** Serialize for a <script type="application/ld+json">, escaping "<" so content can't close the tag. */
+/**
+ * The standard graph for an inner page: WebPage (author, publisher, dateModified) + BreadcrumbList (Home > page).
+ * Usage on /pricing: <JsonLd data={innerPageLd({ name: "Pricing", path: "/pricing", description: pricingPage.metaDescription })} />
+ */
+export function innerPageLd(input: WebPageInput & { breadcrumbName?: string }): JsonLdNode[] {
+  return [
+    webPageLd(input),
+    breadcrumbLd([{ name: input.breadcrumbName ?? input.name, path: input.path }]),
+  ];
+}
+
+/** Recursively drops any string (and the key holding it) that still contains "[PLACEHOLDER". */
+export function stripPlaceholders<T>(value: T): T {
+  if (Array.isArray(value)) {
+    return value
+      .filter((v) => !(typeof v === "string" && isPlaceholder(v)))
+      .map((v) => stripPlaceholders(v)) as T;
+  }
+  if (value && typeof value === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value)) {
+      if (typeof v === "string" && isPlaceholder(v)) continue;
+      out[k] = stripPlaceholders(v);
+    }
+    return out as T;
+  }
+  return value;
+}
+
+/**
+ * Serialize for a <script type="application/ld+json">: strips any leftover placeholders,
+ * then escapes "<" so content can't close the tag.
+ */
 export function serializeJsonLd(data: JsonLdNode | readonly JsonLdNode[]): string {
-  return JSON.stringify(data).replace(/</g, "\\u003c");
+  return JSON.stringify(stripPlaceholders(data)).replace(/</g, "\\u003c");
 }
 
 /**

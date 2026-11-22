@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { absoluteUrl, siteUrl } from "@/lib/seo/metadata";
+import { absoluteUrl } from "@/lib/seo/metadata";
 
 const DISALLOW = ["/admin", "/api/", "/design-preview"];
 
@@ -43,6 +43,5 @@ export default function robots(): MetadataRoute.Robots {
       { userAgent: NAMED_CRAWLERS, allow: "/", disallow: DISALLOW },
     ],
     sitemap: absoluteUrl("/sitemap.xml"),
-    host: siteUrl(),
   };
 }

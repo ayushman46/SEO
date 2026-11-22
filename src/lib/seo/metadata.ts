@@ -16,19 +16,21 @@ export const OG_IMAGE = {
   alt: "seenhq: be seen by people and by the machines they ask.",
 } as const;
 
-function stripTrailingSlash(url: string): string {
-  return url.replace(/\/+$/, "");
+/** Normalise any configured site address to a bare origin: adds https:// when missing, drops paths and trailing slashes. */
+function toOrigin(raw: string): string {
+  const withScheme = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+  return new URL(withScheme).origin;
 }
 
 /**
- * Absolute base URL of the site, without a trailing slash.
+ * Absolute base URL of the site (an origin, no trailing slash).
  * NEXT_PUBLIC_SITE_URL wins; then the Vercel production URL; then localhost.
  */
 export function siteUrl(): string {
   const explicit = process.env.NEXT_PUBLIC_SITE_URL?.trim();
-  if (explicit) return stripTrailingSlash(explicit);
+  if (explicit) return toOrigin(explicit);
   const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim();
-  if (vercel) return stripTrailingSlash(`https://${vercel.replace(/^https?:\/\//, "")}`);
+  if (vercel) return toOrigin(vercel);
   return "http://localhost:3000";
 }
 
@@ -61,6 +63,7 @@ export function buildMetadata({
     metadataBase: new URL(siteUrl()),
     title: absoluteTitle ? { absolute: title } : title,
     description,
+    authors: [{ name: site.name, url: siteUrl() }],
     alternates: { canonical: path },
     openGraph: {
       type: "website",
@@ -75,7 +78,7 @@ export function buildMetadata({
       card: "summary_large_image",
       title: fullTitle,
       description,
-      images: [OG_IMAGE.url],
+      images: [OG_IMAGE],
     },
     ...(noindex ? { robots: { index: false, follow: false } } : {}),
   };
@@ -90,6 +93,7 @@ export const rootMetadata: Metadata = {
     template: `%s${TITLE_SUFFIX}`,
   },
   description: site.description,
+  authors: [{ name: site.name, url: siteUrl() }],
   creator: site.name,
   publisher: site.name,
   formatDetection: { email: false, address: false, telephone: false },
@@ -105,7 +109,7 @@ export const rootMetadata: Metadata = {
     card: "summary_large_image",
     title: homeMeta.metaTitle,
     description: site.description,
-    images: [OG_IMAGE.url],
+    images: [OG_IMAGE],
   },
   robots: {
     index: true,

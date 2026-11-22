@@ -1,7 +1,7 @@
 import type { PageCopy } from "./types";
 
 export const contactPage = {
-  metaTitle: "Contact seenhq about an audit or fix",
+  metaTitle: "Contact us about an audit or fix",
   metaDescription:
     "Tell us about your website and what you need, from a full SEO or GEO audit to hands-on fixes. We reply by email with next steps and a fixed quote.",
   kicker: "Contact",

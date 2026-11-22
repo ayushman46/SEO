@@ -1,7 +1,7 @@
 import type { PageCopy } from "./types";
 
 export const aboutPage = {
-  metaTitle: "About seenhq: SEO and GEO for real businesses",
+  metaTitle: "About us: SEO and GEO for real businesses",
   metaDescription:
     "seenhq helps startups, SaaS teams and local businesses be found on Google and cited by AI answer engines. Learn who we are and how we work.",
   kicker: "About",
@@ -12,7 +12,7 @@ export const aboutPage = {
 
 export const aboutSections: { title: string; body: string }[] = [
   {
-    title: "What seenhq does",
+    title: "seenhq at a glance",
     body: "seenhq checks how well a website works for two audiences at once: people searching on Google and Bing, and AI answer engines such as ChatGPT, Perplexity, Claude, Gemini and Google AI Overviews. Our free audit scores a site on SEO, GEO and performance in about a minute, and our services fix what the audit finds.",
   },
   {

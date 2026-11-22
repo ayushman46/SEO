@@ -2,13 +2,13 @@ import type { LegalDoc } from "./types";
 
 /** Meta for the legal pages (LegalDoc has no meta fields). */
 export const privacyMeta = {
-  metaTitle: "Privacy policy",
+  metaTitle: "Privacy policy: how we handle your data",
   metaDescription:
     "How seenhq handles the data behind our free audit, report unlock and contact form: what we collect, why, who processes it, and how to have it deleted.",
 };
 
 export const termsMeta = {
-  metaTitle: "Terms of service",
+  metaTitle: "Terms of service: audits and paid services",
   metaDescription:
     "The terms for using seenhq: what the free audit does and doesn't promise, acceptable use, paid services, liability and how these terms can change.",
 };
@@ -28,7 +28,7 @@ export const privacy = {
       heading: "What we collect and why",
       body: [
         "When you run an audit: the website address you enter and the results of the audit (scores, checks, issues and a summary of the pages we scanned). We keep these so we can show you the report and improve the service.",
-        "When you unlock a full report: your email address, the audit it belongs to, the website address and score, whether you gave consent to be contacted, and the browser's user-agent string. We use this to keep a record of your report and, if you agreed, to contact you about it.",
+        "When you unlock a full report: your email address, the audit it belongs to, the website address and score, a record that you ticked the consent box, and the browser's user-agent string. Ticking that box is required to unlock the report; it covers storing your email with the report and contacting you about it. You can withdraw it at any time (see \"Your rights\").",
         "When you use the contact form: your name, email, and any business name, website, service, budget and message you choose to send. We use this only to reply to your enquiry and to deliver any work you ask for.",
         "For all of the above we also store a one-way, salted hash of your IP address. We use it to limit abuse (for example, too many audits per hour). We do not store your IP address itself.",
       ],
@@ -36,8 +36,8 @@ export const privacy = {
     {
       heading: "What we fetch from the websites you audit",
       body: [
-        "When you enter a website address, our crawler (user agent \"seenhqbot\") fetches publicly available pages from that site: the homepage, robots.txt, the sitemap, llms.txt and up to five internal pages. We respect robots.txt rules for seenhqbot, never submit forms and never access password-protected areas.",
-        "We also send the homepage address to Google PageSpeed Insights to measure performance. Google processes that request under its own terms and privacy policy.",
+        "When you enter a website address, our crawler (user agent \"seenhqbot\") fetches publicly available pages from that site: the address you entered (normally the homepage), robots.txt, the sitemap, llms.txt and up to five internal pages. We always read the page you asked us to audit; for the internal pages we skip anything the site's robots.txt disallows for seenhqbot. We never submit forms and never access password-protected areas.",
+        "We also send the address you entered to Google PageSpeed Insights to measure performance. Google processes that request under its own terms and privacy policy.",
       ],
     },
     {
@@ -64,7 +64,7 @@ export const privacy = {
       heading: "Your rights",
       body: [
         "You can ask us for a copy of the personal data we hold about you, ask us to correct it, or ask us to delete it. Email [PLACEHOLDER: privacy contact email] from the address you used and we will act on it within 30 days.",
-        "If you agreed to be contacted about your report, you can withdraw that consent at any time by replying to any email from us or writing to the address above.",
+        "You can withdraw your consent to be contacted about your report at any time by replying to any email from us or writing to the address above.",
         "Depending on where you live, you may also have the right to complain to your local data protection authority.",
       ],
     },
@@ -111,7 +111,7 @@ export const terms = {
       heading: "Paid services",
       body: [
         "Paid services such as full audits, fix sprints, content work and monitoring are agreed by email before work starts. The agreed scope, price and timing in that email, together with these terms, form our agreement.",
-        "Payment terms: [PLACEHOLDER: payment method, due date and refund policy]. Monitoring is billed monthly and can be cancelled any month by email; cancellation takes effect at the end of the current month.",
+        "Payment terms: [PLACEHOLDER: payment method, due date and refund policy]. Monitoring is billed monthly and can be cancelled any month by email; cancellation takes effect [PLACEHOLDER: when cancellation takes effect, e.g. at the end of the current billing month].",
         "Where we make changes to your website, you are responsible for giving us appropriate access and for keeping your own backups.",
       ],
     },

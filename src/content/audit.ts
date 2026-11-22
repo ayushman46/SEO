@@ -44,7 +44,7 @@ export const auditResultCopy = {
   effortLabels: { quick: "Quick fix", moderate: "Moderate", involved: "Involved" },
   categoryLabels: { seo: "SEO", geo: "GEO", performance: "Performance" },
   runAnother: "Audit another site",
-  helpCta: { label: "Get help fixing this", href: "/contact" },
+  helpCta: { label: "Have us fix these for you", href: "/contact?service=technical-fixes" },
 } as const;
 
 export const auditEmailGate = {
