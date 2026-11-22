@@ -1,5 +1,11 @@
 # Status log (newest on top)
 
+## 2026-11-23 03:20 IST: platform-aware fixes added; still WAITING for founder yes to deploy production
+- **Committed + pushed:** platform detection + 135 vendor-verified where-to-click fix entries (ADR-019). 675 tests, typecheck, lint, build green.
+- **Latest preview (final candidate):** https://seenhq-14z10gium-ayushs-projects-32c1d225.vercel.app (audit of webflow.com via its API: 200 in 4.8 s, score 92).
+- **Production is still v1.** Next step on founder yes: `npx vercel deploy --prod --yes`, smoke test, PageSpeed Insights, launch report v1.1.
+- **Known:** Shopify's bot check sometimes refuses seenhqbot (403), so some Shopify stores cannot be audited.
+
 ## 2026-11-23 02:45 IST: v1.1 reviewed, fixed, on preview; WAITING for founder yes to deploy production
 - **Committed + pushed (39c92d4):** all R3 review findings fixed (1 critical ReDoS, 1 high label trust, 14 others). 605 tests x3, typecheck, lint, build green. New pages a11y/best-practices/SEO 100 locally.
 - **Preview (v1.1 final candidate):** https://seenhq-klvcg209z-ayushs-projects-32c1d225.vercel.app. All routes 200; real audit of wikipedia.org through the deployed API: 200 in 2.0 s, 31 checks.
