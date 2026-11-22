@@ -1,5 +1,9 @@
 # Status log (newest on top)
 
+## 2026-11-23 00:05 IST: LAUNCHED
+- **Live:** https://seenhq.vercel.app. PageSpeed Insights mobile: / 96, /audit 99, /pricing 98, /about 99; A11y/BP/SEO 100. Launch report: docs/LAUNCH_REPORT.md.
+- **Next (optional, founder):** DATABASE_URL, PAGESPEED_API_KEY, ADMIN_PASSWORD, email keys, custom domain (see launch report).
+
 ## 2026-11-23 ~00:30 IST: QA done, preview deployed
 - **Preview:** https://seenhq-7xbaexaql-ayushs-projects-32c1d225.vercel.app (Vercel Authentication on; open while logged in to Vercel). All routes 200, missing path 404. Real audit of vercel.com via the deployed API: 200 in 3.2 s; unlock 200 (seal secret works across instances).
 - **Vercel env set (values never printed):** AUDIT_SEAL_SECRET, IP_HASH_SALT (preview + production), NEXT_PUBLIC_SITE_URL=https://seenhq.vercel.app (production).
