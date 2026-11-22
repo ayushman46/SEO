@@ -1,5 +1,13 @@
 # Status log (newest on top)
 
+## 2026-11-23 01:50 IST: v1.1 built, on preview, under review
+- **Committed + pushed (fc8c945):** AI reading (NVIDIA, off until NVIDIA_API_KEY is set), 9 new checks (content-format, fact-consistency, raw-html-facts, ai-crawler-probe, snippet-eligibility, review-signals, bing-indexnow, soft-404, ai-clarity), export (tickets / agent prompt), instant quote + order hand-off to contact form, /methodology, /bot, /sample-report, logo marquee, copy + legal updates. 547 tests, typecheck, lint, build green. Browser-checked locally: logo strip, sample report, real audit of python.org (79), quote panel, hand-off to /contact.
+- **Preview:** https://seenhq-ido5sx3ub-ayushs-projects-32c1d225.vercel.app
+- **Running:** qa-security review T023 → docs/reviews/R3-v1.1.md.
+- **Exact next step:** apply R3 findings (owners: audit-engine / architect-backend / frontend-designer / content-seo), rebuild, Lighthouse on preview pages, then production deploy (vercel deploy --prod) and PageSpeed check, then final report.
+- **Founder decisions open:** NVIDIA_API_KEY; Fix sprint fixed $199 vs "From $199"; INR price for Content & entity; taxes shown inclusive; contact email + Bing verification for our own site; founder identity on About.
+- **Research docs:** MARKET_RESEARCH.md, _2_PRODUCT.md, _3_FULL.md, CONVERSION_RESEARCH.md.
+
 ## 2026-11-23 00:30 IST: v1.1 sprint (founder: run autonomously until 12:30 today)
 Founder brief: improve the free audit with an NVIDIA-hosted LLM, add every validated market gap, deepest market research, and a real free-to-paid path. If a usage limit interrupts, resume with "continue the SeenHQ sprint" and pick up from this entry.
 - **Live:** https://seenhq.vercel.app is v1 (commit fe25d51 + ring fix). Nothing from v1.1 is deployed yet.
