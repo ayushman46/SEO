@@ -1,10 +1,20 @@
 import { outcome, plural, type Check, type IssueSeed } from "../../context";
-import { scanPage } from "./page-scan";
+import { PRICE_RE, scanPage, timeRangesInText } from "./page-scan";
 
 const def = { id: "geo.content-format", category: "geo", label: "Menus, prices & hours as text" } as const;
 
 /** A key section is "image-only" when it has images and fewer than this many words of text. */
 export const IMAGE_ONLY_MAX_WORDS = 30;
+/** "Services" sections are often icon grids: require at least this many images there (R3 L2). */
+export const SERVICES_MIN_IMAGES = 2;
+
+/** The page already states prices or times as text, so a menu/price PDF isn't the only source (R3 L2). */
+function hasFactsAsText(text: string): boolean {
+  PRICE_RE.lastIndex = 0;
+  const price = PRICE_RE.test(text);
+  PRICE_RE.lastIndex = 0;
+  return price || timeRangesInText(text).length > 0;
+}
 
 /**
  * geo.content-format: key facts (menu, prices, hours, services) that exist only as an image or a
@@ -22,12 +32,16 @@ export const contentFormatCheck: Check = (ctx) => {
 
   for (const p of ctx.pages) {
     const s = scanPage(p);
+    const textHasFacts = s.pdfLinks.length > 0 && hasFactsAsText(s.visibleText);
     for (const l of s.pdfLinks) {
+      if (textHasFacts) break;
       pdfPages.add(p.url);
       if (pdfLabels.size < 5) pdfLabels.add(l.text || decodeURIComponentSafe(l.href.split("/").pop() ?? "PDF"));
     }
     for (const sec of s.keySections) {
-      if (sec.images > 0 && sec.words < IMAGE_ONLY_MAX_WORDS) {
+      const servicesOnly = /\bservices\b/i.test(sec.heading) && !/\b(menu|price|pricing|rates|hours|timetable)/i.test(sec.heading);
+      const minImages = servicesOnly ? SERVICES_MIN_IMAGES : 1;
+      if (sec.images >= minImages && sec.words < IMAGE_ONLY_MAX_WORDS) {
         imagePages.add(p.url);
         if (imageHeadings.size < 5) imageHeadings.add(sec.heading);
         if (sec.weakAlts > 0) {

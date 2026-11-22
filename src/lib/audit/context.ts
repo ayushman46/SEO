@@ -135,7 +135,14 @@ export interface BotProbe {
 }
 
 export type CrawlerProbe =
-  | { status: "ok"; targets: ProbeTarget[]; probes: BotProbe[]; skippedByRobots: { bot: string; url: string }[] }
+  | {
+      status: "ok";
+      targets: ProbeTarget[];
+      probes: BotProbe[];
+      skippedByRobots: { bot: string; url: string }[];
+      /** reused from a probe of the same host in the last 15 minutes (per server instance) */
+      cached?: boolean;
+    }
   | { status: "inconclusive"; baselineStatus: number }
   | { status: "skipped"; reason: "not_run" | "no_time" | "aborted" | "error" };
 

@@ -11,7 +11,26 @@ import { countAnswerBlocks, hasListsOrTables } from "@/lib/audit/checks/geo/answ
 import { parseSitemap } from "@/lib/audit/checks/seo/sitemap";
 import { canonicalCheck } from "@/lib/audit/checks/seo/canonical";
 import { AuditError } from "@/lib/audit/types";
-import { goodHome, makeCtx, page } from "./helpers";
+import { doc, goodHome, makeCtx, page } from "./helpers";
+import {
+  ATTRIBUTION_TAIL,
+  EMAIL_RE,
+  PHONE_RE,
+  PRICE_RE,
+  STREET_RE,
+  STRUCK_CLASS,
+  TESTIMONIAL_CLASS,
+  TIME_RANGE_RE,
+} from "@/lib/audit/checks/geo/page-scan";
+import { COPYRIGHT_RE, SCHEMA_HOURS_RE } from "@/lib/audit/checks/geo/fact-consistency";
+import { DAY_HOURS, ENABLE_JS } from "@/lib/audit/checks/geo/raw-html-facts";
+import { VISIBLE_REVIEWS } from "@/lib/audit/checks/geo/review-signals";
+import { CHALLENGE_BODY, classifyLayer } from "@/lib/audit/checks/geo/crawler-probe";
+import { LASTMOD_RE } from "@/lib/audit/checks/seo/bing-indexnow";
+import { BARE_DOMAIN, HTML_TAG, INSTRUCTION_PATTERNS, MD_LINK_DEST, OBFUSCATED_EMAIL, URL_RE } from "@/lib/audit/ai/validate";
+import { DELIM_WORDS } from "@/lib/audit/ai/prompt";
+import { stripThinking } from "@/lib/audit/ai/client";
+import { TITLE_RE } from "@/lib/audit/net/soft404";
 
 const HOME = "https://acme.example.com/";
 const BASE_LIMIT_MS = 1_500;
@@ -210,5 +229,102 @@ describe("hostile pages: analysis stays linear", { timeout: 60_000 }, () => {
     const r = timed(() => canonicalCheck(ctx));
     expect(r.ms).toBeLessThan(within(100));
     expect(r.value.issues.map((i) => i.key)).toEqual(["seo.canonical:missing"]);
+  });
+});
+
+describe("R3 C1: PRICE_RE digit-group runs (was quadratic: 64 KB page = 22 s)", { timeout: 120_000 }, () => {
+  beforeEach(() => {
+    slack = Math.max(1, unitMs() / REF_UNIT_MS);
+  });
+  const run = (wrap: (t: string) => string) => (n: number) => fullAnalysis(doc({ body: wrap(`1${",111".repeat(n)}`) }));
+  for (const [name, wrap] of [
+    ["<p>", (t: string) => `<p>${t}</p>`],
+    ["data-nosnippet", (t: string) => `<div data-nosnippet>${t}</div>`],
+    ["<del>", (t: string) => `<del>${t}</del>`],
+  ] as const) {
+    it(`64 KB of ",111" groups inside ${name} is linear`, () => {
+      const r = timed(() => run(wrap)(16_000));
+      expect(r.ms).toBeLessThan(within(LIMIT_MS));
+      expect(growth(run(wrap), 8_000)).toBeLessThan(MAX_GROWTH);
+    });
+  }
+  it('".111" and " 111" groups too', () => {
+    for (const sep of [".", " "]) {
+      const r = timed(() => fullAnalysis(doc({ body: `<p>1${`${sep}111`.repeat(16_000)}</p>` })));
+      expect(r.ms).toBeLessThan(within(LIMIT_MS));
+    }
+  });
+});
+
+/**
+ * Sweep of every regex added since v1 (R3): each runs on adversarial inputs that repeat the
+ * pattern's own prefix without the token it requires next. 512 KB here so the suite stays fast;
+ * SWEEP_KB=2048 SHOW_SWEEP=1 prints the 2 MB table used in the R3 report.
+ */
+describe("R3 regex sweep: adversarial inputs stay linear", { timeout: 300_000 }, () => {
+  const KB = Number(process.env.SWEEP_KB ?? 512);
+  const fill = (unit: string) => unit.repeat(Math.ceil((KB * 1024) / unit.length)).slice(0, KB * 1024);
+  const INPUTS: Record<string, string> = {
+    commaGroups: `1${fill(",111")}`,
+    dotGroups: `1${fill(".111")}`,
+    spaceGroups: `1${fill(" 111")}`,
+    digits: fill("9"),
+    letters: fill("a"),
+    spaces: `x${fill(" ")}`,
+    openTags: fill("<a"),
+    titleTags: fill("<title"),
+    thinkTags: fill("<think>"),
+    begin: fill("BEGIN "),
+    atDot: fill("a (at) b "),
+    times: fill("1:11 "),
+    dashNames: fill("— Ab "),
+    days: fill("mon "),
+    wwwRuns: fill("www.a"),
+    mdLinks: fill("]("),
+    requestBlocked: fill("request blocked "),
+    copyright: fill("© 2020 "),
+    ignore: fill("ignore the "),
+  };
+  const REGEXES: Record<string, RegExp> = {
+    PRICE_RE, PHONE_RE, EMAIL_RE, TIME_RANGE_RE, STREET_RE, STRUCK_CLASS, TESTIMONIAL_CLASS, ATTRIBUTION_TAIL,
+    COPYRIGHT_RE, SCHEMA_HOURS_RE, DAY_HOURS, ENABLE_JS, VISIBLE_REVIEWS, CHALLENGE_BODY, LASTMOD_RE,
+    HTML_TAG, URL_RE, BARE_DOMAIN, MD_LINK_DEST, OBFUSCATED_EMAIL, DELIM_WORDS, TITLE_RE,
+    ...Object.fromEntries(INSTRUCTION_PATTERNS.map((re, i) => [`INSTRUCTION_PATTERNS[${i}]`, re])),
+  };
+  const worst = (fn: (s: string) => unknown) => {
+    let max = 0;
+    let which = "";
+    for (const [name, s] of Object.entries(INPUTS)) {
+      const ms = timed(() => fn(s)).ms;
+      if (ms > max) {
+        max = ms;
+        which = name;
+      }
+    }
+    return { max, which };
+  };
+  const rows: string[] = [];
+
+  for (const [name, re] of Object.entries(REGEXES)) {
+    it(name, () => {
+      const r = worst((s) => {
+        const g = new RegExp(re.source, re.flags.includes("g") ? re.flags : `${re.flags}g`);
+        const it = s.matchAll(g);
+        for (let n = 0; n <= 100_000 && !it.next().done; n++);
+      });
+      rows.push(`| ${name} | ${r.max.toFixed(0)} ms | ${r.which} |`);
+      expect(r.max, `${name} on ${r.which}`).toBeLessThan(within(KB >= 2048 ? 5_000 : 1_500));
+    });
+  }
+  it("stripThinking and classifyLayer", () => {
+    const a = worst((s) => stripThinking(s));
+    const b = worst((s) => classifyLayer({ method: "GET", status: 403, headers: {}, body: s, size: s.length }));
+    rows.push(`| stripThinking | ${a.max.toFixed(0)} ms | ${a.which} |`, `| classifyLayer (body capped 20 KB) | ${b.max.toFixed(0)} ms | ${b.which} |`);
+    expect(a.max).toBeLessThan(within(1_500));
+    expect(b.max).toBeLessThan(within(1_500));
+    if (process.env.SHOW_SWEEP) console.log(`input ${KB} KB
+| regex | worst | input |
+|---|---|---|
+${rows.join("\n")}`);
   });
 });

@@ -47,10 +47,13 @@ export function normStreet(s: string): string {
     .trim();
 }
 
+export const COPYRIGHT_RE = /(?:©|\(c\)|copyright)\s{0,5}(?:(?:19|20)\d{2}\s{0,3}[-–—]\s{0,3})?((?:19|20)\d{2})/gi;
+export const SCHEMA_HOURS_RE = /(\d{1,2}):(\d{2})\s{0,3}-\s{0,3}(\d{1,2}):(\d{2})/g;
+
 /** Footer copyright year (the later year of a range), or null. */
 export function copyrightYear(text: string): number | null {
   let best: number | null = null;
-  for (const m of text.matchAll(/(?:©|\(c\)|copyright)\s*(?:(?:19|20)\d{2}\s*[-–—]\s*)?((?:19|20)\d{2})/gi)) {
+  for (const m of text.matchAll(COPYRIGHT_RE)) {
     const y = Number(m[1]);
     if (best === null || y > best) best = y;
   }
@@ -67,7 +70,7 @@ export function isStaleYear(year: number, now: Date): boolean {
 function schemaHours(node: JsonLdNode): string[] {
   const out: string[] = [];
   for (const s of strings(node.openingHours)) {
-    for (const m of s.matchAll(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/g)) {
+    for (const m of s.matchAll(SCHEMA_HOURS_RE)) {
       out.push(`${m[1].padStart(2, "0")}:${m[2]}-${m[3].padStart(2, "0")}:${m[4]}`);
     }
   }
@@ -93,6 +96,23 @@ export interface FactInventory {
   textHours: Set<string>;
   schemaPrices: { value: number; url: string }[];
   visiblePrices: Set<number>;
+  /** JSON-LD nodes (other than PostalAddress) that carry an address, and the largest `location` list */
+  addressedNodes: number;
+  maxLocations: number;
+}
+
+/** More than 3 distinct streets, or schema describing several places → several locations (R3 M6). */
+export function isMultiLocation(inv: FactInventory): boolean {
+  return inv.streets.size > 3 || inv.addressedNodes >= 2 || inv.maxLocations >= 2;
+}
+
+const SECOND_LEVEL = /^(co|com|net|org|gov|ac|edu)\.[a-z]{2}$/;
+/** Registrable domain, approximately: "a.b.example.co.uk" → "example.co.uk". */
+export function registrableDomain(email: string): string {
+  const host = (email.split("@")[1] ?? "").toLowerCase();
+  const parts = host.split(".");
+  const two = parts.slice(-2).join(".");
+  return SECOND_LEVEL.test(two) ? parts.slice(-3).join(".") : two;
 }
 
 export function factInventory(ctx: AuditContext): FactInventory {
@@ -104,6 +124,8 @@ export function factInventory(ctx: AuditContext): FactInventory {
     textHours: new Set(),
     schemaPrices: [],
     visiblePrices: new Set(),
+    addressedNodes: 0,
+    maxLocations: 0,
   };
   const addPhone = (raw: string) => {
     const d = phoneDigits(raw);
@@ -112,6 +134,8 @@ export function factInventory(ctx: AuditContext): FactInventory {
   for (const { node, url } of allJsonLdNodes(ctx.pages)) {
     for (const t of strings(node.telephone)) addPhone(t);
     for (const e of strings(node.email)) inv.emails.add(e.replace(/^mailto:/i, "").trim().toLowerCase());
+    if (!nodeTypes(node).includes("PostalAddress") && node.address) inv.addressedNodes++;
+    if (Array.isArray(node.location)) inv.maxLocations = Math.max(inv.maxLocations, node.location.length);
     if (nodeTypes(node).includes("PostalAddress")) {
       for (const s of strings(node.streetAddress)) if (s.trim()) inv.streets.add(normStreet(s));
     } else if (typeof node.address === "string" && node.address.trim()) {
@@ -216,10 +240,13 @@ export const factConsistencyCheck: Check = (ctx) => {
       `We found ${inv.phones.size} different phone numbers in links and schema (${[...inv.phones.values()].slice(0, 4).join(", ")}).`,
     );
   }
-  if (inv.emails.size > 1) {
+  // Department mailboxes on one domain are normal (R3 L1): flag different domains, or more than 3.
+  const emailDomains = new Set([...inv.emails].map(registrableDomain));
+  if (inv.emails.size > 3 || emailDomains.size > 1) {
     flag("geo.fact-consistency:emails", null, `We found ${inv.emails.size} different email addresses (${[...inv.emails].slice(0, 4).join(", ")}).`);
   }
-  if (inv.streets.size > 1) {
+  const multiLocation = isMultiLocation(inv);
+  if (inv.streets.size > 1 && !multiLocation) {
     flag("geo.fact-consistency:addresses", null, `We found ${inv.streets.size} different street addresses (${[...inv.streets].slice(0, 3).join("; ")}).`);
   }
   if (inv.schemaHours.size > 0 && inv.textHours.size > 0 && ![...inv.schemaHours].some((h) => inv.textHours.has(h))) {
@@ -239,6 +266,9 @@ export const factConsistencyCheck: Check = (ctx) => {
     for (const u of unseen) found.get("geo.fact-consistency:schema-price")!.urls.add(u.url);
   }
 
+  const multiNote = multiLocation
+    ? ` You appear to have several locations (${inv.streets.size} street addresses), so different addresses weren't flagged.`
+    : "";
   const issues: IssueSeed[] = [...found.entries()].map(([key, e]) => ({
     key,
     affectedUrls: [...e.urls],
@@ -248,7 +278,7 @@ export const factConsistencyCheck: Check = (ctx) => {
   if (issues.length === 0) {
     return outcome(def, {
       score: 1,
-      summary: "No crossed-out or hidden prices, and contact details, prices and hours agree across the pages and schema we read.",
+      summary: `No crossed-out or hidden prices, and contact details, prices and hours agree across the pages and schema we read.${multiNote}`,
       issues,
     });
   }
@@ -257,7 +287,7 @@ export const factConsistencyCheck: Check = (ctx) => {
     score: Math.max(0, score),
     summary: `${issues.length} possible ${issues.length === 1 ? "mismatch" : "mismatches"} an AI model could quote: ${[...found.keys()]
       .map((k) => LABEL[k])
-      .join(", ")}.`,
+      .join(", ")}.${multiNote}`,
     issues,
   });
 };

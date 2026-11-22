@@ -93,7 +93,8 @@ function quoteLines(quote: StoredQuote | null, attachment: ContactAttachment): s
     lines.push(
       `  - ${item.label} [${item.serviceSlug}] ${item.submittedFrom ? "from " : ""}${money(item.submittedPrice)}` +
         (item.valid ? "" : `; catalog ${item.catalogPrice === null ? "-" : money(item.catalogPrice)}`) +
-        ` (${status})`,
+        ` (${status})` +
+        (item.submittedLabel ? `; client label was: "${item.submittedLabel}"` : ""),
     );
   }
   return lines;
@@ -141,8 +142,14 @@ export async function submitContact(
   let stored = false;
   try {
     stored =
-      (await insertContact({ ...data, ipHash, quote, auditId: attachment.auditId, auditUrl: attachment.auditUrl })) !==
-      null;
+      (await insertContact({
+        ...data,
+        ipHash,
+        quote,
+        auditId: attachment.auditId,
+        auditUrl: attachment.auditUrl,
+        attachmentText: quoteLines(quote, attachment).join("\n"),
+      })) !== null;
   } catch (error) {
     // Best effort (ADR-010): the notification below still carries the full message.
     console.error(`[actions/contact] could not store submission: ${error instanceof Error ? error.message : "unknown error"}`);

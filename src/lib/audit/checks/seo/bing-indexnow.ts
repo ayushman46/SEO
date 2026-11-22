@@ -5,7 +5,7 @@ const def = { id: "seo.bing-indexnow", category: "seo", label: "Bing & IndexNow 
 
 /** A sitemap whose newest <lastmod> is older than this is "stale". */
 export const STALE_LASTMOD_DAYS = 180;
-const LASTMOD_RE = /<(?:\w{1,20}:)?lastmod>\s{0,16}(\d{4}-\d{2}-\d{2}(?:T[\d:.]{1,20}(?:Z|[+-]\d{2}:?\d{2})?)?)/gi;
+export const LASTMOD_RE = /<(?:\w{1,20}:)?lastmod>\s{0,16}(\d{4}-\d{2}-\d{2}(?:T[\d:.]{1,20}(?:Z|[+-]\d{2}:?\d{2})?)?)/gi;
 
 /** Newest <lastmod> in the sitemap, or null if there are none. */
 export function newestLastmod(xml: string | null): Date | null {

@@ -49,7 +49,7 @@ export const FACTS_OPEN = "<<<BEGIN_SITE_FACTS>>>";
 export const FACTS_CLOSE = "<<<END_SITE_FACTS>>>";
 
 const DELIM_CHARS = /<{3,}|>{3,}/g;
-const DELIM_WORDS = /(BEGIN|END)[\s_-]*(PAGE[\s_-]*DATA|SITE[\s_-]*FACTS)/gi;
+export const DELIM_WORDS = /(BEGIN|END)[\s_-]{0,5}(PAGE[\s_-]{0,5}DATA|SITE[\s_-]{0,5}FACTS)/gi;
 const CONTROL = /[\u0000-\u0008\u000b-\u001f\u007f-\u009f\u200b-\u200f\u2028\u2029\u202a-\u202e\u2066-\u2069\ufeff]/g;
 
 /** Remove anything that could close or forge one of our data blocks, plus control/bidi chars. */

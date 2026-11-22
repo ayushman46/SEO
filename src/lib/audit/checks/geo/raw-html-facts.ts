@@ -9,7 +9,7 @@ export const RAW_FACTS = ["phone", "email", "address", "hours", "price"] as cons
 export type RawFact = (typeof RAW_FACTS)[number];
 
 const MIN_WORDS = 80;
-const ENABLE_JS = /(enable|turn on|activate)\s+javascript|javascript\s+(is\s+)?(required|disabled|needed)|requires?\s+javascript/i;
+export const ENABLE_JS = /(enable|turn on|activate)\s{1,5}javascript|javascript\s{1,5}(is\s{1,5})?(required|disabled|needed)|requires?\s{1,5}javascript/i;
 
 export interface ShellSignals {
   words: number;
@@ -51,7 +51,7 @@ function schemaHas(ctx: AuditContext): Record<RawFact, boolean> {
   return out;
 }
 
-const DAY_HOURS = /\b(mon|tue|wed|thu|fri|sat|sun)[a-z]*\.?\b[^.\n]{0,40}?\d{1,2}(?::\d{2})?\s?(am|pm)?/i;
+export const DAY_HOURS = /\b(mon|tue|wed|thu|fri|sat|sun)[a-z]{0,6}\.?\b[^.\n]{0,40}?\d{1,2}(?::\d{2})?\s?(am|pm)?/i;
 
 function textHas(ctx: AuditContext): Record<RawFact, boolean> {
   const out: Record<RawFact, boolean> = { phone: false, email: false, address: false, hours: false, price: false };

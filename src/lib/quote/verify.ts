@@ -1,16 +1,33 @@
 /**
- * Checks an order's line items against the catalog (T019). Pure; used by the contact server
- * action so a client can never set its own price. Client prices are compared, never trusted.
+ * Checks an order's line items against the catalog (T019, R3 H1/L4). Pure; used by the contact
+ * server action so a client can never set its own price, label or scope. Client values are
+ * compared, never trusted: a known item always carries the catalog label.
  */
-import { catalogItemForSlug, MAX_ORDER_ITEMS, priceIn, type QuoteCurrency, type ServiceSlug } from "./catalog";
+import {
+  catalogItemForSlug,
+  MAX_ORDER_ITEMS,
+  priceIn,
+  type CatalogKey,
+  type QuoteCurrency,
+  type ServiceSlug,
+} from "./catalog";
 import type { OrderItem } from "./quote";
 
-export type OrderItemProblem = "unknown-service" | "not-quotable" | "price-mismatch" | "from-mismatch";
+export type OrderItemProblem =
+  | "unknown-service"
+  | "not-quotable"
+  | "duplicate"
+  | "price-mismatch"
+  | "from-mismatch"
+  | "label-mismatch";
 
 export interface VerifiedOrderItem {
   /** as submitted (slug already shape-checked by the caller) */
   serviceSlug: string;
+  /** the catalog label for known services; the client's text only when the slug is unknown */
   label: string;
+  /** the client's label, kept only when it differs from the catalog label (shown as evidence) */
+  submittedLabel: string | null;
   submittedPrice: number | null;
   submittedFrom: boolean;
   /** catalog values; null when the slug is unknown or has no price in this currency */
@@ -42,26 +59,53 @@ export function verifyOrder(input: {
   submittedTotal: number | null;
   submittedFixed: boolean;
 }): VerifiedOrder {
+  const seen = new Set<CatalogKey>();
   const items: VerifiedOrderItem[] = input.items.slice(0, MAX_ORDER_ITEMS).map((it) => {
-    const base = {
+    const submitted = {
       serviceSlug: it.serviceSlug,
-      label: it.label,
       submittedPrice: it.price,
       submittedFrom: it.from,
     };
     const item = catalogItemForSlug(it.serviceSlug);
     if (!item) {
-      return { ...base, catalogSlug: null, catalogPrice: null, catalogFrom: null, valid: false, problem: "unknown-service" };
+      return {
+        ...submitted,
+        label: it.label,
+        submittedLabel: null,
+        catalogSlug: null,
+        catalogPrice: null,
+        catalogFrom: null,
+        valid: false,
+        problem: "unknown-service",
+      };
     }
     const p = priceIn(item, input.currency);
     const catalogPrice = p === null ? null : p.amount;
     // "on-request" (no price in this currency) is a starting point, never fixed.
     const catalogFrom = p === null ? true : p.kind === "from";
-    const known = { ...base, catalogSlug: item.serviceSlug, catalogPrice, catalogFrom };
-    if (!item.quotable) return { ...known, valid: false, problem: "not-quotable" };
-    if (it.price !== catalogPrice) return { ...known, valid: false, problem: "price-mismatch" };
-    if (it.from !== catalogFrom) return { ...known, valid: false, problem: "from-mismatch" };
-    return { ...known, valid: true, problem: null };
+    const labelMatches = it.label.trim() === item.label;
+    const known = {
+      ...submitted,
+      label: item.label,
+      submittedLabel: labelMatches ? null : it.label,
+      catalogSlug: item.serviceSlug,
+      catalogPrice,
+      catalogFrom,
+    };
+    const duplicate = seen.has(item.key);
+    seen.add(item.key);
+    const problem: OrderItemProblem | null = !item.quotable
+      ? "not-quotable"
+      : duplicate
+        ? "duplicate"
+        : it.price !== catalogPrice
+          ? "price-mismatch"
+          : it.from !== catalogFrom
+            ? "from-mismatch"
+            : !labelMatches
+              ? "label-mismatch"
+              : null;
+    return { ...known, valid: problem === null, problem };
   });
 
   const catalogTotal = items.reduce((sum, i) => sum + (i.valid ? (i.catalogPrice ?? 0) : 0), 0);

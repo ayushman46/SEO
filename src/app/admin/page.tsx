@@ -63,9 +63,10 @@ function QuoteCell({ quote, auditId, auditUrl }: { quote: StoredQuote | null; au
       <ul className="mt-1 list-disc pl-4 text-xs">
         {(Array.isArray(quote.items) ? quote.items : []).map((item, i) => (
           <li key={`${item.serviceSlug}-${i}`}>
-            {item.label} ({item.submittedFrom ? "from " : ""}
+            {item.label} <code>[{item.serviceSlug}]</code> ({item.submittedFrom ? "from " : ""}
             {money(item.submittedPrice)})
             {item.valid ? null : <strong> invalid: {item.problem ?? "unknown"}</strong>}
+            {item.submittedLabel ? <span className="block opacity-70">client label: {item.submittedLabel}</span> : null}
           </li>
         ))}
       </ul>

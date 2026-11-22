@@ -47,6 +47,23 @@ export interface ContactInsert extends ContactInput {
   quote?: StoredQuote | null;
   auditId?: string | null;
   auditUrl?: string | null;
+  /**
+   * Plain-text rendering of the quote/audit attachment. Used only on a pre-0002 database, where
+   * it is appended to `message` so the order is still stored (R3 L5).
+   */
+  attachmentText?: string;
+}
+
+/** Same limit as the 0001 check on contact_submissions.message (characters). */
+const MAX_MESSAGE_CHARS = 4000;
+
+/** Message with the attachment appended, cut to the column limit (code points, like Postgres). */
+export function messageWithAttachment(message: string, attachmentText: string | undefined): string {
+  const extra = attachmentText?.trim() ?? "";
+  if (extra === "") return message;
+  const combined = `${message}\n\n--- Attached quote (stored in the message: migration 0002 not applied) ---\n${extra}`;
+  const chars = Array.from(combined);
+  return chars.length <= MAX_MESSAGE_CHARS ? combined : `${chars.slice(0, MAX_MESSAGE_CHARS - 1).join("")}…`;
 }
 
 /** Postgres "undefined_column": migration 0002 has not been applied yet. */
@@ -55,8 +72,9 @@ const isMissingColumn = (error: unknown): boolean =>
 
 /**
  * Returns the new id, or null when no DB is configured. Throws on DB errors.
- * Submissions without a quote or audit use the 0001 column set, so they keep working on a
- * database where migration 0002 has not been applied.
+ * Submissions without a quote or audit use the 0001 column set. With a quote on a database where
+ * migration 0002 has not been applied, the insert is retried with the 0001 column set and the
+ * quote appended to the message, so the submission is still stored.
  */
 export async function insertContact(input: ContactInsert): Promise<string | null> {
   const sql = getDb();
@@ -65,7 +83,7 @@ export async function insertContact(input: ContactInsert): Promise<string | null
   const auditId = input.auditId ?? null;
   const auditUrl = input.auditUrl === undefined || input.auditUrl === null ? null : input.auditUrl.slice(0, 2048);
 
-  if (quote === null && auditId === null && auditUrl === null) {
+  const insertBasic = async (message: string): Promise<string | null> => {
     const rows = await sql<{ id: string }[]>`
       insert into contact_submissions (name, email, company, website, service, budget, message, ip_hash)
       values (
@@ -75,15 +93,19 @@ export async function insertContact(input: ContactInsert): Promise<string | null
         ${input.website ?? null},
         ${input.service},
         ${input.budget ?? null},
-        ${input.message},
+        ${message},
         ${input.ipHash}
       )
       returning id
     `;
     return rows[0]?.id ?? null;
-  }
+  };
 
-  const rows = await sql<{ id: string }[]>`
+  if (quote === null && auditId === null && auditUrl === null) return insertBasic(input.message);
+
+  let rows: { id: string }[];
+  try {
+    rows = await sql<{ id: string }[]>`
     insert into contact_submissions (
       name, email, company, website, service, budget, message, ip_hash,
       quote, quote_valid, audit_id, audit_url
@@ -104,6 +126,12 @@ export async function insertContact(input: ContactInsert): Promise<string | null
     )
     returning id
   `;
+  } catch (error) {
+    if (!isMissingColumn(error)) throw error;
+    // Pre-0002 schema: keep the order by storing the quote as text in the message (R3 L5).
+    console.warn("[db/contact] quote columns missing (run npm run db:migrate); storing the quote in the message text");
+    return insertBasic(messageWithAttachment(input.message, input.attachmentText));
+  }
   return rows[0]?.id ?? null;
 }
 

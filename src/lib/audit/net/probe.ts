@@ -14,7 +14,25 @@ import { safeFetch, type SafeFetchOptions, type SafeFetchResult, type SimulatedB
 
 export const PROBE_MAX_MS = 6_000;
 export const PROBE_REQUEST_TIMEOUT_MS = 2_500;
-export const PROBE_CONCURRENCY = 4;
+export const PROBE_CONCURRENCY = 2;
+/** At most this many GETs per bot (block-page classification); everything else is HEAD. */
+export const PROBE_MAX_GETS_PER_BOT = 2;
+/** Reuse a host's probe result for this long (R3 M4). In-memory, per server instance. */
+export const PROBE_CACHE_TTL_MS = 15 * 60 * 1000;
+const PROBE_CACHE_MAX = 500;
+const probeCache = new Map<string, { at: number; result: Extract<CrawlerProbe, { status: "ok" }> }>();
+
+export function clearProbeCache(): void {
+  probeCache.clear();
+}
+
+function cacheKey(url: string): string | null {
+  try {
+    return new URL(url).host.toLowerCase();
+  } catch {
+    return null;
+  }
+}
 export const PROBE_BODY_CAP = 64 * 1024;
 /** Homepage + this many other crawled pages. */
 export const PROBE_EXTRA_PAGES = 2;
@@ -90,6 +108,11 @@ export async function probeCrawlers(ctx: AuditContext, opts: ProbeOptions): Prom
     if (home.statusCode >= 400) return { status: "inconclusive", baselineStatus: home.statusCode };
     if (opts.signal?.aborted) return { status: "skipped", reason: "aborted" };
 
+    const key = cacheKey(home.url);
+    const now = Date.now();
+    const hit = key ? probeCache.get(key) : undefined;
+    if (hit && now - hit.at < PROBE_CACHE_TTL_MS) return { ...hit.result, cached: true };
+
     const targets = probeTargets(ctx);
     const robots = parseRobots(ctx.robots);
     const fetcher = opts.fetcher ?? safeFetch;
@@ -113,6 +136,8 @@ export async function probeCrawlers(ctx: AuditContext, opts: ProbeOptions): Prom
 
     const probes: BotProbe[] = jobs.map((j) => ({ bot: j.bot.name, url: j.target.url, kind: j.target.kind, response: null }));
     let next = 0;
+    let backOff = false; // a 429 stops new requests: never hammer a rate-limited site
+    const getsPerBot = new Map<string, number>();
     const timeout = () => Math.max(300, Math.min(PROBE_REQUEST_TIMEOUT_MS, opts.deadline - Date.now()));
     const one = async (i: number) => {
       const { bot, target } = jobs[i];
@@ -128,27 +153,31 @@ export async function probeCrawlers(ctx: AuditContext, opts: ProbeOptions): Prom
       try {
         const head = await fetcher(target.url, { ...base, method: "HEAD", timeoutMs: timeout() });
         res = toResponse("HEAD", head);
+        if (res.status === 429) backOff = true;
       } catch (err) {
         if (signal.aborted || !(err instanceof AuditError)) return;
         res = null; // HEAD failed (some servers reset HEAD): fall through to GET
       }
-      const needGet =
-        res === null ||
-        (target.kind === "page" && target === targets[0]) ||
-        res.status >= 400 ||
-        res.status !== target.baselineStatus;
-      if (needGet && !signal.aborted && opts.deadline - Date.now() > 300) {
+      // GET only when HEAD is refused or unsupported (R3 M4), never after a 429, and at most
+      // PROBE_MAX_GETS_PER_BOT times per bot.
+      const needGet = res === null || (res.status >= 400 && res.status !== 429);
+      const gets = getsPerBot.get(bot.name) ?? 0;
+      if (needGet && !backOff && gets < PROBE_MAX_GETS_PER_BOT && !signal.aborted && opts.deadline - Date.now() > 300) {
+        getsPerBot.set(bot.name, gets + 1);
         try {
           const get = await fetcher(target.url, { ...base, method: "GET", maxBytes: PROBE_BODY_CAP, onOverflow: "truncate", timeoutMs: timeout() });
           res = toResponse("GET", get);
+          if (res.status === 429) backOff = true;
         } catch {
           /* keep the HEAD result if we have one */
         }
       }
+      // HEAD unsupported and no GET made: we learned nothing about this bot here.
+      if (res && res.method === "HEAD" && (res.status === 405 || res.status === 501)) res = null;
       probes[i].response = res;
     };
     const worker = async () => {
-      while (next < jobs.length && !signal.aborted && opts.deadline - Date.now() > 300) {
+      while (next < jobs.length && !backOff && !signal.aborted && opts.deadline - Date.now() > 300) {
         const i = next++;
         await one(i);
       }
@@ -160,7 +189,15 @@ export async function probeCrawlers(ctx: AuditContext, opts: ProbeOptions): Prom
       if (!phase.signal.aborted) phase.abort();
     }
     if (opts.signal?.aborted) return { status: "skipped", reason: "aborted" };
-    return { status: "ok", targets, probes, skippedByRobots };
+    const result = { status: "ok" as const, targets, probes, skippedByRobots };
+    if (key) {
+      if (probeCache.size >= PROBE_CACHE_MAX) {
+        const oldest = probeCache.keys().next().value;
+        if (oldest !== undefined) probeCache.delete(oldest);
+      }
+      probeCache.set(key, { at: Date.now(), result });
+    }
+    return result;
   } catch {
     return { status: "skipped", reason: "error" };
   }

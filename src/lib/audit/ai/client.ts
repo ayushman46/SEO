@@ -53,6 +53,25 @@ async function readCapped(res: Response): Promise<string | null> {
   return new TextDecoder().decode(Buffer.concat(chunks));
 }
 
+/**
+ * Remove <think>...</think> blocks with indexOf (linear). A lazy regex here was quadratic on a
+ * reply full of unclosed "<think>" tags (R3 regex sweep).
+ */
+export function stripThinking(content: string): string {
+  const lower = content.toLowerCase();
+  let out = "";
+  let i = 0;
+  for (;;) {
+    const open = lower.indexOf("<think>", i);
+    if (open < 0) break;
+    const close = lower.indexOf("</think>", open + 7);
+    if (close < 0) break;
+    out += content.slice(i, open);
+    i = close + 8;
+  }
+  return out + content.slice(i);
+}
+
 /** Pull the assistant text out of an OpenAI-style chat completion. */
 export function extractContent(body: unknown): string | null {
   if (typeof body !== "object" || body === null) return null;
@@ -62,7 +81,7 @@ export function extractContent(body: unknown): string | null {
   const content = msg?.content;
   if (typeof content !== "string") return null;
   // Some reasoning models inline their thinking; we only want the answer.
-  const stripped = content.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+  const stripped = stripThinking(content).trim();
   return stripped || null;
 }
 

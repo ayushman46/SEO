@@ -9,6 +9,7 @@ import { safeFetch, type SafeFetchOptions, type SafeFetchResult } from "./fetch"
  * followed (we stay on the host and see where it points). Never throws.
  */
 export const SOFT404_TIMEOUT_MS = 4_000;
+export const TITLE_RE = /<title[^<>]{0,200}>([^<]{0,200})/i;
 const BODY_CAP = 32 * 1024;
 
 export function soft404Path(): string {
@@ -31,7 +32,7 @@ export async function probeSoft404(
       timeoutMs: Math.max(500, Math.min(SOFT404_TIMEOUT_MS, opts.timeoutMs)),
       signal: opts.signal,
     });
-    const title = /<title[^>]*>([^<]{0,200})/i.exec(res.text.slice(0, BODY_CAP))?.[1]?.trim() ?? null;
+    const title = TITLE_RE.exec(res.text.slice(0, BODY_CAP))?.[1]?.trim() ?? null;
     return { status: "ok", url, statusCode: res.status, location: res.location, title };
   } catch {
     return { status: "skipped", reason: opts.signal?.aborted ? "aborted" : "error" };

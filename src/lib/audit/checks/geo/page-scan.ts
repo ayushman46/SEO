@@ -17,7 +17,7 @@ export const KEY_SECTION =
 export const KEY_PDF =
   /(menu|price|pricing|rates|tariff|fees|brochure|catalog|catalogue|timetable|schedule|hours|opening)/i;
 
-const STRUCK_CLASS = /(^|[\s_-])(was|old-?price|price-?old|was-?price|strike|strikethrough|line-?through|crossed|regular-?price)([\s_-]|$)/i;
+export const STRUCK_CLASS = /(^|[\s_-])(was|old-?price|price-?old|was-?price|strike|strikethrough|line-?through|crossed|regular-?price)([\s_-]|$)/i;
 
 export interface KeySection {
   heading: string;
@@ -49,8 +49,8 @@ export interface PageScan {
   testimonials: { text: string; attributed: boolean }[];
 }
 
-const TESTIMONIAL_CLASS = /(^|[\s_-])(testimonials?|customer-reviews?|review-(item|card|text|body|content)|reviews?-(list|slider|carousel)|quote-(card|block))([\s_-]|$)/i;
-const ATTRIBUTION_TAIL = /(?:[—–-]|~)\s*[A-Z][\p{L}'.-]+(?:\s+[A-Z][\p{L}'.-]*){0,3}\s*(?:,[^,]{1,60})?$/u;
+export const TESTIMONIAL_CLASS = /(^|[\s_-])(testimonials?|customer-reviews?|review-(item|card|text|body|content)|reviews?-(list|slider|carousel)|quote-(card|block))([\s_-]|$)/i;
+export const ATTRIBUTION_TAIL = /(?:[—–-]|~)\s{0,3}[A-Z][\p{L}'.-]{1,40}(?:\s{1,3}[A-Z][\p{L}'.-]{0,40}){0,3}\s{0,3}(?:,[^,]{1,60})?$/u;
 
 function hasAttribution(n: DomNode, text: string): boolean {
   let found = false;
@@ -258,9 +258,19 @@ function decodeSafe(s: string): string {
 
 /* ── Shared fact patterns (deterministic) ── */
 
-/** Currency amounts: £79, $1,299.00, 79 €, 49 USD. */
-export const PRICE_RE =
-  /(?:\p{Sc}\s?\d{1,3}(?:[.,\s]\d{3})*(?:[.,]\d{1,2})?|\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{1,2})?\s?(?:\p{Sc}|USD|EUR|GBP|INR|AUD|CAD|CHF|JPY)\b)/gu;
+/** Integer part of a price: grouped ("1,299" / "1.299" / "1 299", ≤ 5 groups) or ≤ 9 plain digits. */
+const PRICE_INT = String.raw`(?:\d{1,3}(?:[.,  ]\d{3}){1,5}|\d{1,9})`;
+const PRICE_DEC = String.raw`(?:[.,]\d{1,2})?`;
+/**
+ * Currency amounts: £79, $1,299.00, 79 €, 1.299,50 €, 49 USD.
+ * Every repetition is bounded and the suffix form can't start inside a number, so each start
+ * position does constant work: linear on any input (R3 C1: the old unbounded group followed by
+ * a required currency token was quadratic). `\b` follows only the letter codes (R3 M5).
+ */
+export const PRICE_RE = new RegExp(
+  String.raw`(?:\p{Sc}\s?${PRICE_INT}${PRICE_DEC}(?!\d)|(?<![\d.,])${PRICE_INT}${PRICE_DEC}\s?(?:\p{Sc}|(?:USD|EUR|GBP|INR|AUD|CAD|CHF|JPY)\b))`,
+  "gu",
+);
 /** Phone numbers written like phone numbers: a + prefix, parentheses, or 2+ separator groups. */
 export const PHONE_RE = /(?<![\d+])(?:\+\d{1,3}[\s.-]?)?(?:\(\d{1,5}\)[\s.-]?)?\d{2,5}(?:[\s.-]\d{2,5}){1,4}/g;
 export const EMAIL_RE = /(?<![a-z0-9._%+-])[a-z0-9._%+-]{1,64}@[a-z0-9-]{1,63}(?:\.[a-z0-9-]{1,63}){0,8}\.[a-z]{2,24}/gi;
@@ -268,7 +278,7 @@ export const EMAIL_RE = /(?<![a-z0-9._%+-])[a-z0-9._%+-]{1,64}@[a-z0-9-]{1,63}(?
 export const TIME_RANGE_RE =
   /\b(\d{1,2})(?:[:.](\d{2}))?\s?(am|pm|a\.m\.|p\.m\.)?\s?(?:-|–|—|to|until|till)\s?(\d{1,2})(?:[:.](\d{2}))?\s?(am|pm|a\.m\.|p\.m\.)?/gi;
 export const STREET_RE =
-  /\b\d{1,5}[a-z]?\s+(?:[A-Z][\w'-]*\s+){0,4}(?:street|st|road|rd|avenue|ave|lane|ln|drive|dr|boulevard|blvd|way|place|pl|court|ct|square|sq|terrace|crescent|close|parkway|highway|hwy)\b\.?/gi;
+  /\b\d{1,5}[a-z]?\s{1,3}(?:[A-Z][\w'-]{0,30}\s{1,3}){0,4}(?:street|st|road|rd|avenue|ave|lane|ln|drive|dr|boulevard|blvd|way|place|pl|court|ct|square|sq|terrace|crescent|close|parkway|highway|hwy)\b\.?/gi;
 
 /** Digits of a plausible phone number (7–15 digits), else null. */
 export function phoneDigits(s: string): string | null {

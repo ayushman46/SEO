@@ -33,6 +33,10 @@ export function soft404Outcome(probe: Soft404Probe, ctx: AuditContext): CheckOut
       return probe.url;
     }
   })();
+  // Refused or errored: we learn nothing about soft 404s (R3 L7).
+  if ([401, 403, 429].includes(probe.statusCode) || probe.statusCode >= 500) {
+    return unavailable(def, `The site refused or errored on the test URL (status ${probe.statusCode}), so we couldn't check how it handles missing pages.`);
+  }
   if (probe.statusCode === 404 || probe.statusCode === 410) {
     return outcome(def, { score: 1, summary: `A made-up URL (${path}) correctly returned ${probe.statusCode}.`, issues: [] });
   }

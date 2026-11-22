@@ -63,9 +63,27 @@ export function parseModelJson(content: string): unknown {
 /* ── Text guards ── */
 
 const CONTROL = /[\u0000-\u0008\u000b-\u000c\u000e-\u001f\u007f-\u009f\u200b-\u200f\u2028\u2029\u202a-\u202e\u2066-\u2069\ufeff]/g;
-const HTML_TAG = /<\s*\/?\s*[a-z!?][^>]*>/i;
+export const HTML_TAG = /<\s{0,5}\/?\s{0,5}[a-z!?][^<>]{0,1000}>/i;
 const BAD_SCHEME = /\b(javascript|data|vbscript|file):/i;
-const URL_RE = /\bhttps?:\/\/[^\s<>"'`)\]}]+|\bwww\.[a-z0-9-]+(?:\.[a-z0-9-]+)+[^\s<>"'`)\]}]*/gi;
+export const URL_RE =
+  /\bhttps?:\/\/[^\s<>"'`)\]}]{1,2048}|\bwww\.[a-z0-9-]{1,63}(?:\.[a-z0-9-]{1,63}){1,8}[^\s<>"'`)\]}]{0,2048}|(?<![\w:/])\/\/[a-z0-9-]{1,63}(?:\.[a-z0-9-]{1,63}){1,8}[^\s<>"'`)\]}]{0,2048}/gi;
+/**
+ * Bare domains ("evil.com/acme", "acme.example.com.evil.net") in model text (R3 M2). Explicit TLD
+ * list so "Node.js" and the like don't trip it; e-mail domains are excluded by the lookbehind.
+ */
+export const BARE_DOMAIN =
+  /(?<![\w@.\/-])(?:[a-z0-9-]{1,63}\.){1,8}(?:com|net|org|io|co|info|biz|xyz|app|dev|ai|me|us|uk|in|de|fr|eu|ca|au|shop|store|online|site|tech)(?![\w-])/gi;
+/** Markdown link destinations: `[text](dest)` (R3 M2). */
+export const MD_LINK_DEST = /\]\(\s{0,5}<?([^)\s>]{0,2048})/g;
+/** Instructions aimed at the reader / our product, and spelled-out e-mails (R3 L8). Conservative on purpose. */
+export const INSTRUCTION_PATTERNS = [
+  /\b(ignore|disregard|forget)\s+(?:(?:all|any|the|your|previous|prior|above|earlier|these)\s+){0,3}(instructions?|prompts?|rules|audit|report|results?)\b/i,
+  /\bsystem\s+prompt\b/i,
+  /\byou\s+are\s+(?:now\s+)?(?:an?\s+)?(?:ai|assistant|language\s+model|chatgpt)\b/i,
+];
+const SEENHQ_MENTION = /\bseenhq\b/i;
+export const OBFUSCATED_EMAIL =
+  /(?<![a-z0-9._-])[a-z0-9._-]{1,64}(?:\s{0,3}[([{]\s{0,3}at\s{0,3}[)\]}]\s{0,3}[a-z0-9-]{1,63}\s{0,3}(?:[([{]\s{0,3}dot\s{0,3}[)\]}]|\.)\s{0,3}[a-z]{2,24}\b|\s{1,3}at\s{1,3}[a-z0-9-]{1,63}\s{1,3}dot\s{1,3}(?:com|net|org|io|co|in|uk|de)\b)/i;
 const EMAIL_RE = /(?<![a-z0-9._%+-])[a-z0-9._%+-]{1,64}@[a-z0-9-]{1,63}(?:\.[a-z0-9-]{1,63}){0,8}\.[a-z]{2,24}/gi;
 const PHONE_RE = /(?<![\d+])\+?\(?\d[\d\s().-]{5,22}\d/g;
 
@@ -93,7 +111,7 @@ function urlAllowed(raw: string, g: Guard, extraHosts: string[] = []): boolean {
   const u = trimUrl(raw);
   let parsed: URL;
   try {
-    parsed = new URL(/^www\./i.test(u) ? `https://${u}` : u);
+    parsed = new URL(/^www\./i.test(u) ? `https://${u}` : u.startsWith("//") ? `https:${u}` : u);
   } catch {
     return false;
   }
@@ -122,8 +140,9 @@ export function hasFabricatedContact(s: string, g: Guard): boolean {
   if (phones.length === 0) return false;
   const inputPhones = known.phones;
   for (const p of phones) {
-    const tail = p.slice(-9);
-    const known = inputPhones.some((q) => q === p || (tail.length >= 7 && q.endsWith(tail)) || p.endsWith(q.slice(-9)));
+    // Exact digits, or the same last 9 digits when both are full-length numbers (country-code
+    // variants). A short number in the input must not vouch for a longer invented one (R3 L6).
+    const known = inputPhones.some((q) => q === p || (q.length >= 9 && p.length >= 9 && q.slice(-9) === p.slice(-9)));
     if (!known) return true;
   }
   return false;
@@ -156,7 +175,39 @@ export function safeText(value: unknown, rules: TextRules, g: Guard): string | n
   if (urls.length && (rules.urls ?? "site") === "none") return null;
   for (const u of urls) if (!urlAllowed(u, g, rules.extraHosts)) return null;
   if (hasFabricatedContact(s, g)) return null;
+  if (hasForeignBareDomain(s, g, rules.extraHosts)) return null;
+  for (const m of s.matchAll(MD_LINK_DEST)) {
+    const dest = m[1];
+    // Only absolute http(s) destinations; entity-encoded or relative schemes are refused.
+    if (!/^https?:\/\//i.test(dest) || !urlAllowed(dest, g, rules.extraHosts)) return null;
+  }
+  if (looksLikeInstructions(s, g)) return null;
   return s;
+}
+
+function hasForeignBareDomain(s: string, g: Guard, extraHosts: string[] = []): boolean {
+  const allowedHosts = new Set([bareHost(g.hostname), ...extraHosts.map(bareHost)]);
+  for (const l of g.externalLinks ?? []) {
+    try {
+      allowedHosts.add(bareHost(new URL(l).hostname));
+    } catch {
+      /* ignore */
+    }
+  }
+  // URLs were already vetted by urlAllowed; look at what's left.
+  const rest = s.replace(URL_RE, " ").replace(EMAIL_RE, " ");
+  for (const m of rest.matchAll(BARE_DOMAIN)) {
+    if (!allowedHosts.has(bareHost(m[0]))) return true;
+  }
+  return false;
+}
+
+/** Text that addresses the reader/our product with instructions, or spells out an e-mail. */
+export function looksLikeInstructions(s: string, g: Guard): boolean {
+  if (OBFUSCATED_EMAIL.test(s)) return true;
+  if (INSTRUCTION_PATTERNS.some((re) => re.test(s))) return true;
+  // Mentioning us only makes sense when the audited site is ours.
+  return SEENHQ_MENTION.test(s) && !/seenhq/i.test(g.hostname);
 }
 
 /** sourceUrl must be one of the crawled pages; returns that page's URL as crawled. */
@@ -236,6 +287,8 @@ export function validateAnalysis(raw: unknown, g: Guard): Analysis | null {
     let status: FactStatus = f.data.status;
     let value = status === "missing" || !f.data.value ? null : safeText(f.data.value, { max: CAPS.factValue }, g);
     if (status === "missing") value = null;
+    // Grounding (R3 M1): "clear" only when the evidence is mostly words from the pages we sent.
+    if (status === "clear" && value !== null && !isGrounded(value, g)) status = "vague";
     // The UI shows the value as evidence; "clear" without usable evidence is at best vague.
     if (value === null && status !== "missing") status = "vague";
     byKey.set(f.data.key, { key: f.data.key, label: FACT_LABELS[f.data.key], value, status });
@@ -255,14 +308,39 @@ export function validateAnalysis(raw: unknown, g: Guard): Analysis | null {
     if (!question || seen.has(question.toLowerCase())) continue;
     const note = q.data.note ? safeText(q.data.note, { max: CAPS.note, urls: "none" }, g) : null;
     if (!note) continue;
-    const answered: Answered = q.data.answered;
+    let answered: Answered = q.data.answered;
     const sourceUrl = answered === "no" ? null : matchPageUrl(q.data.sourceUrl, g);
+    // "yes" needs a crawled page that answers it (R3 M1).
+    if (answered === "yes" && sourceUrl === null) answered = "partly";
     seen.add(question.toLowerCase());
     questions.push({ question, answered, sourceUrl, note });
   }
   if (questions.length < MIN_QUESTIONS) return null;
 
   return { readback, businessType: businessType ?? null, local: a.local === true, facts, questions };
+}
+
+/* ── Grounding ── */
+
+export const GROUNDING_MIN_SHARE = 0.6;
+const WORD4 = /\p{L}{4,}/gu;
+let lowerMemo: { input: string; lower: string } | null = null;
+function lowerInput(input: string): string {
+  if (lowerMemo?.input !== input) lowerMemo = { input, lower: input.toLowerCase() };
+  return lowerMemo.lower;
+}
+
+/**
+ * ≥ 60% of the value's 4+ letter words occur in the input (or, with no such words, the value
+ * itself does). Substring match, because extracted page text can run words together
+ * ("Acme PlumbingPlumbers in Leeds").
+ */
+export function isGrounded(value: string, g: Guard): boolean {
+  const lower = lowerInput(g.input);
+  const tokens = (value.toLowerCase().match(WORD4) ?? []).slice(0, 60);
+  if (tokens.length === 0) return lower.includes(value.toLowerCase().trim());
+  const hits = tokens.filter((t) => lower.includes(t)).length;
+  return hits / tokens.length >= GROUNDING_MIN_SHARE;
 }
 
 /* ── Drafts ── */
@@ -321,12 +399,18 @@ export function validateDrafts(raw: unknown, g: Guard): AiDrafts | null {
     metaDescription: d.metaDescription
       ? safeText(d.metaDescription, { max: CAPS.metaDescription, min: 40, urls: "none" }, g)
       : null,
-    llmsTxt: llms && isValidLlmsTxt(llms) ? llms : null,
+    llmsTxt: llms && isValidLlmsTxt(llms) && llmsLinksAreCrawledPages(llms, g) ? llms : null,
     organizationJsonLd: d.organizationJsonLd ? sanitizeJsonLd(d.organizationJsonLd, g) : null,
     answerParagraph: d.answerParagraph
       ? safeText(d.answerParagraph, { max: CAPS.answerParagraph, min: 40 }, g)
       : null,
   };
+}
+
+/** Every Markdown link in an llms.txt draft must point at a page we crawled (R3 M2). */
+function llmsLinksAreCrawledPages(text: string, g: Guard): boolean {
+  for (const m of text.matchAll(MD_LINK_DEST)) if (matchPageUrl(m[1], g) === null) return false;
+  return true;
 }
 
 export const EMPTY_DRAFTS: AiDrafts = {

@@ -138,7 +138,7 @@ describe("verifyOrder: client prices are checked, never trusted", () => {
   });
 
   it("accepts the geo-audit alias for the Full audit", () => {
-    const v = verifyOrder({ currency: "USD", items: [{ serviceSlug: "geo-audit", label: "Full audit", price: 49, from: false }], submittedTotal: 49, submittedFixed: true });
+    const v = verifyOrder({ currency: "USD", items: [{ serviceSlug: "geo-audit", label: "Full audit (SEO + GEO, reviewed by a person)", price: 49, from: false }], submittedTotal: 49, submittedFixed: true });
     expect(v).toMatchObject({ valid: true, fixed: true });
   });
 });

@@ -7,9 +7,9 @@
   "startedAt": "2026-11-23T09:41:52.000Z",
   "durationMs": 31480,
   "scores": {
-    "overall": 77,
+    "overall": 78,
     "seo": 86,
-    "geo": 85,
+    "geo": 86,
     "performance": 44
   },
   "checks": [
@@ -224,10 +224,10 @@
       "id": "geo.content-format",
       "category": "geo",
       "label": "Menus, prices & hours as text",
-      "status": "warn",
-      "score": 0.6,
+      "status": "pass",
+      "score": 1,
       "weight": 5,
-      "summary": "Found 1 link to a menu, price list or similar PDF (we don't open PDFs or read images)."
+      "summary": "We didn't find menus, prices or opening hours locked in images or PDFs on the pages we read."
     },
     {
       "id": "geo.fact-consistency",
@@ -394,20 +394,6 @@
       "affectedUrls": [
         "https://www.marigold-dental.example/about/",
         "https://www.marigold-dental.example/contact/"
-      ]
-    },
-    {
-      "id": "geo.content-format:pdf-only",
-      "checkId": "geo.content-format",
-      "category": "geo",
-      "severity": "medium",
-      "title": "Your menu or price list is a PDF",
-      "description": "You link to a menu, price list, brochure or timetable as a PDF. Some AI systems can read PDFs, but many skip them or quote them badly, and PDFs go stale. We don't open the PDF, so if the same details are already on a page as text you can ignore this. PDF links found: \"Download our price list (PDF)\".",
-      "howToFix": "Put the key details on a normal web page as text and keep the PDF as a download, e.g. `<h2>Menu</h2><h3>Starters</h3><ul><li>Soup of the day: £6</li></ul><p><a href=\"/menu.pdf\">Download the menu (PDF)</a></p>`.",
-      "effort": "moderate",
-      "impact": 0.5,
-      "affectedUrls": [
-        "https://www.marigold-dental.example/fees/"
       ]
     },
     {
@@ -595,7 +581,7 @@
       "h1Count": 1,
       "wordCount": 74,
       "indexable": true,
-      "issueCount": 3
+      "issueCount": 2
     },
     {
       "url": "https://www.marigold-dental.example/about/",

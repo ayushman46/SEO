@@ -1,6 +1,31 @@
 import { outcome, type AuditContext, type Check, type IssueSeed } from "../../context";
 import { allJsonLdNodes, nodeTypes } from "../../html";
 import { scanPage } from "./page-scan";
+import { ORG_TYPES } from "./org-types";
+
+/** Organization types that are not local businesses. */
+const NON_LOCAL_ORGS = new Set([
+  "organization", "corporation", "ngo", "governmentorganization", "educationalorganization", "newsmediaorganization",
+  "onlinebusiness", "researchorganization", "politicalparty", "consortium", "fundingscheme",
+  "collegeoruniversity", "workersunion", "project", "researchproject", "fundingagency", "sportsorganization",
+  "performinggroup", "searchrescueorganization",
+]);
+const COMMERCIAL_TYPES = new Set(["product", "offer", "aggregateoffer", "productgroup", "localbusiness"]);
+
+/**
+ * Review profiles are expected from local or commercial sites only (R3 L3): schema with a
+ * LocalBusiness-type node or Product/Offer markup. Elsewhere "no profiles" is a note, not an issue.
+ */
+export function looksLocalOrCommercial(ctx: AuditContext): boolean {
+  for (const { node } of allJsonLdNodes(ctx.pages)) {
+    for (const t of nodeTypes(node)) {
+      const k = t.toLowerCase();
+      if (COMMERCIAL_TYPES.has(k)) return true;
+      if (ORG_TYPES.has(k) && !NON_LOCAL_ORGS.has(k)) return true;
+    }
+  }
+  return false;
+}
 
 const def = { id: "geo.review-signals", category: "geo", label: "Review signals" } as const;
 
@@ -46,7 +71,7 @@ export function reviewProfiles(ctx: AuditContext): string[] {
   return [...found];
 }
 
-const VISIBLE_REVIEWS = /\b(reviews?|testimonials?|rated|ratings?|stars?)\b|★|⭐|\b[1-5](?:\.\d)?\s?\/\s?5\b|\b[1-5](?:\.\d)? out of 5\b/i;
+export const VISIBLE_REVIEWS = /\b(reviews?|testimonials?|rated|ratings?|stars?)\b|★|⭐|\b[1-5](?:\.\d)?\s?\/\s?5\b|\b[1-5](?:\.\d)? out of 5\b/i;
 
 /**
  * geo.review-signals (low weight): links to review profiles, AggregateRating/Review schema vs
@@ -90,7 +115,8 @@ export const reviewSignalsCheck: Check = (ctx) => {
     score -= 0.2;
     issues.push({ key: "geo.review-signals:anonymous-testimonials", affectedUrls: [...anonPages], share: 1 });
   }
-  if (profiles.length === 0) {
+  const expectsProfiles = looksLocalOrCommercial(ctx);
+  if (profiles.length === 0 && expectsProfiles) {
     score -= 0.3;
     issues.push({ key: "geo.review-signals:no-profiles", share: 1 });
   }

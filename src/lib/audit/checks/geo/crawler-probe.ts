@@ -25,11 +25,18 @@ const WEIGHT = { search: 3, training: 1 } as const;
 
 /* ── Response verdicts ── */
 
-export type Verdict = "ok" | "refused" | "challenged" | "differs" | "untested";
+export type Verdict = "ok" | "refused" | "challenged" | "differs" | "rate_limited" | "untested";
 
-const CHALLENGE_BODY =
-  /challenge-platform|cf-chl|_cf_chl_opt|<title>\s*(just a moment|attention required|access denied|security check)|captcha-delivery|g-recaptcha|h-captcha|verify you are human|are you a robot/i;
-const REFUSED_STATUSES = new Set([401, 403, 406, 429, 451, 503]);
+export const CHALLENGE_BODY =
+  /challenge-platform|cf-chl|_cf_chl_opt|<title>\s{0,20}(just a moment|attention required|access denied|security check)|captcha-delivery|g-recaptcha|h-captcha|verify you are human|are you a robot/i;
+const REFUSED_STATUSES = new Set([401, 403, 406, 451, 503]);
+
+/**
+ * Bots whose operators publish crawler IP ranges, so sites may verify them by IP and refuse a
+ * request that only carries the name (R3 M3). ClaudeBot is not listed: Anthropic doesn't
+ * publish its crawler IP ranges.
+ */
+export const IP_VERIFIED_BOTS = new Set(["bingbot", "GPTBot", "OAI-SearchBot", "ChatGPT-User", "PerplexityBot"]);
 /** Size below which a 200 counts as "different content" vs the crawler's copy. */
 const DIFFERS_RATIO = 0.3;
 const MIN_BASELINE_FOR_SIZE = 2_000;
@@ -44,6 +51,8 @@ export function isChallenge(r: ProbeResponse): boolean {
 export function verdict(t: ProbeTarget, r: ProbeResponse | null, bodyCap: number): Verdict {
   if (!r) return "untested";
   const base = t.baselineStatus;
+  // Our own burst may trigger rate limiting: never count a 429 as a block (R3 M4).
+  if (r.status === 429 && base !== 429) return "rate_limited";
   const baseOk = base !== null && base < 400;
   if (isChallenge(r) && baseOk) return "challenged";
   if (
@@ -106,7 +115,7 @@ export function classifyLayer(r: ProbeResponse): { layer: Layer; evidence: strin
   if (h["x-datadome"] || server.includes("datadome") || /captcha-delivery\.com/i.test(body)) {
     return { layer: "datadome", evidence: "DataDome headers" };
   }
-  if (h["x-amz-cf-id"] || /cloudfront/i.test(h.via ?? "") || server.includes("awselb") || /request blocked[\s\S]*cloudfront/i.test(body)) {
+  if (h["x-amz-cf-id"] || /cloudfront/i.test(h.via ?? "") || server.includes("awselb") || /request blocked[\s\S]{0,3000}cloudfront/i.test(body)) {
     return { layer: "aws", evidence: "CloudFront / AWS headers" };
   }
   if (h["x-nf-request-id"] || server.includes("netlify")) return { layer: "netlify", evidence: "Netlify headers" };
@@ -155,11 +164,13 @@ export function crawlerProbeOutcome(probe: CrawlerProbe, bodyCap = 64 * 1024): C
 
   const targetOf = new Map(probe.targets.map((t) => [t.url, t]));
   const byBot = new Map<string, { tested: number; refused: { p: BotProbe; v: Verdict }[]; differs: BotProbe[]; homeRefused: boolean }>();
+  const rateLimited = new Set<string>();
   for (const p of probe.probes) {
     const t = targetOf.get(p.url);
     if (!t) continue;
     const v = verdict(t, p.response, bodyCap);
-    if (v === "untested") continue;
+    if (v === "rate_limited") rateLimited.add(p.bot);
+    if (v === "untested" || v === "rate_limited") continue;
     const e = byBot.get(p.bot) ?? { tested: 0, refused: [], differs: [], homeRefused: false };
     e.tested++;
     if (v === "refused" || v === "challenged") {
@@ -168,11 +179,36 @@ export function crawlerProbeOutcome(probe: CrawlerProbe, bodyCap = 64 * 1024): C
     } else if (v === "differs") e.differs.push(p);
     byBot.set(p.bot, e);
   }
-  if (byBot.size === 0) return unavailable(def, `The live AI-crawler test got no responses in time. ${PROBE_HONESTY}`);
+  const untestedByRate = [...rateLimited].filter((b) => !byBot.has(b));
+  const rateNote =
+    (rateLimited.size ? ` Not tested (rate limited): ${untestedByRate.length ? untestedByRate.join(", ") : "some requests"}.` : "") +
+    (probe.cached ? " (Result reused from a test of this site in the last 15 minutes.)" : "");
+  if (byBot.size === 0) {
+    return unavailable(def, `The live AI-crawler test got no usable responses in time.${rateNote} ${PROBE_HONESTY}`);
+  }
+
+  // Classify every refusal once.
+  const refusals = new Map<string, { p: BotProbe; v: Verdict; layer: Layer; evidence: string }[]>();
+  for (const [bot, e] of byBot) {
+    refusals.set(
+      bot,
+      e.refused.map(({ p, v }) => ({ p, v, ...classifyLayer(p.response!) })),
+    );
+  }
+  const refusingBots = [...refusals.entries()].filter(([, r]) => r.length > 0).map(([b]) => b);
+  // R3 M3: only IP-verifiable bots refused, no named WAF, and other bots got through, so the
+  // site may simply verify crawler IPs. Low severity, careful wording, small score effect.
+  const ipVerificationLikely =
+    refusingBots.length > 0 &&
+    refusingBots.length < byBot.size &&
+    refusingBots.every((b) => IP_VERIFIED_BOTS.has(b) && refusals.get(b)!.every((r) => r.layer === "host"));
 
   let total = 0;
   let lost = 0;
-  const layerHits = new Map<Layer, { bots: Set<string>; urls: Set<string>; paths: Set<string>; statuses: Set<string>; evidence: Set<string>; search: boolean; full: boolean }>();
+  const layerHits = new Map<
+    Layer,
+    { bots: Set<string>; urls: Set<string>; paths: Set<string>; statuses: Set<string>; evidence: Set<string>; search: boolean; full: boolean }
+  >();
   const differsBots = new Set<string>();
   const differsUrls = new Set<string>();
   const blockedNames: string[] = [];
@@ -182,11 +218,18 @@ export function crawlerProbeOutcome(probe: CrawlerProbe, bodyCap = 64 * 1024): C
     total += WEIGHT[b.kind];
     const full = e.homeRefused || e.refused.length * 2 >= e.tested;
     if (e.refused.length) {
-      lost += WEIGHT[b.kind] * (full ? 1 : e.refused.length / e.tested);
+      lost += WEIGHT[b.kind] * (full ? 1 : e.refused.length / e.tested) * (ipVerificationLikely ? 0.25 : 1);
       blockedNames.push(b.name);
-      for (const { p, v } of e.refused) {
-        const { layer, evidence } = classifyLayer(p.response!);
-        const hit = layerHits.get(layer) ?? { bots: new Set(), urls: new Set(), paths: new Set(), statuses: new Set(), evidence: new Set(), search: false, full: false };
+      for (const { p, v, layer, evidence } of refusals.get(b.name)!) {
+        const hit = layerHits.get(layer) ?? {
+          bots: new Set(),
+          urls: new Set(),
+          paths: new Set(),
+          statuses: new Set(),
+          evidence: new Set(),
+          search: false,
+          full: false,
+        };
         hit.bots.add(b.name);
         hit.paths.add(pathOf(p.url));
         hit.urls.add(p.url);
@@ -206,6 +249,16 @@ export function crawlerProbeOutcome(probe: CrawlerProbe, bodyCap = 64 * 1024): C
 
   const issues: IssueSeed[] = [];
   for (const [layer, hit] of layerHits) {
+    if (ipVerificationLikely && layer === "host") {
+      issues.push({
+        key: "geo.ai-crawler-probe:ip-verification-likely",
+        severity: "low",
+        share: 1,
+        affectedUrls: [...hit.urls],
+        detail: `${[...hit.bots].join(", ")} got ${[...hit.statuses].join(", ")} on ${[...hit.paths].slice(0, 5).join(", ")}, while other simulated crawlers got through.`,
+      });
+      continue;
+    }
     const severity: Severity = hit.search ? (hit.full ? "high" : "medium") : "medium";
     issues.push({
       key: LAYER_ISSUE[layer],
@@ -234,13 +287,15 @@ export function crawlerProbeOutcome(probe: CrawlerProbe, bodyCap = 64 * 1024): C
       ...def,
       status: "pass",
       score: 1,
-      summary: `All ${plural(tested, "simulated AI crawler")} got the same response as our own crawler. ${PROBE_HONESTY}`,
+      summary: `All ${plural(tested, "simulated AI crawler")} tested got the same response as our own crawler.${rateNote} ${PROBE_HONESTY}`,
       issues: [],
     };
   }
-  const summary = blockedNames.length
-    ? `${blockedNames.join(", ")} ${blockedNames.length === 1 ? "was" : "were"} refused (${layers.join(", ")}) although robots.txt allows ${blockedNames.length === 1 ? "it" : "them"}. ${PROBE_HONESTY}`
-    : `${[...differsBots].join(", ")} got much smaller pages than our own crawler. ${PROBE_HONESTY}`;
+  const summary = ipVerificationLikely
+    ? `${blockedNames.join(", ")} ${blockedNames.length === 1 ? "was" : "were"} refused while other crawlers got through: your site may be verifying crawler IP addresses; we cannot tell from outside.${rateNote} ${PROBE_HONESTY}`
+    : blockedNames.length
+      ? `${blockedNames.join(", ")} ${blockedNames.length === 1 ? "was" : "were"} refused (${layers.join(", ")}) although robots.txt allows ${blockedNames.length === 1 ? "it" : "them"}.${rateNote} ${PROBE_HONESTY}`
+      : `${[...differsBots].join(", ")} got much smaller pages than our own crawler.${rateNote} ${PROBE_HONESTY}`;
   const s = Math.min(score, 0.99);
   return { ...def, status: s < 0.5 ? "fail" : "warn", score: s, summary, issues };
 }

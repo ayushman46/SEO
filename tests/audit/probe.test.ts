@@ -1,8 +1,8 @@
 /** T016 C: live AI-crawler probe with a mocked fetcher (no network). */
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { SafeFetchOptions, SafeFetchResult } from "@/lib/audit/net/fetch";
 import { botInfoUrl, simulatedUserAgent, SIMULATED_BOT_TOKENS, userAgent } from "@/lib/audit/net/fetch";
-import { probeCrawlers, probeTargets } from "@/lib/audit/net/probe";
+import { clearProbeCache, probeCrawlers, probeTargets } from "@/lib/audit/net/probe";
 import { classifyLayer, crawlerProbeOutcome, PROBE_BOTS, PROBE_HONESTY } from "@/lib/audit/checks/geo/crawler-probe";
 import { ISSUE_CATALOG } from "@/lib/audit/issues";
 import { AuditError } from "@/lib/audit/types";
@@ -11,7 +11,7 @@ import { doc, makeCtx, page } from "./helpers";
 const HOME = "https://acme.example.com/";
 const BIG = `<p>${"Real content for people and crawlers. ".repeat(200)}</p>`;
 
-function ctx(opts: { robots?: string; homeStatus?: number } = {}) {
+function ctx(opts: { robots?: string; homeStatus?: number; llms?: string } = {}) {
   return makeCtx({
     pages: [
       page(doc({ body: BIG }), HOME, { status: opts.homeStatus }),
@@ -20,6 +20,7 @@ function ctx(opts: { robots?: string; homeStatus?: number } = {}) {
       page(doc({ body: "<p>Blog</p>" }), `${HOME}blog`),
     ],
     robots: opts.robots ?? "User-agent: *\nAllow: /",
+    llms: opts.llms,
   });
 }
 
@@ -73,14 +74,16 @@ describe("probe targets", () => {
 });
 
 describe("probeCrawlers + geo.ai-crawler-probe", () => {
+  beforeEach(() => clearProbeCache());
+
   it("all bots get the crawler's response → pass, with the honesty caveat", async () => {
     const { f, calls } = fetcher(okAll);
     const p = await probeCrawlers(ctx(), { deadline: deadline(), fetcher: f });
     expect(p.status).toBe("ok");
     expect(new Set(calls.map((c) => c.host))).toEqual(new Set(["acme.example.com"]));
     expect(new Set(calls.map((c) => c.simulate))).toEqual(new Set(PROBE_BOTS.map((b) => b.token)));
-    // HEAD first everywhere; GET only for the homepage when HEAD looks normal
-    expect(calls.filter((c) => c.method === "GET").every((c) => c.url === HOME)).toBe(true);
+    // HEAD only when everything looks normal (R3 M4: no forced homepage GET)
+    expect(calls.filter((c) => c.method === "GET")).toHaveLength(0);
     // pages are requested with the crawler's HTML Accept header (vercel.com serves Markdown to text/plain)
     expect(calls.filter((c) => !c.url.endsWith(".txt")).every((c) => c.acceptHtml === true)).toBe(true);
     expect(calls.filter((c) => c.url.endsWith("/robots.txt")).every((c) => !c.acceptHtml)).toBe(true);
@@ -106,12 +109,51 @@ describe("probeCrawlers + geo.ai-crawler-probe", () => {
     expect(o.summary).toContain(PROBE_HONESTY);
   });
 
-  it("training-only block on some pages → medium; unknown layer → host", async () => {
-    const { f } = fetcher((url, o) => (o.simulate === "GPTBot/1.3" && url.endsWith("/pricing") ? res(url, 403, {}, "Forbidden") : okAll(url, o)));
+  it("training-only block on some pages (bot without published IPs) → medium; unknown layer → host", async () => {
+    const { f } = fetcher((url, o) => (o.simulate === "ClaudeBot/1.0" && url.endsWith("/pricing") ? res(url, 403, {}, "Forbidden") : okAll(url, o)));
     const o = crawlerProbeOutcome(await probeCrawlers(ctx(), { deadline: deadline(), fetcher: f }));
     const issue = o.issues.find((i) => i.key === "geo.ai-crawler-probe:blocked-host")!;
     expect(issue.severity).toBe("medium");
     expect(issue.affectedUrls).toEqual([`${HOME}pricing`]);
+  });
+
+  it("R3 M3: only IP-verifiable bots refused by an unnamed layer, others pass → low, 'may be verifying crawler IP addresses'", async () => {
+    // wikipedia.org case: bingbot 403 from haproxy, everything else fine
+    const { f } = fetcher((url, o) => (o.simulate === "bingbot/2.0" ? res(url, 403, { server: "haproxy" }, "Forbidden") : okAll(url, o)));
+    const o = crawlerProbeOutcome(await probeCrawlers(ctx(), { deadline: deadline(), fetcher: f }));
+    expect(o.issues.map((i) => [i.key, i.severity])).toEqual([["geo.ai-crawler-probe:ip-verification-likely", "low"]]);
+    expect(o.summary).toContain("may be verifying crawler IP addresses; we cannot tell from outside");
+    expect(o.score).toBeGreaterThan(0.9);
+    // the same refusal with named WAF evidence stays high
+    clearProbeCache();
+    const cf = fetcher((url, o2) => (o2.simulate === "bingbot/2.0" ? res(url, 403, { "cf-mitigated": "challenge", server: "cloudflare" }, "") : okAll(url, o2)));
+    const o3 = crawlerProbeOutcome(await probeCrawlers(ctx(), { deadline: deadline(), fetcher: cf.f }));
+    expect(o3.issues[0].key).toBe("geo.ai-crawler-probe:blocked-cloudflare");
+    expect(o3.issues[0].severity).toBe("high");
+  });
+
+  it("R3 M4: 429 is 'not tested (rate limited)', never 'refused', and stops further requests", async () => {
+    let n = 0;
+    const { f, calls } = fetcher((url, o) => (++n > 4 ? res(url, 429) : okAll(url, o)));
+    const p = await probeCrawlers(ctx(), { deadline: deadline(), fetcher: f });
+    expect(calls.length).toBeLessThanOrEqual(6); // in-flight requests finish, nothing new starts
+    const o = crawlerProbeOutcome(p);
+    expect(o.issues).toEqual([]);
+    expect(o.summary).toMatch(/Not tested \(rate limited\)/);
+  });
+
+  it("R3 M4: per-host cache for 15 minutes; worst case 30 HEAD + 12 GET", async () => {
+    const all403 = fetcher((url) => res(url, 403, {}, "Forbidden"));
+    // worst case: 5 targets (home, 2 pages, robots.txt, llms.txt) x 6 bots
+    const p1 = await probeCrawlers(ctx({ llms: "# Acme" }), { deadline: deadline(), fetcher: all403.f });
+    expect(all403.calls.filter((c) => c.method === "HEAD")).toHaveLength(30);
+    expect(all403.calls.filter((c) => c.method === "GET")).toHaveLength(12);
+    const again = fetcher(okAll);
+    const p2 = await probeCrawlers(ctx(), { deadline: deadline(), fetcher: again.f });
+    expect(again.calls).toHaveLength(0);
+    expect(p2.status === "ok" && p2.cached).toBe(true);
+    expect(crawlerProbeOutcome(p2).summary).toContain("reused from a test of this site in the last 15 minutes");
+    expect(p1.status).toBe("ok");
   });
 
   it("bots disallowed by robots.txt are not probed (that's geo.ai-crawlers' finding)", async () => {
@@ -138,8 +180,11 @@ describe("probeCrawlers + geo.ai-crawler-probe", () => {
     expect(crawlerProbeOutcome(p).status).toBe("pass");
   });
 
-  it("much smaller page for a bot → different-content (low)", async () => {
-    const { f } = fetcher((url, o) => (o.simulate === "ClaudeBot/1.0" && o.method === "GET" ? res(url, 200, {}, "<html>hi</html>") : okAll(url, o)));
+  it("much smaller page for a bot → different-content (low), when a GET happened", async () => {
+    // HEAD unsupported → GET → tiny body for ClaudeBot
+    const { f } = fetcher((url, o) =>
+      o.method === "HEAD" ? res(url, 405) : o.simulate === "ClaudeBot/1.0" ? res(url, 200, {}, "<html>hi</html>") : okAll(url, o),
+    );
     const o = crawlerProbeOutcome(await probeCrawlers(ctx(), { deadline: deadline(), fetcher: f }));
     expect(o.issues.map((i) => i.key)).toEqual(["geo.ai-crawler-probe:different-content"]);
   });

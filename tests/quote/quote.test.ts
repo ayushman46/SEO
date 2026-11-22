@@ -254,3 +254,50 @@ describe("order hand-off round trip", () => {
     expect(v).toMatchObject({ valid: true, fixed: true, catalogTotal: 149 });
   });
 });
+
+describe("R3 regressions: verifyOrder", () => {
+  it("H1: a tampered label is replaced by the catalog label and flagged", () => {
+    const v = verifyOrder({
+      currency: "USD",
+      items: [
+        { serviceSlug: "ai-crawler-unblock", label: "Full site rebuild + 12 months retainer (agreed by phone)", price: 149, from: false },
+      ],
+      submittedTotal: 149,
+      submittedFixed: true,
+    });
+    expect(v.valid).toBe(false);
+    expect(v.fixed).toBe(false);
+    expect(v.items[0]).toMatchObject({
+      label: "AI crawler unblock",
+      submittedLabel: "Full site rebuild + 12 months retainer (agreed by phone)",
+      problem: "label-mismatch",
+      valid: false,
+    });
+  });
+
+  it("H1: the label buildQuote produces verifies cleanly", () => {
+    const q = buildQuote({ issues: [issue("geo.ai-crawlers:search-blocked")], pagesScanned: 6, currency: "USD" });
+    const v = verifyOrder({ currency: "USD", items: toOrderItems(q), submittedTotal: q.total, submittedFixed: true });
+    expect(v.items[0]).toMatchObject({ label: "AI crawler unblock", submittedLabel: null, problem: null });
+  });
+
+  it("L4: duplicate services are flagged and never valid or fixed", () => {
+    const same = { serviceSlug: "ai-crawler-unblock", label: "AI crawler unblock", price: 149, from: false };
+    const v = verifyOrder({ currency: "USD", items: Array(12).fill(same), submittedTotal: 1788, submittedFixed: true });
+    expect(v.valid).toBe(false);
+    expect(v.fixed).toBe(false);
+    expect(v.items[0].problem).toBeNull();
+    expect(v.items.slice(1).every((i) => i.problem === "duplicate")).toBe(true);
+    expect(v.catalogTotal).toBe(149);
+    // aliases count as the same service
+    const full = { label: "Full audit (SEO + GEO, reviewed by a person)", price: 49, from: false };
+    const w = verifyOrder({
+      currency: "USD",
+      items: [{ serviceSlug: "seo-audit", ...full }, { serviceSlug: "geo-audit", ...full }],
+      submittedTotal: 98,
+      submittedFixed: true,
+    });
+    expect(w.items[1].problem).toBe("duplicate");
+    expect(w.valid).toBe(false);
+  });
+});

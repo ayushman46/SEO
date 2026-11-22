@@ -88,7 +88,7 @@ describe("geo.review-signals", () => {
 
   it("anonymous testimonials vs named ones; no profiles", () => {
     const anon = reviewSignalsCheck(ctxOf({ body: "<blockquote>They fixed our boiler on the same day, brilliant service.</blockquote><blockquote>Friendly and fast plumbers, would use again.</blockquote>" }));
-    expect(keys(anon)).toEqual(["geo.review-signals:anonymous-testimonials", "geo.review-signals:no-profiles"]);
+    expect(keys(anon)).toEqual(["geo.review-signals:anonymous-testimonials"]);
     const named = reviewSignalsCheck(
       ctxOf({ body: '<a href="https://www.g2.com/products/acme">G2</a><blockquote>They fixed our boiler the same day, brilliant.<cite>Priya S., Leeds</cite></blockquote><div class="testimonial">Friendly and fast plumbers, would use again — John Smith</div>' }),
     );

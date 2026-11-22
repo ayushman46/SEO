@@ -771,6 +771,16 @@ export const ISSUE_CATALOG = {
     howToFix:
       "Send your host a ticket like: \"Our robots.txt allows GPTBot, OAI-SearchBot, ChatGPT-User, ClaudeBot, PerplexityBot and bingbot, but requests with these user agents get refused (see the status codes in our audit). Please tell us which firewall or bot rule blocks them and allow these crawlers. They publish their IP ranges for verification.\"",
   },
+  "geo.ai-crawler-probe:ip-verification-likely": {
+    checkId: "geo.ai-crawler-probe",
+    category: "geo",
+    severity: "low",
+    effort: "quick",
+    title: "Some AI crawlers were refused: your site may be verifying crawler IPs",
+    description: `Requests labelled as crawlers whose operators publish their IP addresses were refused, while other simulated crawlers got through. Your site may be verifying crawler IP addresses, which is fine; we cannot tell from outside. ${PROBE_CAVEAT}`,
+    howToFix:
+      "Nothing to change if your firewall verifies crawlers by IP. To confirm, check your firewall or host logs for requests from the real crawlers (e.g. bingbot, GPTBot) and make sure they get normal responses.",
+  },
   "geo.ai-crawler-probe:different-content": {
     checkId: "geo.ai-crawler-probe",
     category: "geo",
