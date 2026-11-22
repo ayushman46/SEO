@@ -1,5 +1,16 @@
 # Status log (newest on top)
 
+## 2026-11-23 00:30 IST: v1.1 sprint (founder: run autonomously until 12:30 today)
+Founder brief: improve the free audit with an NVIDIA-hosted LLM, add every validated market gap, deepest market research, and a real free-to-paid path. If a usage limit interrupts, resume with "continue the SeenHQ sprint" and pick up from this entry.
+- **Live:** https://seenhq.vercel.app is v1 (commit fe25d51 + ring fix). Nothing from v1.1 is deployed yet.
+- **In flight (uncommitted in the working tree unless noted):**
+  - audit-engine: T014 NVIDIA LLM insights (spec docs/tasks/014-ai-insights.md; contract v1.1 in src/lib/audit/types.ts), then T016 four gap checks + export.ts (docs/MARKET_RESEARCH_2_PRODUCT.md "build now").
+  - frontend-designer: T015 logo marquee DONE in tree (src/components/ui/EngineStrip*.tsx, public/logos), not yet browser-checked.
+  - research agents writing docs/MARKET_RESEARCH_3_FULL.md and docs/CONVERSION_RESEARCH.md.
+- **Queue after the engine reports:** UI for AI insights + new checks + export buttons (frontend-designer); privacy/copy update for LLM use (content-seo); conversion features from CONVERSION_RESEARCH.md (instant quote, per-issue "fix this for me", sample report, methodology page); backlog gaps (platform-aware fixes, competitor comparison, re-audit diff needs DB); independent review; build; browser + Lighthouse; preview deploy; production deploy.
+- **Founder actions:** NVIDIA_API_KEY in .env.local and Vercel (AI section stays off without it); optional DATABASE_URL, PAGESPEED_API_KEY, ADMIN_PASSWORD.
+- **Deploy rule:** production deploy was approved for v1 at 23:40; founder then asked for the complete product by 12:30, so v1.1 goes to preview first and to production after browser + Lighthouse checks pass.
+
 ## 2026-11-23 00:05 IST: LAUNCHED
 - **Live:** https://seenhq.vercel.app. PageSpeed Insights mobile: / 96, /audit 99, /pricing 98, /about 99; A11y/BP/SEO 100. Launch report: docs/LAUNCH_REPORT.md.
 - **Next (optional, founder):** DATABASE_URL, PAGESPEED_API_KEY, ADMIN_PASSWORD, email keys, custom domain (see launch report).

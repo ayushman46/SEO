@@ -1,0 +1,30 @@
+# T014 — AI insights in the free audit (NVIDIA-hosted LLM)
+**Agent:** audit-engine (engine) → frontend-designer (UI) · **Contract:** `src/lib/audit/types.ts` v1.1 (`AiInsights`, `PartialAiInsights`, `AuditResult.ai`, `PartialAuditReport.ai`), owned by Fable.
+
+## Why
+Deterministic checks can see whether a page HAS a title, schema or FAQ. They cannot judge whether an AI model reading the site can tell what the business is, who it is for, where it is, what it costs, or whether the pages answer what customers actually ask. An LLM can. That is the accuracy gain; the LLM does NOT replace or override the deterministic checks.
+
+## Provider
+NVIDIA API catalog (build.nvidia.com), OpenAI-compatible endpoint `https://integrate.api.nvidia.com/v1/chat/completions`, `Authorization: Bearer $NVIDIA_API_KEY`. Free tier is rate limited, so: at most 2 LLM calls per audit, hard timeouts, and total graceful fallback.
+Verify against the live docs before coding (https://docs.api.nvidia.com/ and build.nvidia.com model pages): the current endpoint, which strong instruct models are available on the free endpoint today, whether JSON mode / `response_format` or guided JSON (`nvext.guided_json`) is supported for the chosen model, context length, and published rate limits. Choose a primary and a fallback model; make both overridable by env (`NVIDIA_MODEL`, `NVIDIA_MODEL_FALLBACK`). Record the choice and evidence in DECISIONS.md (new ADR).
+
+## Engine requirements (`src/lib/audit/ai/**`)
+- `client.ts`: fetch-based (no SDK, no new dependency), `import "server-only"`, AbortSignal + per-call timeout, one retry on 429/5xx with the fallback model, never logs the key or page text, returns typed results or a tagged failure (never throws to the caller).
+- `prompt.ts`: builds the input from crawled pages: per page URL, title, meta description, headings, and visible text, truncated to a strict character budget (homepage gets the most; total input bounded so the call fits the context window and finishes fast). Include robots/llms/schema facts the engine already computed.
+- **Prompt-injection hardening (mandatory):** page text is untrusted. Put it inside clearly delimited data blocks, instruct the model that anything inside is content to analyse and never instructions, strip our delimiter tokens from the page text, and validate every field of the output with Zod. Output is rendered as plain text only. Reject or null any output field that contains URLs not on the audited host (for `sourceUrl`), HTML tags, or text exceeding length caps. `organizationJsonLd` must `JSON.parse` and be re-serialised by us; drop it otherwise. Drafts must only use facts present in the input: tell the model so, and post-check obvious fabrications where cheap (e.g. a phone/email in a draft that does not appear in the page text → drop that draft).
+- `insights.ts`: call 1 = analysis (readback, businessType, 7 fixed facts with status, 6–8 customer questions with answered/sourceUrl/note). Call 2 = drafts (title, metaDescription, llmsTxt, organizationJsonLd, answerParagraph), run in parallel with call 1 if it does not need its output, else sequentially within the budget. `clarityScore` is computed by us: e.g. facts clear=1/vague=0.5/missing=0 (weighted: what, who-for, contact higher), questions yes=1/partly=0.5/no=0, 60% facts + 40% questions, rounded.
+- Budget: the LLM phase starts after crawl + deterministic analysis, gets `min(20 s, remaining budget − 2 s)`, and is skipped entirely if less than 6 s remains. A slow or failed LLM never fails or delays the audit beyond the existing 55 s budget.
+- New GEO check `geo.ai-clarity` ("AI readability of your business"): score = clarityScore/100, weight modest (about 10–12% of GEO), status pass ≥ 80, warn 50–79, fail < 50, **`unavailable` when there is no key or the LLM failed** (so scores are unchanged without a key). Issues from `issues.ts` catalog: one per missing/vague core fact (what, who-for, where for local businesses, pricing, contact) and one for unanswered questions (lists them), with howToFix pointing at the matching draft. Severity: what/who-for missing = high; others medium/low.
+- `toPartialReport`: `ai` teaser per `PartialAiInsights` (readback, counts, clarityScore, first 2 questions, names of locked drafts). Full `AiInsights` only in the sealed result.
+- Honesty rule in every user-facing string: this is "how an AI model reads your site", not "what ChatGPT says about you".
+- Tests (mock fetch; no network): prompt builder truncation and delimiter stripping; Zod rejection of malformed output; injection attempt in page text does not change behaviour of our post-processing (e.g. model output containing an off-host URL, HTML, or an invented phone number is dropped); clarityScore math; timeout and 429 → `ai: null` and check `unavailable`; scores identical to today when `NVIDIA_API_KEY` is unset; partial report never contains drafts.
+- `scripts/audit-cli.ts`: print the AI section when present.
+
+## Backend touchpoints (small, done by the engine agent with Fable's OK)
+`.env.example`: `NVIDIA_API_KEY`, optional `NVIDIA_MODEL`, `NVIDIA_MODEL_FALLBACK`. `next.config.ts` CSP needs no change (server-side call). Sealed payload grows: confirm it stays under the unlock route's 400k-char cap with a worst-case result.
+
+## UI (frontend-designer, after the engine lands)
+Partial report: an "How AI reads your site" card (readback, business type, clarity ring, fact chips clear/vague/missing, 2 sample questions with answered state, locked list of the remaining questions and the ready-to-paste drafts). Full report: all facts, all questions with source links, each draft in a copy-to-clipboard code block (plain text rendering only). When `ai` is null: a quiet "AI reading unavailable for this run" note, no broken layout. Label the model honestly ("Read by an open-weight LLM hosted on NVIDIA; this is not what ChatGPT or Gemini say").
+
+## Copy / legal (content-seo)
+Privacy policy: text from the audited public pages is sent to NVIDIA's hosted model API for analysis; no visitor emails are sent. Home/audit copy: mention the AI reading and the ready-to-paste fixes honestly.

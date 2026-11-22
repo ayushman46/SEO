@@ -40,7 +40,7 @@ Sky blues come from photography, never from UI fills.
 | `ui/Field` + `ui/Input` | shared | `Field` renders label/error/help with ids; wire the input with `describedBy(id, {help, error})`. `invalid` sets `aria-invalid`. |
 | `ui/ScoreRing` | client | SVG ring; SSR shows the final value; count-up only when it starts below the fold and motion is allowed, and it snaps to the final value when reached by a scroll jump (shares the `Reveal` watcher). `role="img"` with "X out of 100". `null` = unavailable. |
 | `ui/IssueRow` | server | Severity pill + title + category + effort dots (+ impact). `locked` for gated teasers. Exports label maps for severity/effort/category. |
-| `ui/EngineStrip` | server | Hairline grid of TEXT names (4 cols md, 8 xl); horizontal scroll-snap in its own keyboard-focusable region below md. |
+| `ui/EngineStrip` + `ui/EngineStripToggle` | server + client | Hairline band of official engine logos (24 px tall, explicit width/height) each next to its product name, plus the `enginesDisclaimer` line. CSS-only marquee: one track, list duplicated once (copy `aria-hidden`), `transform` keyframe `engine-marquee` (48 s), static gradient edge fades, paused on hover / focus-within and by the pause/play button (WCAG 2.2.2; the button is the only client code). Reduced motion: no animation, no copy, no button, names wrap into a centred static row. |
 | `ui/Reveal` | client | Fade-up or `variant="tear"` wipe. Only hides elements that are below the fold at mount (and only with IntersectionObserver + motion allowed), so no flash, no LCP delay, no hidden content without JS. One shared watcher (`watchReveal`): animated reveal starts 12% of a viewport before entry; anything found already in the top 65% of the viewport or above it (anchor jump, `scrollTo`, find-in-page, restored scroll) is shown at once with no transition; scroll, resize, `hashchange`, `pageshow` and a 900 ms failsafe sweep make sure nothing stays hidden. |
 | `ui/PlaceholderText` | server | Renders `[PLACEHOLDER…]` markers from content as a small dashed tag. |
 | `ui/Icon` | server | Hand-drawn 24px line icons; keys match `FeatureItem.icon`. |
@@ -68,7 +68,7 @@ targets ≥ 36px; AA contrast for all text including text near imagery (no text 
 reduced motion disables parallax, reveals, count-ups, twinkle and smooth scroll.
 
 ## Don'ts
-No customer logos, testimonials, user counts or "most popular" badges. No engine logos. No Sign in. No sky-blue UI fills.
+No customer logos, testimonials, user counts or "most popular" badges. Engine logos only in `ui/EngineStrip` (T015, founder decision), always with the product name and the not-affiliated disclaimer; never framed as partners or "trusted by". No Sign in. No sky-blue UI fills.
 No default shadcn look: no gray-50 cards with 1px gray-200 borders and Inter-only headings.
 
 ## Performance rules (T011)
@@ -82,3 +82,4 @@ Measured on mobile Lighthouse: most main-thread "Other" time was the renderer wa
 - Shared illustrations across tabs: one collage, swap only the card (`Tabs` `asideFrame` + `TabsAsideSlot`).
 - Read all layout first, then write (see `whenBelowFold` in `ui/Reveal`), never per-element read/write during hydration.
 - Hero sky is art-directed: phones in portrait get `sky-hero-portrait.webp`; LCP images use `fetchPriority="high"`.
+- Marquees (T015 engine strip): animate one track's `transform` with a CSS keyframe, no `will-change`, no `mask-image` on the moving layer (edge fades are static gradient pseudo-elements), stop entirely under reduced motion.
