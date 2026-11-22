@@ -50,11 +50,12 @@ export function ScoreRing({
       // those overrides, so whatever React rendered last (the current value) shows.
       const release = () => {
         arc.style.removeProperty("stroke-dashoffset");
-        num.style.removeProperty("visibility");
+        num.style.removeProperty("opacity");
         tickEl.textContent = "";
       };
       arc.style.strokeDashoffset = String(c);
-      num.style.visibility = "hidden";
+      // opacity (not visibility) keeps the real value in the accessibility tree.
+      num.style.opacity = "0";
       tickEl.textContent = "0";
       let raf = 0;
       const cleanup = watchReveal(wrap, (shouldAnimate) => {
@@ -130,7 +131,7 @@ export function ScoreRing({
             <span ref={numRef} className="[grid-area:1/1]">
               {display}
             </span>
-            <span ref={tickRef} className="text-center [grid-area:1/1]" />
+            <span ref={tickRef} aria-hidden="true" className="text-center [grid-area:1/1]" />
           </span>
           {size >= 96 ? (
             <span
