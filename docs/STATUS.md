@@ -1,5 +1,12 @@
 # Status log (newest on top)
 
+## 2026-11-23 ~00:30 IST: QA done, preview deployed
+- **Preview:** https://seenhq-7xbaexaql-ayushs-projects-32c1d225.vercel.app (Vercel Authentication on; open while logged in to Vercel). All routes 200, missing path 404. Real audit of vercel.com via the deployed API: 200 in 3.2 s; unlock 200 (seal secret works across instances).
+- **Vercel env set (values never printed):** AUDIT_SEAL_SECRET, IP_HASH_SALT (preview + production), NEXT_PUBLIC_SITE_URL=https://seenhq.vercel.app (production).
+- **QA (docs/QA.md):** no critical/high security issues. Placeholders replaced with neutral wording (founder decision). Lighthouse mobile local: A11y/BP/SEO 100 on all 8 pages, CLS 0; Performance 57-79 locally but this laptop benchmarks 670-800 and runs vary widely; measure on production with PageSpeed Insights after deploy.
+- **Exact next step:** founder yes for production deploy (vercel deploy --prod), then smoke test production + PageSpeed Insights on seenhq.vercel.app, then launch report.
+- **Founder optional env:** ADMIN_PASSWORD (enables /admin), PAGESPEED_API_KEY, DATABASE_URL (+ npm run db:migrate), RESEND_API_KEY/CONTACT_NOTIFY_EMAIL/MAIL_FROM.
+
 ## 2026-11-22 ~22:10 IST: feature-complete for v1 (pre-QA)
 - **Done + pushed (d6f3a4c):** all pages, live audit flow verified end to end in the browser (python.org: 75, unlock works), R2 security/correctness fixes (engine 19, backend 6), 3 research-validated services (docs/MARKET_RESEARCH.md). Typecheck, lint, 339 tests, build green.
 - **Exact next step:** QA pass (axe + keyboard + Lighthouse on all marketing pages, 360/768/1280/1920), then Vercel preview deploy (needs founder env vars), then launch report.
