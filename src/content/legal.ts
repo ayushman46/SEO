@@ -1,0 +1,150 @@
+import type { LegalDoc } from "./types";
+
+/** Meta for the legal pages (LegalDoc has no meta fields). */
+export const privacyMeta = {
+  metaTitle: "Privacy policy",
+  metaDescription:
+    "How seenhq handles the data behind our free audit, report unlock and contact form: what we collect, why, who processes it, and how to have it deleted.",
+};
+
+export const termsMeta = {
+  metaTitle: "Terms of service",
+  metaDescription:
+    "The terms for using seenhq: what the free audit does and doesn't promise, acceptable use, paid services, liability and how these terms can change.",
+};
+
+export const privacy = {
+  title: "Privacy policy",
+  updated: "2026-11-22",
+  sections: [
+    {
+      heading: "Who we are",
+      body: [
+        "seenhq is operated by [PLACEHOLDER: legal entity name], [PLACEHOLDER: registered address]. In this policy, \"seenhq\", \"we\" and \"us\" mean that entity.",
+        "If you have any question about this policy or your data, email us at [PLACEHOLDER: privacy contact email].",
+      ],
+    },
+    {
+      heading: "What we collect and why",
+      body: [
+        "When you run an audit: the website address you enter and the results of the audit (scores, checks, issues and a summary of the pages we scanned). We keep these so we can show you the report and improve the service.",
+        "When you unlock a full report: your email address, the audit it belongs to, the website address and score, whether you gave consent to be contacted, and the browser's user-agent string. We use this to keep a record of your report and, if you agreed, to contact you about it.",
+        "When you use the contact form: your name, email, and any business name, website, service, budget and message you choose to send. We use this only to reply to your enquiry and to deliver any work you ask for.",
+        "For all of the above we also store a one-way, salted hash of your IP address. We use it to limit abuse (for example, too many audits per hour). We do not store your IP address itself.",
+      ],
+    },
+    {
+      heading: "What we fetch from the websites you audit",
+      body: [
+        "When you enter a website address, our crawler (user agent \"seenhqbot\") fetches publicly available pages from that site: the homepage, robots.txt, the sitemap, llms.txt and up to five internal pages. We respect robots.txt rules for seenhqbot, never submit forms and never access password-protected areas.",
+        "We also send the homepage address to Google PageSpeed Insights to measure performance. Google processes that request under its own terms and privacy policy.",
+      ],
+    },
+    {
+      heading: "Cookies and analytics",
+      body: [
+        "seenhq does not set advertising or tracking cookies. We use Vercel Web Analytics and Speed Insights, which measure page views and performance without cookies and without identifying you personally.",
+        "While you view an audit, your browser briefly holds an encrypted copy of the full report so it can be unlocked. It expires after two hours and cannot be read without the unlock step.",
+      ],
+    },
+    {
+      heading: "Who processes your data",
+      body: [
+        "We use a small number of service providers to run seenhq: Vercel (hosting and analytics), our database provider [PLACEHOLDER: e.g. Neon], our email provider [PLACEHOLDER: e.g. Resend] for sending replies and notifications, and Google PageSpeed Insights for performance checks.",
+        "We do not sell your personal data and we do not share it with anyone for their own marketing.",
+      ],
+    },
+    {
+      heading: "How long we keep it",
+      body: [
+        "We keep audit results, report unlocks and contact messages for [PLACEHOLDER: retention period, e.g. 24 months] after your last interaction with us, unless you ask us to delete them sooner or we need to keep them longer to meet a legal obligation.",
+      ],
+    },
+    {
+      heading: "Your rights",
+      body: [
+        "You can ask us for a copy of the personal data we hold about you, ask us to correct it, or ask us to delete it. Email [PLACEHOLDER: privacy contact email] from the address you used and we will act on it within 30 days.",
+        "If you agreed to be contacted about your report, you can withdraw that consent at any time by replying to any email from us or writing to the address above.",
+        "Depending on where you live, you may also have the right to complain to your local data protection authority.",
+      ],
+    },
+    {
+      heading: "Security",
+      body: [
+        "Data is sent over HTTPS and stored in a database that only our server can access. Full audit reports held in your browser are encrypted. No system is perfectly secure, but we limit what we collect so there is less to protect.",
+      ],
+    },
+    {
+      heading: "Changes to this policy",
+      body: [
+        "If we change how we handle data, we will update this page and the date at the top. Significant changes will be highlighted on the site.",
+      ],
+    },
+  ],
+} satisfies LegalDoc;
+
+export const terms = {
+  title: "Terms of service",
+  updated: "2026-11-22",
+  sections: [
+    {
+      heading: "About these terms",
+      body: [
+        "These terms apply to your use of the seenhq website, the free audit and any paid services. seenhq is operated by [PLACEHOLDER: legal entity name], [PLACEHOLDER: registered address]. By using the site you agree to these terms.",
+      ],
+    },
+    {
+      heading: "The free audit",
+      body: [
+        "The audit is an automated check of publicly available pages. It is a guide, not a guarantee: automated checks can miss things or flag issues that do not matter for your site, and third-party data such as Google PageSpeed Insights may be unavailable or vary between runs.",
+        "Scores and recommendations are our opinion of good practice at the time of the audit. Search engines and AI answer engines change often and decide for themselves what to rank, show or cite.",
+      ],
+    },
+    {
+      heading: "Acceptable use",
+      body: [
+        "Please only audit websites you own, manage or have a legitimate interest in. Do not use seenhq to overload, probe or attack any website, to get around our rate limits, or to scrape our site or reports at scale.",
+        "We may block requests or addresses that we believe are abusing the service.",
+      ],
+    },
+    {
+      heading: "Paid services",
+      body: [
+        "Paid services such as full audits, fix sprints, content work and monitoring are agreed by email before work starts. The agreed scope, price and timing in that email, together with these terms, form our agreement.",
+        "Payment terms: [PLACEHOLDER: payment method, due date and refund policy]. Monitoring is billed monthly and can be cancelled any month by email; cancellation takes effect at the end of the current month.",
+        "Where we make changes to your website, you are responsible for giving us appropriate access and for keeping your own backups.",
+      ],
+    },
+    {
+      heading: "No guarantees of rankings or citations",
+      body: [
+        "We do not and cannot guarantee any particular ranking in Google, Bing or any other search engine, or that ChatGPT, Perplexity, Claude, Gemini, Google AI Overviews, Microsoft Copilot or any other AI engine will mention or cite your website. seenhq is not affiliated with or endorsed by any of these companies; their names are used only to describe what we check.",
+      ],
+    },
+    {
+      heading: "Your content and our reports",
+      body: [
+        "You keep all rights in your website and content. Reports we produce for you are yours to use within your business. The seenhq site, software, design and brand remain ours.",
+      ],
+    },
+    {
+      heading: "Liability",
+      body: [
+        "The free audit is provided \"as is\" without warranties of any kind. To the extent the law allows, we are not liable for indirect or consequential losses, such as lost profits or lost traffic, and our total liability for any paid service is limited to the amount you paid for it.",
+        "Nothing in these terms limits liability that cannot be limited by law.",
+      ],
+    },
+    {
+      heading: "Governing law",
+      body: [
+        "These terms are governed by the laws of [PLACEHOLDER: jurisdiction], and the courts of [PLACEHOLDER: jurisdiction] have jurisdiction over any dispute.",
+      ],
+    },
+    {
+      heading: "Changes and contact",
+      body: [
+        "We may update these terms from time to time. The date at the top shows when they last changed. Questions? Email [PLACEHOLDER: contact email].",
+      ],
+    },
+  ],
+} satisfies LegalDoc;
