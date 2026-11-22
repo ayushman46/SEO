@@ -107,3 +107,18 @@ export const pricingFaq = [
     a: "After we agree the scope by email, we send an invoice [PLACEHOLDER: payment method]. Work starts once it is paid.",
   },
 ] satisfies FaqItem[];
+
+/** Label on the highlighted tier card. Factual, not a "most popular" claim (added by frontend-designer for T006). */
+export const pricingHighlightLabel = "Reviewed by a person";
+
+/** Short note under the tier grid (added by frontend-designer for T006; content-seo may refine). */
+export const pricingNote =
+  "Prices are in US dollars. Fix sprints and content work are quoted by email before any work starts, and you pay nothing until you agree to the quote.";
+
+/** Closing call to action on /pricing (added by frontend-designer for T006; content-seo may refine). */
+export const pricingClosing = {
+  title: "Start free, then decide",
+  body: "The free audit shows your scores and top issues in about a minute. If you want a person to look deeper, or want us to do the fixing, tell us about your site and we will reply with a fixed quote.",
+  primaryCta: { label: "Tell us about your site", href: "/contact" },
+  secondaryCta: { label: "Run a free audit", href: "/audit" },
+};

@@ -1,5 +1,5 @@
 import "server-only";
-import type { ContactBudget, ContactInput, ContactService } from "@/app/actions/contact-schema";
+import type { ContactBudget, ContactInput } from "@/app/actions/contact-schema";
 import { getDb } from "./index";
 
 export type ContactStatus = "new" | "contacted" | "qualified" | "closed" | "spam";
@@ -10,7 +10,8 @@ export interface ContactRow {
   email: string;
   company: string | null;
   website: string | null;
-  service: ContactService;
+  /** Slug as stored; may be a slug that has since been removed from CONTACT_SERVICES. */
+  service: string;
   budget: ContactBudget | null;
   message: string;
   status: ContactStatus;

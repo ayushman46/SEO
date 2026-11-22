@@ -68,3 +68,26 @@ export const contactForm = {
   },
   directEmailLabel: "Prefer email? Write to",
 } as const;
+
+/** "What happens next" panel beside the contact form (added by frontend-designer for T006; content-seo may refine). */
+export const contactNextSteps = {
+  title: "What happens next",
+  steps: [
+    {
+      title: "We read your message",
+      body: "A person reads every enquiry. If you shared your website, we take a first look before replying.",
+    },
+    {
+      title: "You get a reply by email",
+      body: "We reply within [PLACEHOLDER: 2 working days] with questions, next steps and a fixed quote for the work.",
+    },
+    {
+      title: "Nothing starts until you agree",
+      body: "You pay nothing until you accept the quote. If we are not the right fit, we will say so.",
+    },
+  ],
+  auditPrompt: {
+    body: "Haven't run the free audit yet? It takes about a minute and gives us a head start.",
+    cta: { label: "Run a free audit", href: "/audit" },
+  },
+};

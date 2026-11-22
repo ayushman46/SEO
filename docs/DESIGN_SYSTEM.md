@@ -26,6 +26,8 @@ Sky blues come from photography, never from UI fills.
 - Sections alternate white and paper; paper sections open and close with a `SectionTear`.
 - Every section that holds collage layers uses `overflow-clip`; `body` has `overflow-x: clip`. No horizontal scroll at 360–1920.
 - Header is sticky and transparent (`--nav-h` = 5rem); the home hero pulls up under it with `-mt-(--nav-h)`.
+- `html` has `scroll-padding-top: calc(var(--nav-h) + 1rem)`, so every anchor jump (skip link, `#id` links, find-in-page) lands below the nav. Do not add `scroll-mt-*` on top of it (they add up). Sticky side columns use `lg:top-28`.
+- Route layouts: `src/app/layout.tsx` is the bare root (html, body, fonts, `rootMetadata`, Organization + WebSite JSON-LD). `src/app/(marketing)/layout.tsx` adds the chrome via `site/SiteChrome` (skip link, Nav, the single `<main id="main">`, Footer). `/admin` lives outside the group and gets no chrome; the root `not-found.tsx` wraps itself in `SiteChrome`. Pages must not render their own `<main>`.
 
 ## Components (`src/components`)
 | Component | Type | Notes |
@@ -36,22 +38,29 @@ Sky blues come from photography, never from UI fills.
 | `ui/Tabs` | client | Segmented blue bar, white active pill. WAI-ARIA tabs, automatic activation, ←/→ wrap, Home/End, roving tabindex. All panels SSR'd (inactive `hidden`). `layout="split"` adds a per-tab aside (illustration) on the right from lg. |
 | `ui/Accordion` | server | Native `<details>`; optional `name` for exclusive groups. |
 | `ui/Field` + `ui/Input` | shared | `Field` renders label/error/help with ids; wire the input with `describedBy(id, {help, error})`. `invalid` sets `aria-invalid`. |
-| `ui/ScoreRing` | client | SVG ring; SSR shows the final value; count-up only when it starts below the fold and motion is allowed. `role="img"` with "X out of 100". `null` = unavailable. |
+| `ui/ScoreRing` | client | SVG ring; SSR shows the final value; count-up only when it starts below the fold and motion is allowed, and it snaps to the final value when reached by a scroll jump (shares the `Reveal` watcher). `role="img"` with "X out of 100". `null` = unavailable. |
 | `ui/IssueRow` | server | Severity pill + title + category + effort dots (+ impact). `locked` for gated teasers. Exports label maps for severity/effort/category. |
 | `ui/EngineStrip` | server | Hairline grid of TEXT names (4 cols md, 8 xl); horizontal scroll-snap in its own keyboard-focusable region below md. |
-| `ui/Reveal` | client | Fade-up or `variant="tear"` wipe. Only hides elements that are below the fold at mount, so no flash, no LCP delay, no hidden content without JS. |
+| `ui/Reveal` | client | Fade-up or `variant="tear"` wipe. Only hides elements that are below the fold at mount (and only with IntersectionObserver + motion allowed), so no flash, no LCP delay, no hidden content without JS. One shared watcher (`watchReveal`): animated reveal starts 12% of a viewport before entry; anything found already in the top 65% of the viewport or above it (anchor jump, `scrollTo`, find-in-page, restored scroll) is shown at once with no transition; scroll, resize, `hashchange`, `pageshow` and a 900 ms failsafe sweep make sure nothing stays hidden. |
 | `ui/PlaceholderText` | server | Renders `[PLACEHOLDER…]` markers from content as a small dashed tag. |
 | `ui/Icon` | server | Hand-drawn 24px line icons; keys match `FeatureItem.icon`. |
 | `site/Nav` + `site/MobileMenu` | server + client | Floating white pill (logo, links lg+, blue square menu button < lg) + Contact + "Free audit". Mobile sheet is a native modal `<dialog>` (focus trap, Esc, inert page, focus return) + backdrop click, link click, auto-close at lg, scroll lock. No sign-in in v1. |
 | `site/Footer`, `site/Logo` | server | Eye mark on ink tile + lowercase serif wordmark "seenhq". |
+| `site/SiteChrome` | server | Skip link + Nav + `<main id="main">` + Footer. Used by the `(marketing)` layout and the root 404. |
 | `collage/torn.ts` | util | Seeded torn outlines as CSS `polygon()`: `tornRectPair`, `tornEllipsePair` (rim + cut-out share one tear), `tornBand`, `tornRect`. |
 | `collage/TornFrame` | server | Torn cut-out on a paper rim with grain and paper/float drop-shadow. `shape="rect" | "ellipse"`, `rotate`, `edges`. |
 | `collage/Parallax` | client | Moves an inner layer by `speed` × scroll offset; listens only while on screen; off under reduced motion. |
 | `collage/HeroCollage`, `collage/FeatureCollage` (+ `FloatingCard`), `collage/SectionTear` | server | Compositions. Mock UI cards are labelled "Illustrative" and `aria-hidden`. |
 
 ## Imagery rules
-Public domain / CC0 only, logged in `docs/ASSETS.md`, optimized by `scripts/optimize-images.mjs` (< 250 KB each).
-Every raster goes through `next/image` with `sizes`; the hero sky is the only `preload` image; decorative layers use `alt=""`.
+Public domain / CC0 only, logged in `docs/ASSETS.md`, optimized by `scripts/optimize-images.mjs` (< 300 KB each,
+exported at >= 2x their largest rendered CSS width; next/image re-encodes to AVIF/WebP).
+Every raster goes through `next/image` with `sizes` that describe the real rendered width, including object-cover boxes that are
+height-bound (the hero sky renders ~1060-1240 CSS px wide on phones). The hero sky is the only `preload` image; decorative layers use `alt=""`.
+
+## Brand assets
+Generated by the same script from the `LogoMark` geometry (`site/Logo.tsx`): `public/logo.png` (512, full-bleed ink, used by
+Organization JSON-LD), `src/app/icon.svg` (rounded tile), `src/app/apple-icon.png` (180, full-bleed) and `src/app/favicon.ico` (32 + 16).
 
 ## Accessibility checklist
 Skip link → `#main`; landmarks (header/nav/main/footer, labelled sections); visible focus ring (2px accent, 3px offset);

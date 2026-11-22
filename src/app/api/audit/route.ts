@@ -3,7 +3,8 @@ import { AuditError, normalizeAuditUrl, runAudit, toPartialReport } from "@/lib/
 import type { AuditError as AuditErrorShape, AuditResult, PartialAuditReport } from "@/lib/audit/types";
 import { insertAudit } from "@/lib/db/audits";
 import { jsonError, jsonOk, readJsonBody } from "@/lib/security/http";
-import { rateLimit } from "@/lib/security/rate-limit";
+import { auditInFlightGuard } from "@/lib/security/concurrency";
+import { clientKey, rateLimitByIp } from "@/lib/security/rate-limit";
 import { getClientIp, hashIp } from "@/lib/security/request";
 import { seal } from "@/lib/security/seal";
 
@@ -13,6 +14,12 @@ import { seal } from "@/lib/security/seal";
  * `maxDuration` is set. POST handlers always run at request time.
  */
 export const maxDuration = 60;
+
+/**
+ * Crawl budget is measured from the start of the request, so time spent on the rate limiter (a
+ * slow or unreachable DB) is not added on top. Leaves ~10 s of the 60 s for persistence + sealing.
+ */
+const REQUEST_BUDGET_MS = 50_000;
 
 const MAX_BODY_BYTES = 4 * 1024;
 const RATE_LIMIT = { limit: 5, windowSec: 60 * 60 } as const;
@@ -49,6 +56,7 @@ function auditErrorResponse(code: AuditErrorCode): Response {
 }
 
 export async function POST(request: Request): Promise<Response> {
+  const startedAt = Date.now();
   const body = await readJsonBody(request, MAX_BODY_BYTES);
   if (!body.ok) return body.response;
 
@@ -65,20 +73,53 @@ export async function POST(request: Request): Promise<Response> {
     return auditErrorResponse(code ?? "invalid_url");
   }
 
-  const ipHash = hashIp(getClientIp(request.headers));
-  const limited = await rateLimit(`audit:${ipHash}`, RATE_LIMIT);
+  const ip = getClientIp(request.headers);
+  const ipHash = hashIp(ip);
+
+  // Per-instance in-flight cap (ADR-013). Taken before the rate limiter so a busy instance does
+  // not spend the client's quota, and released only after the whole audit has finished.
+  const slot = auditInFlightGuard().tryAcquire(clientKey(ip));
+  if (!slot.ok) {
+    return jsonError(
+      503,
+      "server_busy",
+      slot.reason === "key_busy"
+        ? "An audit from your network is already running. Please wait for it to finish."
+        : "We're running a lot of audits right now. Please try again in a minute.",
+      { retryAfter: slot.reason === "key_busy" ? 30 : 60 },
+    );
+  }
+  try {
+    return await runLimitedAudit(request, normalized, ip, ipHash, startedAt);
+  } finally {
+    slot.release();
+  }
+}
+
+async function runLimitedAudit(
+  request: Request,
+  normalized: string,
+  ip: string,
+  ipHash: string,
+  startedAt: number,
+): Promise<Response> {
+  const limited = await rateLimitByIp("audit", ip, RATE_LIMIT);
   if (!limited.ok) {
     return jsonError(
       429,
       "rate_limited",
-      `You've run ${RATE_LIMIT.limit} free audits in the last hour. Please try again later.`,
+      `You've run ${limited.limit} free audits in the last hour. Please try again later.`,
       { retryAfter: limited.retryAfter },
     );
   }
 
   let result: AuditResult;
   try {
-    result = await runAudit(normalized, { signal: request.signal });
+    // runAudit clamps the budget to at least 5 s.
+    result = await runAudit(normalized, {
+      signal: request.signal,
+      budgetMs: REQUEST_BUDGET_MS - (Date.now() - startedAt),
+    });
   } catch (error) {
     const code = auditErrorCode(error);
     if (code) return auditErrorResponse(code);

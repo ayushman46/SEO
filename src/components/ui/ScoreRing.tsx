@@ -2,10 +2,12 @@
 
 import { useEffect, useRef } from "react";
 import { cx } from "./cx";
+import { canAnimateIn, watchReveal } from "./Reveal";
 
 /**
  * SVG score ring with a count-up. Renders the final value on the server; the
- * count-up only runs when the ring starts below the fold and motion is allowed.
+ * count-up only runs when the ring starts below the fold and motion is allowed,
+ * and snaps to the final value when the ring is reached by a scroll jump.
  */
 export function ScoreRing({
   value,
@@ -28,6 +30,7 @@ export function ScoreRing({
   const wrapRef = useRef<HTMLDivElement>(null);
   const arcRef = useRef<SVGCircleElement>(null);
   const numRef = useRef<HTMLSpanElement>(null);
+  const tickRef = useRef<HTMLSpanElement>(null);
 
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
@@ -38,39 +41,46 @@ export function ScoreRing({
     const wrap = wrapRef.current;
     const arc = arcRef.current;
     const num = numRef.current;
-    if (!animate || value === null || !wrap || !arc || !num) return;
-    if (typeof IntersectionObserver === "undefined") return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    if (wrap.getBoundingClientRect().top < window.innerHeight * 0.95) return;
+    const tickEl = tickRef.current;
+    if (!animate || value === null || !wrap || !arc || !num || !tickEl) return;
+    if (!canAnimateIn(wrap)) return;
 
-    arc.style.strokeDashoffset = String(c);
-    num.textContent = "0";
-    let raf = 0;
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((e) => e.isIntersecting)) return;
-        io.disconnect();
-        const start = performance.now();
-        const dur = 1300;
-        const tick = (now: number) => {
-          const t = Math.min(1, (now - start) / dur);
-          const eased = 1 - Math.pow(1 - t, 3);
-          arc.style.strokeDashoffset = String(c * (1 - (v / 100) * eased));
-          num.textContent = String(Math.round(v * eased));
-          if (t < 1) raf = requestAnimationFrame(tick);
-        };
-        raf = requestAnimationFrame(tick);
-      },
-      { rootMargin: "0px 0px -10% 0px" },
-    );
-    io.observe(wrap);
-    return () => {
-      io.disconnect();
-      cancelAnimationFrame(raf);
-      arc.style.strokeDashoffset = String(offset);
-      num.textContent = String(v);
+    // Server HTML already holds the final value. The count-up never touches nodes
+    // React owns: it hides the React-rendered number, writes into an empty overlay
+    // span, and drives the arc through an inline style. Releasing simply removes
+    // those overrides, so whatever React rendered last (the current value) shows.
+    const release = () => {
+      arc.style.removeProperty("stroke-dashoffset");
+      num.style.removeProperty("visibility");
+      tickEl.textContent = "";
     };
-  }, [animate, value, c, v, offset]);
+    arc.style.strokeDashoffset = String(c);
+    num.style.visibility = "hidden";
+    tickEl.textContent = "0";
+    let raf = 0;
+    const cleanup = watchReveal(wrap, (shouldAnimate) => {
+      if (!shouldAnimate) return release();
+      const start = performance.now();
+      const dur = 1300;
+      const tick = (now: number) => {
+        const t = Math.min(1, (now - start) / dur);
+        const eased = 1 - Math.pow(1 - t, 3);
+        if (t < 1) {
+          arc.style.strokeDashoffset = String(c * (1 - (v / 100) * eased));
+          tickEl.textContent = String(Math.round(v * eased));
+          raf = requestAnimationFrame(tick);
+        } else {
+          release();
+        }
+      };
+      raf = requestAnimationFrame(tick);
+    });
+    return () => {
+      cleanup();
+      cancelAnimationFrame(raf);
+      release();
+    };
+  }, [animate, value, c, v]);
 
   const night = tone === "night";
   const display = value === null ? "–" : String(v);
@@ -83,7 +93,13 @@ export function ScoreRing({
       className={cx("relative inline-grid shrink-0 place-items-center", className)}
       style={{ width: size, height: size }}
     >
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden className="-rotate-90">
+      <svg
+        width={size}
+        height={size}
+        viewBox={`0 0 ${size} ${size}`}
+        aria-hidden
+        className="-rotate-90"
+      >
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -108,15 +124,23 @@ export function ScoreRing({
       <div aria-hidden className="absolute inset-0 grid place-items-center text-center">
         <div className="flex flex-col items-center leading-none">
           <span
-            ref={numRef}
-            className={cx("font-serif tabular-nums", night ? "text-night-ink" : "text-ink")}
+            className={cx(
+              "grid font-serif tabular-nums",
+              night ? "text-night-ink" : "text-ink",
+            )}
             style={{ fontSize: size * 0.34 }}
           >
-            {display}
+            <span ref={numRef} className="[grid-area:1/1]">
+              {display}
+            </span>
+            <span ref={tickRef} className="text-center [grid-area:1/1]" />
           </span>
           {size >= 96 ? (
             <span
-              className={cx("mt-1 font-medium tracking-wide uppercase", night ? "text-night-muted" : "text-muted")}
+              className={cx(
+                "mt-1 font-medium tracking-wide uppercase",
+                night ? "text-night-muted" : "text-muted",
+              )}
               style={{ fontSize: Math.max(10, size * 0.085) }}
             >
               {label}

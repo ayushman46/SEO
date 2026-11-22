@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import { after } from "next/server";
 import { insertContact } from "@/lib/db/contact";
 import { notifyTeam } from "@/lib/mailer";
-import { rateLimit } from "@/lib/security/rate-limit";
+import { rateLimitByIp } from "@/lib/security/rate-limit";
 import { getClientIp, hashIp } from "@/lib/security/request";
 import {
   CONTACT_FIELDS,
@@ -49,8 +49,9 @@ export async function submitContact(
   }
 
   const requestHeaders = await headers();
-  const ipHash = hashIp(getClientIp(requestHeaders));
-  const limited = await rateLimit(`contact:${ipHash}`, RATE_LIMIT);
+  const ip = getClientIp(requestHeaders);
+  const ipHash = hashIp(ip);
+  const limited = await rateLimitByIp("contact", ip, RATE_LIMIT);
   if (!limited.ok) {
     const minutes = Math.max(1, Math.ceil(limited.retryAfter / 60));
     return {

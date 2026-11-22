@@ -1,8 +1,6 @@
 import type { Viewport } from "next";
 import { Instrument_Serif, Inter } from "next/font/google";
-import { rootMetadata } from "@/lib/seo/metadata";
-import { Nav } from "@/components/site/Nav";
-import { Footer } from "@/components/site/Footer";
+import { JsonLd, organizationLd, rootMetadata, websiteLd } from "@/lib/seo";
 import "./globals.css";
 
 const inter = Inter({
@@ -26,18 +24,17 @@ export const viewport: Viewport = {
   colorScheme: "light",
 };
 
+/**
+ * Bare root: html, body, fonts, sitewide metadata and JSON-LD. Site chrome (skip
+ * link, Nav, <main>, Footer) lives in src/app/(marketing)/layout.tsx so /admin
+ * renders without it; not-found.tsx composes the chrome itself.
+ */
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${inter.variable} ${instrumentSerif.variable}`}>
       <body className="flex min-h-svh flex-col">
-        <a href="#main" className="skip-link">
-          Skip to content
-        </a>
-        <Nav />
-        <main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
-          {children}
-        </main>
-        <Footer />
+        <JsonLd data={[organizationLd(), websiteLd()]} />
+        {children}
       </body>
     </html>
   );

@@ -96,3 +96,11 @@ export const services = [
     priceFrom: "$29/month [PLACEHOLDER]",
   },
 ] satisfies Service[];
+
+/** Closing call to action on /services (added by frontend-designer for T006; content-seo may refine). */
+export const servicesClosing = {
+  title: "Not sure which service you need?",
+  body: "Run the free audit first. It shows what is holding your site back, and we can tell you which service fits from there. Or just tell us about your site.",
+  primaryCta: { label: "Tell us about your site", href: "/contact" },
+  secondaryCta: { label: "Run a free audit", href: "/audit" },
+};

@@ -6,6 +6,12 @@ import { z } from "zod";
  * No "use server" here: a server-action module may only export async functions.
  */
 
+/**
+ * THE list of contact-form service slugs (single source of truth for validation and types).
+ * Adding a service = one line here, plus its label in src/content/contact.ts contactServiceOptions
+ * (tests/backend/contact-schema.test.ts fails if the two drift). The DB only checks the slug shape
+ * (lowercase, hyphenated, <= 64 chars), so no migration is needed.
+ */
 export const CONTACT_SERVICES = [
   "seo-audit",
   "geo-audit",

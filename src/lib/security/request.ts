@@ -1,8 +1,12 @@
 import "server-only";
 import { createHash } from "node:crypto";
+import ipaddr from "ipaddr.js";
 import { getServerEnv } from "./env";
 
 type HeaderSource = Pick<Headers, "get">;
+
+/** Returned by getClientIp when no usable client IP header is present. */
+export const UNKNOWN_IP = "unknown";
 
 const IP_CHARS = /^[0-9a-fA-F:.]{2,45}$/;
 
@@ -28,7 +32,22 @@ export function getClientIp(headers: HeaderSource): string {
     const first = cleanIp(forwarded.split(",")[0]);
     if (first) return first;
   }
-  return cleanIp(headers.get("x-real-ip")) ?? "unknown";
+  return cleanIp(headers.get("x-real-ip")) ?? UNKNOWN_IP;
+}
+
+/**
+ * The identity a rate limit should count: IPv4 as-is (IPv4-mapped IPv6 unwrapped), IPv6 collapsed
+ * to its /64 prefix (one subscriber / one cloud VM usually owns a whole /64, so per-address buckets
+ * would be trivially rotated). Returns null for a missing or unparsable IP.
+ */
+export function rateLimitSubject(ip: string): string | null {
+  if (ip === UNKNOWN_IP || !ipaddr.isValid(ip)) return null;
+  const addr = ipaddr.process(ip);
+  if (addr.kind() === "ipv4") return addr.toString();
+  const bytes = addr.toByteArray().slice(0, 8);
+  const groups: string[] = [];
+  for (let i = 0; i < 8; i += 2) groups.push(((bytes[i] << 8) | bytes[i + 1]).toString(16));
+  return `${groups.join(":")}::/64`;
 }
 
 const DEV_SALT = "seenhq-dev-ip-salt-not-for-production";

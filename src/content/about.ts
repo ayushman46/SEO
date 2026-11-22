@@ -32,3 +32,11 @@ export const aboutSections: { title: string; body: string }[] = [
     body: "seenhq is run by [PLACEHOLDER: founder name], [PLACEHOLDER: one or two sentences on background and why you care about search and AI visibility]. Based in [PLACEHOLDER: City, Country].",
   },
 ];
+
+/** Closing call to action on /about (added by frontend-designer for T006; content-seo may refine). */
+export const aboutClosing = {
+  title: "See how your site looks to search and AI",
+  body: "Start with the free audit, or tell us about your site and we will reply by email with next steps.",
+  primaryCta: { label: "Run a free audit", href: "/audit" },
+  secondaryCta: { label: "Contact us", href: "/contact" },
+};

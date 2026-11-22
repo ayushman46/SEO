@@ -1,6 +1,7 @@
 import "server-only";
 import postgres, { type Sql } from "postgres";
 import { getServerEnv } from "@/lib/security/env";
+import { sslOptionsFor } from "./ssl";
 
 export type { Sql };
 
@@ -12,15 +13,6 @@ const globalForDb = globalThis as typeof globalThis & {
   __seenhqDb?: { url: string; sql: Sql };
 };
 
-function isLocalHost(databaseUrl: string): boolean {
-  try {
-    const host = new URL(databaseUrl).hostname;
-    return host === "localhost" || host === "127.0.0.1" || host === "::1" || host === "[::1]";
-  } catch {
-    return false;
-  }
-}
-
 export function getDb(): Sql | null {
   const url = getServerEnv().DATABASE_URL;
   if (!url) return null;
@@ -31,10 +23,13 @@ export function getDb(): Sql | null {
   const sql = postgres(url, {
     max: 5,
     prepare: false, // required by transaction-mode poolers (Neon pooler, Supabase pgbouncer)
-    ssl: isLocalHost(url) ? false : "require",
+    // TLS: the URL's sslmode/sslrootcert win; otherwise verify-full (localhost: off). ADR-014.
+    ...sslOptionsFor(url),
     idle_timeout: 20,
-    connect_timeout: 10,
-    query_timeout: 10,
+    // Short timeouts: every DB call is best effort and must fit inside the routes' maxDuration
+    // (unlock: 15 s with two sequential DB calls; audit: 60 s incl. the crawl budget).
+    connect_timeout: 5,
+    query_timeout: 5,
     onnotice: false,
   });
   globalForDb.__seenhqDb = { url, sql };

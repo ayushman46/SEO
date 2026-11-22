@@ -4,7 +4,7 @@ import type { AuditResult } from "@/lib/audit/types";
 import { insertLead } from "@/lib/db/leads";
 import { notifyTeam } from "@/lib/mailer";
 import { jsonError, jsonOk, readJsonBody } from "@/lib/security/http";
-import { rateLimit } from "@/lib/security/rate-limit";
+import { rateLimitByIp } from "@/lib/security/rate-limit";
 import { getClientIp, getUserAgent, hashIp } from "@/lib/security/request";
 import { unseal } from "@/lib/security/seal";
 
@@ -52,7 +52,7 @@ export async function POST(request: Request): Promise<Response> {
 
   const ip = getClientIp(request.headers);
   const ipHash = hashIp(ip);
-  const limited = await rateLimit(`unlock:${ipHash}`, RATE_LIMIT);
+  const limited = await rateLimitByIp("unlock", ip, RATE_LIMIT);
   if (!limited.ok) {
     return jsonError(429, "rate_limited", "Too many unlock attempts. Please try again later.", {
       retryAfter: limited.retryAfter,

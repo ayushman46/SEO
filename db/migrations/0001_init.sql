@@ -74,10 +74,9 @@ create table if not exists contact_submissions (
                          ),
   company    text                 check (company is null or char_length(company) <= 120),
   website    text                 check (website is null or char_length(website) <= 2048),
-  service    text        not null check (service in (
-                           'seo-audit', 'geo-audit', 'technical-fixes',
-                           'content-entity', 'monitoring', 'not-sure'
-                         )),
+  -- service: slug shape only. The allowed list lives in the app (CONTACT_SERVICES in
+  -- src/app/actions/contact-schema.ts) so adding a service needs no migration.
+  service    text        not null check (service ~ '^[a-z0-9]+(-[a-z0-9]+)*$' and char_length(service) <= 64),
   budget     text                 check (budget is null or budget in (
                            'under-100', '100-300', '300-1000', '1000-plus', 'not-sure'
                          )),

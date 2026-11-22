@@ -69,3 +69,12 @@ export const contentUpdated = "2026-11-22";
 
 /** Visible label for the "Last updated" line pages render next to contentUpdated. */
 export const lastUpdatedLabel = "Last updated";
+
+/** Copy for the sitewide 404 page (src/app/not-found.tsx). */
+export const notFoundCopy = {
+  kicker: "404",
+  title: "Nothing to see here. Not even by us.",
+  body: "The page you were looking for has moved or never existed.",
+  primary: { label: "Back to home", href: "/" },
+  secondary: { label: "Run a free audit", href: "/audit" },
+} as const;

@@ -23,17 +23,25 @@ export function HeroCollage() {
             alt=""
             fill
             preload
-            sizes="100vw"
+            // The box is full-bleed and 120% of the hero height (parallax), so with
+            // object-cover it is height-bound below ~1500 px: about 1060-1240 CSS px wide.
+            sizes="(min-width: 1280px) 100vw, (orientation: portrait) 1240px, 1080px"
             quality={75}
             className="object-cover object-[50%_35%]"
           />
         </Parallax>
         {/* gentle top shade so the white nav pills always separate from bright cloud */}
-        <div aria-hidden className="absolute inset-x-0 top-0 h-32 bg-linear-to-b from-[#0b2a5c]/25 to-transparent" />
+        <div
+          aria-hidden
+          className="absolute inset-x-0 top-0 h-32 bg-linear-to-b from-[#0b2a5c]/25 to-transparent"
+        />
       </div>
 
       {/* Daytime moon */}
-      <Parallax speed={0.14} className="absolute top-[24%] left-[7%] w-[clamp(3.25rem,6.5vw,6.25rem)] sm:top-[22%] sm:left-[9%]">
+      <Parallax
+        speed={0.14}
+        className="absolute top-[24%] left-[7%] w-[clamp(3.25rem,6.5vw,6.25rem)] sm:top-[22%] sm:left-[9%]"
+      >
         <Image
           src="/images/moon.webp"
           alt=""
@@ -45,21 +53,37 @@ export function HeroCollage() {
       </Parallax>
 
       {/* Marble youth on a torn scrap (md+) */}
-      <Parallax speed={0.1} className="absolute bottom-[16%] left-[5%] hidden w-[clamp(7rem,12vw,11.5rem)] md:block lg:left-[9%]">
+      <Parallax
+        speed={0.1}
+        className="absolute bottom-[16%] left-[5%] hidden w-[clamp(7rem,12vw,11.5rem)] md:block lg:left-[9%]"
+      >
         <TornFrame seed={33} rotate={-5} shadow="float" className="aspect-[760/923]">
-          <Image src="/images/marble-youth.webp" alt="" fill sizes="190px" className="object-cover" />
+          <Image
+            src="/images/marble-youth.webp"
+            alt=""
+            fill
+            sizes="190px"
+            className="object-cover"
+          />
         </TornFrame>
       </Parallax>
 
       {/* The torn hole and the eye */}
       <div className="absolute top-[56%] left-1/2 w-[min(90vw,48rem)] -translate-x-1/2 -translate-y-1/2">
-        <TornFrame seed={5} shape="ellipse" amp={3.6} rimWidth={2.4} shadow="float" className="aspect-[2.15/1]">
+        <TornFrame
+          seed={5}
+          shape="ellipse"
+          amp={3.6}
+          rimWidth={2.4}
+          shadow="float"
+          className="aspect-[2.15/1]"
+        >
           <Image
             src="/images/eye.webp"
             alt="The painted eyes of Leonardo da Vinci's Mona Lisa, looking out through a hole torn in a blue sky"
             fill
             loading="eager"
-            sizes="(min-width: 860px) 768px, 90vw"
+            sizes="(min-width: 854px) 816px, 96vw"
             className="scale-[1.06] object-cover object-[50%_42%]"
           />
           {/* depth: the sky casts a shadow into the hole */}
@@ -80,7 +104,13 @@ export function HeroCollage() {
         className="absolute right-[3%] bottom-[11%] w-[clamp(8.5rem,24vw,18rem)] sm:right-[6%] sm:bottom-[13%] lg:right-[11%]"
       >
         <TornFrame seed={44} rotate={4} shadow="float" className="aspect-[720/460]">
-          <Image src="/images/hands.webp" alt="" fill sizes="(min-width: 1024px) 290px, 24vw" className="object-cover" />
+          <Image
+            src="/images/hands.webp"
+            alt=""
+            fill
+            sizes="(min-width: 1200px) 288px, (max-width: 566px) 136px, 24vw"
+            className="object-cover"
+          />
         </TornFrame>
       </Parallax>
     </div>

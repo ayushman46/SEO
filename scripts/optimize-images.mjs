@@ -9,16 +9,19 @@ import path from "node:path";
 
 const SRC = path.resolve("public/images/source");
 const OUT = path.resolve("public/images");
-const MAX_BYTES = 250 * 1024;
+const MAX_BYTES = 300 * 1024;
 
 /** @type {{ out: string; src: string; extract?: sharp.Region; width: number; quality?: number; circle?: boolean; modulate?: sharp.Modulate }[]} */
 const jobs = [
-  // Hero sky: landscape crop from the top of a tall CC0 sky photo.
-  { out: "sky-hero.webp", src: "sky-bright.jpg", extract: { left: 0, top: 250, width: 3840, height: 2160 }, width: 2400, quality: 74 },
-  // Collage card sky: deep blue cumulus.
+  // Hero sky: landscape crop from the top of a tall CC0 sky photo. The hero box is
+  // full-bleed and 120% tall (parallax), so on phones it renders ~1100 CSS px wide.
+  { out: "sky-hero.webp", src: "sky-bright.jpg", extract: { left: 0, top: 250, width: 3840, height: 2160 }, width: 2880, quality: 74 },
+  // Sizes below are >= 2x the largest rendered CSS width (see docs/ASSETS.md).
+  // Collage card sky: deep blue cumulus (max 576 px rendered).
   { out: "sky-cumulus.webp", src: "sky-cumulus.jpg", width: 1400, quality: 64 },
-  // The eye: both eyes of the Mona Lisa, cropped tight.
-  { out: "eye.webp", src: "mona-lisa.jpg", extract: { left: 1250, top: 1110, width: 1100, height: 500 }, width: 1100, quality: 70 },
+  // The eye: both eyes of the Mona Lisa, cropped tight from the full 7479 px original
+  // (rendered up to 816 CSS px in the hero, so 1700 covers 2x screens).
+  { out: "eye.webp", src: "mona-lisa-full.jpg", extract: { left: 2435, top: 2162, width: 2142, height: 974 }, width: 1700, quality: 62 },
   // Hands: the near-touch from The Creation of Adam.
   { out: "hands.webp", src: "creation-of-adam.jpg", extract: { left: 990, top: 480, width: 720, height: 460 }, width: 720, quality: 72 },
   // Marble head of a youth (Met, CC0), cropped to the head.
@@ -49,6 +52,56 @@ for (const job of jobs) {
   await img.webp({ quality: job.quality ?? 70, effort: 6, smartSubsample: true, alphaQuality: 80 }).toFile(file);
   const { size } = await stat(file);
   const meta = await sharp(file).metadata();
-  const flag = size > MAX_BYTES ? "  <-- OVER 250 KB" : "";
+  const flag = size > MAX_BYTES ? "  <-- OVER 300 KB" : "";
   console.log(`${job.out.padEnd(20)} ${meta.width}x${meta.height}  ${(size / 1024).toFixed(1)} KB${flag}`);
 }
+
+// ---------------------------------------------------------------------------
+// Brand assets: the seenhq eye mark (same geometry as src/components/site/Logo.tsx),
+// rendered from inline SVG. Outputs public/logo.png (512, used by Organization
+// JSON-LD), src/app/icon.svg, src/app/apple-icon.png (180) and src/app/favicon.ico
+// (32 + 16 px PNGs in an ICO container, for clients that only ask for /favicon.ico).
+// ---------------------------------------------------------------------------
+const INK = "#121212";
+const ACCENT = "#1e7bf5";
+const markSvg = ({ size, rx }) =>
+  `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 32 32">` +
+  `<rect width="32" height="32" rx="${rx}" fill="${INK}"/>` +
+  `<path d="M5 16.2c2.9-5 6.7-7.6 11-7.6s8.1 2.6 11 7.6c-2.9 5-6.7 7.4-11 7.4s-8.1-2.4-11-7.4Z" fill="#fff"/>` +
+  `<circle cx="16" cy="16.1" r="5" fill="${ACCENT}"/>` +
+  `<circle cx="16" cy="16.1" r="2.1" fill="${INK}"/>` +
+  `<circle cx="17.7" cy="14.4" r="1" fill="#fff"/>` +
+  `</svg>`;
+
+const { writeFile } = await import("node:fs/promises");
+const APP = path.resolve("src/app");
+const png = (size, rx) => sharp(Buffer.from(markSvg({ size, rx })), { density: 72 * (size / 32) }).resize(size, size).png({ compressionLevel: 9 }).toBuffer();
+
+// Full-bleed square for logo.png and the apple icon (platforms apply their own mask).
+await writeFile(path.resolve("public/logo.png"), await png(512, 0));
+await writeFile(path.join(APP, "apple-icon.png"), await png(180, 0));
+// Rounded tile for the browser tab icon.
+await writeFile(path.join(APP, "icon.svg"), markSvg({ size: 32, rx: 9 }).replace(` width="32" height="32" viewBox`, ` viewBox`) + "\n");
+
+// ICO container holding PNG frames (supported by every current browser).
+const frames = [await png(32, 9), await png(16, 5)];
+const header = Buffer.alloc(6 + 16 * frames.length);
+header.writeUInt16LE(0, 0);
+header.writeUInt16LE(1, 2);
+header.writeUInt16LE(frames.length, 4);
+let offset = header.length;
+frames.forEach((buf, i) => {
+  const size = i === 0 ? 32 : 16;
+  const o = 6 + i * 16;
+  header.writeUInt8(size, o);
+  header.writeUInt8(size, o + 1);
+  header.writeUInt8(0, o + 2);
+  header.writeUInt8(0, o + 3);
+  header.writeUInt16LE(1, o + 4);
+  header.writeUInt16LE(32, o + 6);
+  header.writeUInt32LE(buf.length, o + 8);
+  header.writeUInt32LE(offset, o + 12);
+  offset += buf.length;
+});
+await writeFile(path.join(APP, "favicon.ico"), Buffer.concat([header, ...frames]));
+console.log("brand: public/logo.png, src/app/icon.svg, src/app/apple-icon.png, src/app/favicon.ico");

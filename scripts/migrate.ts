@@ -3,39 +3,48 @@
  *
  *   npm run db:migrate          (= npx tsx scripts/migrate.ts)
  *
- * - Reads DATABASE_URL from the environment, falling back to .env.local / .env.
+ * - Connection: DATABASE_URL_UNPOOLED (direct, non-pooled) if set, else DATABASE_URL, read from
+ *   the environment with a fallback to .env.local / .env. Prefer the direct URL for migrations.
  * - Tracks applied files in `schema_migrations` (name, checksum, applied_at).
  * - Each file runs in its own transaction; a failure rolls that file back and stops.
- * - A Postgres advisory lock prevents two runners from migrating at once.
+ * - Concurrency: every schema-touching transaction first takes a TRANSACTION-scoped advisory lock
+ *   (pg_advisory_xact_lock). Unlike a session lock this is safe on transaction-mode poolers
+ *   (Neon -pooler, Supabase :6543): it lives and dies with the transaction, on one backend, and is
+ *   released on commit/rollback, so it can neither leak nor be unlocked on the wrong backend.
  *
- * Deliberately does not import src/lib/** (those modules are `server-only`).
+ * Imports only src/lib/db/ssl.ts from the app (pure, not `server-only`).
  */
 import { createHash } from "node:crypto";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
-import postgres from "postgres";
+import postgres, { type TransactionSql } from "postgres";
+import { sslOptionsFor } from "../src/lib/db/ssl";
 
 const MIGRATIONS_DIR = path.resolve(process.cwd(), "db", "migrations");
 const LOCK_KEY = 7_311_420_501; // arbitrary, stable advisory-lock id for seenhq migrations
 
+const LOCK_TIMEOUT = "60s";
+
+function migrationUrl(): string | undefined {
+  const pick = (v: string | undefined): string | undefined => (v && v.trim() !== "" ? v : undefined);
+  return pick(process.env.DATABASE_URL_UNPOOLED) ?? pick(process.env.DATABASE_URL);
+}
+
 function loadEnvFallback(): void {
-  if (process.env.DATABASE_URL) return;
+  if (migrationUrl()) return;
   for (const file of [".env.local", ".env"]) {
     const full = path.resolve(process.cwd(), file);
     if (existsSync(full)) {
       process.loadEnvFile(full);
-      if (process.env.DATABASE_URL) return;
+      if (migrationUrl()) return;
     }
   }
 }
 
-function isLocalHost(databaseUrl: string): boolean {
-  try {
-    const host = new URL(databaseUrl).hostname;
-    return host === "localhost" || host === "127.0.0.1" || host === "::1" || host === "[::1]";
-  } catch {
-    return false;
-  }
+/** Serializes migrators: waits up to LOCK_TIMEOUT for the lock, held until this transaction ends. */
+async function takeLock(tx: TransactionSql): Promise<void> {
+  await tx.unsafe(`set local lock_timeout = '${LOCK_TIMEOUT}'`);
+  await tx`select pg_advisory_xact_lock(${LOCK_KEY}::bigint)`;
 }
 
 function checksum(content: string): string {
@@ -44,9 +53,9 @@ function checksum(content: string): string {
 
 async function main(): Promise<void> {
   loadEnvFallback();
-  const databaseUrl = process.env.DATABASE_URL;
+  const databaseUrl = migrationUrl();
   if (!databaseUrl) {
-    console.error("[migrate] DATABASE_URL is not set (env, .env.local or .env). Nothing to do.");
+    console.error("[migrate] DATABASE_URL_UNPOOLED / DATABASE_URL is not set (env, .env.local or .env). Nothing to do.");
     process.exitCode = 1;
     return;
   }
@@ -56,62 +65,62 @@ async function main(): Promise<void> {
     .sort();
 
   const sql = postgres(databaseUrl, {
-    max: 1, // one connection so the advisory lock and the migrations share a session
-    prepare: false,
-    ssl: isLocalHost(databaseUrl) ? false : "require",
+    max: 1,
+    prepare: false, // works through transaction-mode poolers too
+    ...sslOptionsFor(databaseUrl),
     onnotice: false,
     connect_timeout: 15,
   });
 
   try {
-    await sql`select pg_advisory_lock(${LOCK_KEY}::bigint)`;
-
-    await sql`
-      create table if not exists schema_migrations (
-        name       text        primary key,
-        checksum   text        not null,
-        applied_at timestamptz not null default now()
-      )
-    `;
-    await sql`alter table schema_migrations enable row level security`;
-
-    const appliedRows = await sql<{ name: string; checksum: string }[]>`
-      select name, checksum from schema_migrations
-    `;
-    const applied = new Map(appliedRows.map((r) => [r.name, r.checksum]));
+    await sql.begin(async (tx) => {
+      await takeLock(tx);
+      await tx`
+        create table if not exists schema_migrations (
+          name       text        primary key,
+          checksum   text        not null,
+          applied_at timestamptz not null default now()
+        )
+      `;
+      await tx`alter table schema_migrations enable row level security`;
+    });
 
     let ran = 0;
     for (const file of files) {
       const content = readFileSync(path.join(MIGRATIONS_DIR, file), "utf8");
       const sum = checksum(content);
-      const previous = applied.get(file);
 
-      if (previous !== undefined) {
-        if (previous !== sum) {
-          console.warn(
-            `[migrate] WARNING: ${file} changed after it was applied (checksum mismatch). ` +
-              "Applied migrations are immutable; put changes in a new file.",
-          );
+      // Check, apply and record inside ONE locked transaction, so a concurrent runner either
+      // sees the row (and skips) or waits for the lock.
+      const outcome = await sql.begin(async (tx): Promise<"applied" | "skipped"> => {
+        await takeLock(tx);
+        const done = await tx<{ checksum: string }[]>`
+          select checksum from schema_migrations where name = ${file}
+        `;
+        const previous = done[0];
+        if (previous) {
+          if (previous.checksum !== sum) {
+            console.warn(
+              `[migrate] WARNING: ${file} changed after it was applied (checksum mismatch). ` +
+                "Applied migrations are immutable; put changes in a new file.",
+            );
+          }
+          return "skipped";
         }
-        continue;
-      }
-
-      console.log(`[migrate] applying ${file} …`);
-      await sql.begin(async (tx) => {
+        console.log(`[migrate] applying ${file} …`);
         await tx.unsafe(content); // no args → simple protocol, allows several statements
         await tx`insert into schema_migrations (name, checksum) values (${file}, ${sum})`;
+        return "applied";
       });
-      ran += 1;
-      console.log(`[migrate] applied ${file}`);
+
+      if (outcome === "applied") {
+        ran += 1;
+        console.log(`[migrate] applied ${file}`);
+      }
     }
 
     console.log(ran === 0 ? "[migrate] up to date." : `[migrate] done, ${ran} migration(s) applied.`);
   } finally {
-    try {
-      await sql`select pg_advisory_unlock(${LOCK_KEY}::bigint)`;
-    } catch {
-      // connection may already be gone; the lock is released with the session anyway
-    }
     await sql.end({ timeout: 5 });
   }
 }

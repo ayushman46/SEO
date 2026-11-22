@@ -4,17 +4,26 @@ const isDev = process.env.NODE_ENV === "development";
 const isProd = process.env.NODE_ENV === "production";
 
 /**
+ * Vercel preview deployments inject the Vercel Toolbar / Comments (scripts, styles, fonts and a
+ * frame from vercel.live, websockets to Pusher). Allow those on preview ONLY; the production and
+ * local policies are unchanged. VERCEL_ENV is "production" | "preview" | "development" on Vercel.
+ */
+const isVercelPreview = process.env.VERCEL_ENV === "preview";
+const preview = (sources: string): string => (isVercelPreview ? ` ${sources}` : "");
+
+/**
  * Content Security Policy (static, no nonces — see DECISIONS ADR-012).
  * 'unsafe-inline' scripts are needed for Next's inline bootstrap without per-request nonces;
  * 'unsafe-eval' only in development (React dev tooling).
  */
 const contentSecurityPolicy = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://va.vercel-scripts.com`,
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob:",
-  "font-src 'self'",
-  "connect-src 'self' https://vitals.vercel-insights.com",
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://va.vercel-scripts.com${preview("https://vercel.live")}`,
+  `style-src 'self' 'unsafe-inline'${preview("https://vercel.live")}`,
+  `img-src 'self' data: blob:${preview("https://vercel.live https://vercel.com")}`,
+  `font-src 'self'${preview("https://vercel.live https://assets.vercel.com")}`,
+  `connect-src 'self' https://vitals.vercel-insights.com${preview("https://vercel.live wss://ws-us3.pusher.com")}`,
+  ...(isVercelPreview ? ["frame-src https://vercel.live"] : []),
   "worker-src 'self' blob:",
   "manifest-src 'self'",
   "object-src 'none'",

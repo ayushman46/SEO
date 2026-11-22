@@ -1,5 +1,7 @@
 import "server-only";
 import { getDb } from "@/lib/db";
+import { isProduction } from "./env";
+import { hashIp, rateLimitSubject } from "./request";
 
 export interface RateLimitOptions {
   /** max requests per window */
@@ -20,6 +22,12 @@ export interface RateLimitResult {
 
 /* ---------------------------------------------------------------------------------------------
  * In-memory fallback (per process). Used when DATABASE_URL is unset or Postgres errors.
+ *
+ * HONEST LIMITS (ADR-013): this counts per server instance, not per IP. On Vercel serverless,
+ * traffic is spread over several instances and a cold start begins with an empty map, so a client
+ * can get up to `limit x number of warm instances` per window. Setting DATABASE_URL switches every
+ * limiter to the shared Postgres counter. The per-instance concurrency guard (./concurrency.ts)
+ * caps how much work any one instance does at once, regardless of the counter.
  * ------------------------------------------------------------------------------------------- */
 
 interface MemoryEntry {
@@ -87,6 +95,16 @@ function memoryRateLimit(bucket: string, opts: RateLimitOptions, now: number): R
  * ------------------------------------------------------------------------------------------- */
 
 let warnedDbFailure = false;
+let warnedMemoryInProduction = false;
+
+function warnMemoryInProduction(): void {
+  if (warnedMemoryInProduction || !isProduction()) return;
+  warnedMemoryInProduction = true;
+  console.warn(
+    "[rate-limit] DATABASE_URL is not set: rate limits are counted per server instance (best effort). " +
+      "Set DATABASE_URL to enable the shared Postgres limiter. See DECISIONS ADR-013.",
+  );
+}
 
 /**
  * Fixed-window rate limit. Postgres when configured (atomic upsert), in-memory otherwise.
@@ -99,7 +117,10 @@ export async function rateLimit(bucket: string, opts: RateLimitOptions): Promise
   const safeBucket = bucket.slice(0, 200);
   const now = Date.now();
   const sql = getDb();
-  if (!sql) return memoryRateLimit(safeBucket, opts, now);
+  if (!sql) {
+    warnMemoryInProduction();
+    return memoryRateLimit(safeBucket, opts, now);
+  }
 
   const windowStart = windowStartFor(now, opts.windowSec * 1000);
   try {
@@ -128,8 +149,40 @@ export async function rateLimit(bucket: string, opts: RateLimitOptions): Promise
   }
 }
 
+/** Bucket shared by every request whose client IP is missing or unparsable. */
+export const UNKNOWN_IP_BUCKET = "unknown-ip";
+
+/**
+ * Limit for the shared unknown-IP bucket: half the per-IP limit (at least 1). All clients without
+ * a usable IP share it, so it must not become a way around the per-IP limit. On Vercel the platform
+ * always sets x-forwarded-for, so this bucket only fills when the deployment is misconfigured.
+ */
+export function unknownIpLimit(limit: number): number {
+  return Math.max(1, Math.floor(limit / 2));
+}
+
+/**
+ * Stable per-client key: salted hash of the IPv4 address or IPv6 /64 prefix, or UNKNOWN_IP_BUCKET
+ * when the request carries no usable IP.
+ */
+export function clientKey(ip: string): string {
+  const subject = rateLimitSubject(ip);
+  return subject === null ? UNKNOWN_IP_BUCKET : hashIp(subject);
+}
+
+/**
+ * Per-client rate limit for `scope` ("audit", "unlock", "contact"), keyed by clientKey(ip).
+ * Requests without a usable IP all share one bucket with a stricter limit.
+ */
+export async function rateLimitByIp(scope: string, ip: string, opts: RateLimitOptions): Promise<RateLimitResult> {
+  const key = clientKey(ip);
+  const effective = key === UNKNOWN_IP_BUCKET ? { ...opts, limit: unknownIpLimit(opts.limit) } : opts;
+  return rateLimit(`${scope}:${key}`, effective);
+}
+
 /** Test helper: clears the in-memory store. */
 export function resetMemoryRateLimit(): void {
   memory.clear();
   lastSweep = 0;
+  warnedMemoryInProduction = false;
 }

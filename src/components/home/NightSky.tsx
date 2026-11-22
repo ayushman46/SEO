@@ -61,19 +61,37 @@ export function NightSky() {
         <Stars />
 
         {/* moon and a marble witness, pinned to the night */}
-        <Parallax speed={0.1} className="absolute top-[9%] right-[6%] w-[clamp(6.5rem,18vw,15rem)] sm:right-[9%]">
+        <Parallax
+          speed={0.1}
+          className="absolute top-[4%] right-[5%] w-[clamp(6.5rem,18vw,15rem)] sm:top-[9%] sm:right-[9%]"
+        >
           <Image
             src="/images/moon.webp"
             alt=""
             width={640}
             height={640}
-            sizes="(min-width: 1024px) 240px, 18vw"
+            sizes="(min-width: 1334px) 240px, (max-width: 577px) 104px, 18vw"
             className="h-auto w-full drop-shadow-[0_0_60px_rgb(200_215_255/0.35)]"
           />
         </Parallax>
-        <Parallax speed={-0.06} className="absolute right-[5%] bottom-[10%] hidden w-[clamp(8rem,13vw,12rem)] lg:block xl:right-[12%]">
-          <TornFrame seed={61} rotate={5} rimColor="#e9e6dc" shadow="float" className="aspect-[760/923]">
-            <Image src="/images/marble-youth.webp" alt="" fill sizes="192px" className="object-cover brightness-[0.8] contrast-[1.05]" />
+        <Parallax
+          speed={-0.06}
+          className="absolute right-[5%] bottom-[10%] hidden w-[clamp(8rem,13vw,12rem)] lg:block xl:right-[12%]"
+        >
+          <TornFrame
+            seed={61}
+            rotate={5}
+            rimColor="#e9e6dc"
+            shadow="float"
+            className="aspect-[760/923]"
+          >
+            <Image
+              src="/images/marble-youth.webp"
+              alt=""
+              fill
+              sizes="192px"
+              className="object-cover brightness-[0.8] contrast-[1.05]"
+            />
             <div className="absolute inset-0 bg-[#0d1630]/35 mix-blend-multiply" />
           </TornFrame>
         </Parallax>
@@ -87,7 +105,9 @@ export function NightSky() {
             <h2 id="night-title" className="font-serif text-display-lg text-balance text-night-ink">
               {nightSky.title}
             </h2>
-            <p className="mt-6 max-w-xl text-[1.0625rem] leading-relaxed text-pretty text-night-muted sm:text-lg">{nightSky.body}</p>
+            <p className="mt-6 max-w-xl text-[1.0625rem] leading-relaxed text-pretty text-night-muted sm:text-lg">
+              {nightSky.body}
+            </p>
             <div className="mt-10">
               <Button href={nightSky.cta.href} size="lg" icon="arrow-right">
                 {nightSky.cta.label}
