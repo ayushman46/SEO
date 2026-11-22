@@ -44,3 +44,6 @@ next-env.d.ts
 
 # raw image sources (large)
 /public/images/source/
+
+.vercel
+.env*
