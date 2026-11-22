@@ -81,3 +81,11 @@ export interface LegalDoc {
   updated: string; // ISO date
   sections: { heading: string; body: string[] }[];
 }
+
+/** A priced add-on listed under a pricing ladder (added for T010, India pricing). */
+export interface PriceExtra {
+  name: string;
+  price: string; // display string, placeholder-marked
+  description: string;
+  href: string;
+}

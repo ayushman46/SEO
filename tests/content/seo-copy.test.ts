@@ -10,6 +10,13 @@ import {
   pricingPage,
   pricingServicesLink,
   pricingTiers,
+  currencyLabels,
+  pricingIndiaComparison,
+  pricingIndiaExtras,
+  pricingIndiaHeading,
+  pricingIndiaNotes,
+  pricingNoteInr,
+  pricingTiersInr,
 } from "@/content/pricing";
 import { aboutPage, aboutSections } from "@/content/about";
 import { contactForm, contactPage, contactServiceOptions } from "@/content/contact";
@@ -55,6 +62,13 @@ const allCopy = JSON.stringify({
   pricingClosing,
   pricingFaqHeading,
   pricingServicesLink,
+  pricingTiersInr,
+  pricingIndiaExtras,
+  pricingIndiaNotes,
+  pricingIndiaHeading,
+  pricingIndiaComparison,
+  pricingNoteInr,
+  currencyLabels,
   aboutPage,
   aboutSections,
   contactPage,
@@ -217,6 +231,51 @@ describe("content rules", () => {
 
   it("paid prices are placeholder-marked", () => {
     for (const t of pricingTiers.filter((t) => t.price !== "$0")) expect(t.price).toContain("[PLACEHOLDER");
+  });
+
+  it("INR tiers parallel the USD tiers by name, order and everything but price", () => {
+    expect(pricingTiersInr.map((t) => t.name)).toEqual(pricingTiers.map((t) => t.name));
+    pricingTiersInr.forEach((t, i) => {
+      expect({ ...t, price: "" }).toEqual({ ...pricingTiers[i], price: "" });
+      expect(t.price).toContain("₹");
+      expect(t.price).not.toContain("$");
+    });
+    expect(pricingTiersInr.find((t) => t.name === "Free audit")!.price).toBe("₹0");
+  });
+
+  it("all paid INR prices and India extras are placeholder-marked", () => {
+    for (const t of pricingTiersInr.filter((t) => t.price !== "₹0")) expect(t.price).toContain("[PLACEHOLDER");
+    expect(pricingIndiaExtras.map((x) => x.name)).toEqual([
+      "AI fact-check & fix",
+      "Local AI visibility setup",
+      "AI crawler unblock",
+      "Hindi / Hinglish AI answer check",
+    ]);
+    for (const x of pricingIndiaExtras) {
+      expect(x.price).toContain("₹");
+      expect(x.price).toContain("[PLACEHOLDER");
+    }
+    expect(pricingIndiaNotes.some((n) => /UPI/.test(n) && n.includes("[PLACEHOLDER"))).toBe(true);
+    expect(pricingIndiaNotes.some((n) => /GST/.test(n) && n.includes("[PLACEHOLDER"))).toBe(true);
+    expect(pricingIndiaNotes).toContain("No retainer and no minimum term");
+    expect(pricingIndiaComparison.source.href).toMatch(/^https:\/\//);
+    expect(currencyLabels.usd).toContain("$");
+    expect(currencyLabels.inr).toContain("₹");
+  });
+
+  it("pricing FAQ answers the rupee question without placeholders, so FAQ JSON-LD keeps it", () => {
+    const item = pricingFaq.find((f) => f.q === "Do you offer pricing in rupees?");
+    expect(item).toBeDefined();
+    expect(item!.a).toMatch(/^Yes\./);
+    expect(item!.a).not.toContain("[PLACEHOLDER");
+    const names = (faqLd(pricingFaq).mainEntity as Array<{ name: string }>).map((q) => q.name);
+    expect(names).toContain("Do you offer pricing in rupees?");
+  });
+
+  it("INR offers never leak into the OfferCatalog while placeholder-marked", () => {
+    const json = JSON.stringify(offerCatalogLd(pricingTiersInr));
+    expect(json).not.toContain("[PLACEHOLDER");
+    expect(json).not.toContain("₹");
   });
 
   it("home has 4 tabs, 3 steps and 6-9 FAQs", () => {

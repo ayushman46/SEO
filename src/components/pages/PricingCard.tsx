@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/Button";
 import { cx } from "@/components/ui/cx";
 import { Icon } from "@/components/ui/Icon";
 import { PlaceholderText } from "@/components/ui/PlaceholderText";
+import { PriceText } from "./PriceText";
 
 function slugify(s: string) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -13,8 +14,17 @@ function slugify(s: string) {
  * blue top rule and a text label (never by colour alone), and is described by
  * that label for screen readers.
  */
-export function PricingCard({ tier, highlightLabel }: { tier: PricingTier; highlightLabel: string }) {
-  const id = `tier-${slugify(tier.name)}`;
+export function PricingCard({
+  tier,
+  highlightLabel,
+  idSuffix,
+}: {
+  tier: PricingTier;
+  highlightLabel: string;
+  /** Keeps ids unique when the same tiers are rendered twice (e.g. USD and INR price sets). */
+  idSuffix?: string;
+}) {
+  const id = `tier-${slugify(tier.name)}${idSuffix ? `-${idSuffix}` : ""}`;
   const hi = Boolean(tier.highlighted);
   return (
     <article
@@ -44,7 +54,7 @@ export function PricingCard({ tier, highlightLabel }: { tier: PricingTier; highl
       </div>
 
       <p className="mt-6 flex flex-wrap items-baseline gap-x-2 gap-y-1">
-        <PlaceholderText
+        <PriceText
           value={tier.price}
           tone={hi ? "night" : "light"}
           className="font-serif text-[2.75rem] leading-none tracking-[-0.02em]"

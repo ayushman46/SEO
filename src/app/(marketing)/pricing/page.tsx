@@ -1,14 +1,23 @@
 import {
+  currencyLabels,
   pricingClosing,
   pricingFaq,
   pricingHighlightLabel,
+  pricingIndiaComparison,
+  pricingIndiaExtras,
+  pricingIndiaHeading,
+  pricingIndiaNotes,
   pricingNote,
+  pricingNoteInr,
   pricingPage,
   pricingTiers,
+  pricingTiersInr,
 } from "@/content/pricing";
 import { JsonLd, faqLd, innerPageLd, lastUpdated, offerCatalogLd, pageMetadata } from "@/lib/seo";
 import { SectionTear } from "@/components/collage/SectionTear";
 import { ClosingCta } from "@/components/pages/ClosingCta";
+import { CurrencySwitch } from "@/components/pages/CurrencySwitch";
+import { IndiaPricingExtras } from "@/components/pages/IndiaPricingExtras";
 import { PageHero } from "@/components/pages/PageHero";
 import { PricingCard } from "@/components/pages/PricingCard";
 import { Accordion } from "@/components/ui/Accordion";
@@ -55,23 +64,55 @@ export default function PricingPage() {
           <h2 id="plans-title" className="sr-only">
             Plans and prices
           </h2>
-          <ul className="grid gap-5 md:grid-cols-2 xl:grid-cols-4 xl:gap-4">
-            {pricingTiers.map((tier, i) => (
-              <li key={tier.name} className="min-w-0">
-                <Reveal delay={i * 80} className="h-full">
-                  <PricingCard tier={tier} highlightLabel={pricingHighlightLabel} />
-                </Reveal>
-              </li>
-            ))}
-          </ul>
-          <div className="mt-10 flex flex-col gap-5 border-t border-line pt-8 md:flex-row md:items-center md:justify-between">
-            <p className="max-w-2xl text-[0.9375rem] leading-relaxed text-pretty text-muted">
-              <PlaceholderText value={pricingNote} />
-            </p>
-            <Button href="/services" variant="link" icon="arrow-right" className="self-start md:self-auto">
-              See every service in detail
-            </Button>
-          </div>
+          <CurrencySwitch
+            label={currencyLabels.switchLabel}
+            intro={currencyLabels.intro}
+            labels={{ usd: currencyLabels.usd, inr: currencyLabels.inr }}
+            panels={{
+              usd: (
+                <>
+                  <ul className="grid gap-5 md:grid-cols-2 xl:grid-cols-4 xl:gap-4">
+                    {pricingTiers.map((tier, i) => (
+                      <li key={tier.name} className="min-w-0">
+                        <Reveal delay={i * 80} className="h-full">
+                          <PricingCard tier={tier} highlightLabel={pricingHighlightLabel} />
+                        </Reveal>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="mt-10 flex flex-col gap-5 border-t border-line pt-8 md:flex-row md:items-center md:justify-between">
+                    <p className="max-w-2xl text-[0.9375rem] leading-relaxed text-pretty text-muted">
+                      <PlaceholderText value={pricingNote} />
+                    </p>
+                    <Button href="/services" variant="link" icon="arrow-right" className="self-start md:self-auto">
+                      See every service in detail
+                    </Button>
+                  </div>
+                </>
+              ),
+              inr: (
+                <>
+                  <div className="mb-8 max-w-2xl">
+                    <h3 className="text-lg font-semibold tracking-[-0.01em] text-ink">{pricingIndiaHeading.title}</h3>
+                    <p className="mt-2 text-[0.9375rem] leading-relaxed text-pretty text-muted">{pricingIndiaHeading.intro}</p>
+                  </div>
+                  <ul className="grid gap-5 md:grid-cols-2 xl:grid-cols-4 xl:gap-4">
+                    {pricingTiersInr.map((tier) => (
+                      <li key={tier.name} className="min-w-0">
+                        <PricingCard tier={tier} highlightLabel={pricingHighlightLabel} idSuffix="inr" />
+                      </li>
+                    ))}
+                  </ul>
+                  <IndiaPricingExtras
+                    extras={pricingIndiaExtras}
+                    notes={pricingIndiaNotes}
+                    comparison={pricingIndiaComparison}
+                    note={pricingNoteInr}
+                  />
+                </>
+              ),
+            }}
+          />
         </Container>
       </section>
 
