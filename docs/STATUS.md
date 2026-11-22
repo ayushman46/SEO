@@ -1,5 +1,12 @@
 # Status log (newest on top)
 
+## 2026-11-22 ~22:10 IST: feature-complete for v1 (pre-QA)
+- **Done + pushed (d6f3a4c):** all pages, live audit flow verified end to end in the browser (python.org: 75, unlock works), R2 security/correctness fixes (engine 19, backend 6), 3 research-validated services (docs/MARKET_RESEARCH.md). Typecheck, lint, 339 tests, build green.
+- **Exact next step:** QA pass (axe + keyboard + Lighthouse on all marketing pages, 360/768/1280/1920), then Vercel preview deploy (needs founder env vars), then launch report.
+- **Open product decisions for founder:** India rupee pricing ladder (research option, not added); whether monitoring includes AI fact re-checks; Mona Lisa in hero; all [PLACEHOLDER] prices/contact/legal.
+- **Known issues for launch report:** rate limit per-instance without DATABASE_URL (ADR-013); leads only logged without DATABASE_URL; Core Web Vitals "Not measured" without PAGESPEED_API_KEY.
+- **Time left:** ~11.8 h to 10:00 freeze.
+
 ## 2026-11-22 ~20:30 IST: PAUSED (usage limit). Resume with "continue the SeenHQ sprint"
 - **Done + pushed:** all pages built (home, /audit flow, services, pricing, about, contact, privacy, terms, 404, design-preview), each independently reviewed and fixed. Typecheck, lint, 257 tests and `npm run build` green at this commit.
 - **Was in flight when paused (may be partially applied in this commit or lost):**
