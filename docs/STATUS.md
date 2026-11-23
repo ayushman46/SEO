@@ -1,5 +1,10 @@
 # Status log (newest on top)
 
+## 2026-11-23 13:35 IST: round 4 high findings fixed and LIVE (a592268)
+- **Live and smoke-tested:** (R7 #3) a homepage that refuses our crawler is no longer scored: audit fails with a specific message (yelp.com → 422 "bot check, HTTP 403, looks like DataDome"); normal sites still audit (python.org 79). (R7 #4/#5) the 8-fix cap counts only Fix sprint issues. (R7 #2/#9) the "One Fix sprint covers up to 8…" line shows only for a sprint-only fixed quote (gone from /sample-report). (R7 #1) production error log when a contact message, order or lead was neither stored nor emailed; docs/LAUNCH_REPORT.md has a "Before you take orders" section. Also R7 #14 (figcaption attribution). 769 tests, typecheck, lint, build green.
+- **Still open:** R7 findings 6-13 and 15-24 (medium/low) in docs/reviews/R7-round4-live.md; parked home content-visibility experiment (docs/parked/); home mobile performance unconfirmed by PageSpeed.
+- **Founder actions (most urgent first):** RESEND_API_KEY + CONTACT_NOTIFY_EMAIL (+ MAIL_FROM) or DATABASE_URL, otherwise orders exist only in runtime logs; NVIDIA_API_KEY; PAGESPEED_API_KEY; a named person on About; payments.
+
 ## 2026-11-23 12:45 IST: SPRINT STOPPED at the 12:30 deadline. Round 3 small fixes live; round 4 findings logged, not applied
 - **Live:** round 3 fixes from docs/reviews/R6-live.md that were finished and verified: true hero line (names the $149 Fix sprint), service-card price alignment, no focus ring on the rupee panel, FAQ marker consistency, 404 robots tags, About CTA punctuation. 722 tests, typecheck, lint, build green.
 - **NOT shipped:** the home-page content-visibility experiment (R6 finding 1). The agent was cut off by the usage limit before finishing its sticky/anchor checks, so it is parked in docs/parked/home-content-visibility.patch + LazySection.tsx.txt. Home main-thread cost on mobile is therefore still open and still unconfirmed by PageSpeed Insights.
