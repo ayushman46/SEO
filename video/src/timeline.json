@@ -1,0 +1,20 @@
+{
+  "fps": 30,
+  "total": 1155,
+  "scenes": {
+    "intro": [0, 150],
+    "enter": [150, 270],
+    "stem": [270, 480],
+    "report": [480, 690],
+    "interlude": [690, 855],
+    "contrast": [855, 1005],
+    "end": [1005, 1155]
+  },
+  "intro": { "swaps": [45, 60, 75, 90], "final": 105 },
+  "enter": { "typeStart": 18, "typeEvery": 2, "press": 68, "chipStart": 72, "chipEvery": 6 },
+  "stem": { "swaps": [0, 60, 105, 150] },
+  "report": { "rowStart": 20, "rowEvery": 10, "zoomIn": 84, "buttons": 92, "clicks": [120, 135, 150], "zoomOut": 180 },
+  "interlude": { "lines": [0, 30, 60], "cards": 90, "cardEvery": 8 },
+  "contrast": { "left": 4, "right": 45, "fill": 92, "line": 96 },
+  "end": { "typeStart": 10, "typeEvery": 5, "tagline": 48, "button": 78 }
+}

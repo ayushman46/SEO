@@ -1,5 +1,11 @@
 # Status log (newest on top)
 
+## 2026-11-24 00:20 IST: renamed to noticr; remaining round 4 findings fixed and LIVE (a0f8638)
+- **Live and smoke-tested:** brand is noticr everywhere (site, metadata, crawler UA noticrbot, docs, tests). URL unchanged: https://seenhq.vercel.app (noticr.vercel.app is taken; Vercel project still named seenhq). R7 6-13 and 15-24 fixed. 783 tests, typecheck, lint, build green. All routes 200, missing 404, python.org audits at 79.
+- **Not browser-checked:** the changed audit/contact/report states (only HTML and tests). Fix sprint copy now says "code fixes" (a test bans "technical fixes"): founder may prefer another word.
+- **Open:** server keeps the audit slot after a visitor leaves (needs request cancellation); a production address for the new name; `BING_SITE_VERIFICATION` (new optional env); launch video lives in video/ (own package.json, excluded from site tooling).
+- **Founder actions unchanged:** RESEND_API_KEY + CONTACT_NOTIFY_EMAIL (+ MAIL_FROM) or DATABASE_URL; NVIDIA_API_KEY; PAGESPEED_API_KEY; named person on About; payments.
+
 ## 2026-11-23 13:35 IST: round 4 high findings fixed and LIVE (a592268)
 - **Live and smoke-tested:** (R7 #3) a homepage that refuses our crawler is no longer scored: audit fails with a specific message (yelp.com → 422 "bot check, HTTP 403, looks like DataDome"); normal sites still audit (python.org 79). (R7 #4/#5) the 8-fix cap counts only Fix sprint issues. (R7 #2/#9) the "One Fix sprint covers up to 8…" line shows only for a sprint-only fixed quote (gone from /sample-report). (R7 #1) production error log when a contact message, order or lead was neither stored nor emailed; docs/LAUNCH_REPORT.md has a "Before you take orders" section. Also R7 #14 (figcaption attribution). 769 tests, typecheck, lint, build green.
 - **Still open:** R7 findings 6-13 and 15-24 (medium/low) in docs/reviews/R7-round4-live.md; parked home content-visibility experiment (docs/parked/); home mobile performance unconfirmed by PageSpeed.

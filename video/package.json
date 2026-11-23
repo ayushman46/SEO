@@ -1,0 +1,25 @@
+{
+  "name": "noticr-launch-video",
+  "version": "1.0.0",
+  "private": true,
+  "description": "noticr launch video (Remotion). Self-contained; not part of the site build.",
+  "scripts": {
+    "audio": "node scripts/make-audio.mjs",
+    "studio": "remotion studio src/index.ts",
+    "raw": "remotion render src/index.ts Launch out/_raw.mp4 --codec=h264 --crf=10 --concurrency=8",
+    "finish": "node scripts/finish.mjs",
+    "render": "npm run audio && npm run raw && npm run finish",
+    "typecheck": "tsc --noEmit -p ."
+  },
+  "dependencies": {
+    "@fontsource/instrument-serif": "^5.3.0",
+    "@fontsource/inter": "^5.3.0",
+    "@remotion/cli": "^4.0.546",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "remotion": "^4.0.546",
+    "typescript": "^7.0.2"
+  }
+}
