@@ -1,0 +1,23 @@
+import type { CSSProperties, ReactNode } from "react";
+
+/**
+ * Wraps a home section that sits below the first screen in `content-visibility: auto`
+ * (R6 finding 1, see `.cv-auto` in globals.css). `h` is the measured height in px of the
+ * section (margin included) at 360 / 412 / 768 / 1024 / 1280 / 1920 px wide, used as the placeholder
+ * size until the section first renders. Re-measure if a section's layout changes.
+ */
+export function LazySection({ h, children }: { h: readonly [number, number, number, number, number, number]; children: ReactNode }) {
+  const style = {
+    "--cv-base": `${h[0]}px`,
+    "--cv-sm": `${h[1]}px`,
+    "--cv-md": `${h[2]}px`,
+    "--cv-lg": `${h[3]}px`,
+    "--cv-xl": `${h[4]}px`,
+    "--cv-2xl": `${h[5]}px`,
+  } as CSSProperties;
+  return (
+    <div className="cv-auto" style={style}>
+      {children}
+    </div>
+  );
+}

@@ -28,7 +28,7 @@ export const aboutSections: { title: string; body: string }[] = [
 
 /** Closing call to action on /about (added by frontend-designer for T006; content-seo may refine). */
 export const aboutClosing = {
-  title: "See how your site looks to search and AI",
+  title: "See how your site looks to search and AI.",
   body: "Start with the free audit, or tell us about your site. We reply within two working days.",
   primaryCta: { label: "Run a free audit", href: "/audit" },
   secondaryCta: { label: "Contact us", href: "/contact" },

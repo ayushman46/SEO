@@ -113,10 +113,14 @@ export const rootMetadata: Metadata = {
     description: site.description,
     images: [OG_IMAGE],
   },
+  // One generic robots tag (R6 finding 8). A separate googleBot "index, follow" tag survived on noindex
+  // pages (the 404) next to Next's own noindex, so the snippet settings live on the generic tag and
+  // any page that sets its own `robots` replaces the whole object.
   robots: {
     index: true,
     follow: true,
-    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
+    "max-image-preview": "large",
+    "max-snippet": -1,
   },
 };
 

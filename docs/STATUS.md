@@ -1,10 +1,18 @@
 # Status log (newest on top)
 
+## 2026-11-23 12:45 IST: SPRINT STOPPED at the 12:30 deadline. Round 3 small fixes live; round 4 findings logged, not applied
+- **Live:** round 3 fixes from docs/reviews/R6-live.md that were finished and verified: true hero line (names the $149 Fix sprint), service-card price alignment, no focus ring on the rupee panel, FAQ marker consistency, 404 robots tags, About CTA punctuation. 722 tests, typecheck, lint, build green.
+- **NOT shipped:** the home-page content-visibility experiment (R6 finding 1). The agent was cut off by the usage limit before finishing its sticky/anchor checks, so it is parked in docs/parked/home-content-visibility.patch + LazySection.tsx.txt. Home main-thread cost on mobile is therefore still open and still unconfirmed by PageSpeed Insights.
+- **Next round (not started):** docs/reviews/R7-round4-live.md has 24 verified findings (4 high). Highest: (1) contact/order form reports success even when nothing is stored or emailed (needs RESEND_API_KEY + CONTACT_NOTIFY_EMAIL and/or DATABASE_URL in Vercel); (2) "One Fix sprint covers up to 8 of these for $149" shows above totals where it is untrue; (3) a site that returns 403 to our crawler is still scored from its block page; (4) the 8-fix cap counts issues across all services, so the Fix sprint jumps to "From $249" wrongly.
+- **Reminder:** pushes to main auto-deploy to production (founder chose to keep this).
+- **Founder actions:** NVIDIA_API_KEY, PAGESPEED_API_KEY, RESEND_API_KEY + CONTACT_NOTIFY_EMAIL, DATABASE_URL; a named person on About; payments.
+
 ## 2026-11-23 11:25 IST: v1.2 LIVE (restored v1.1 home + redesigned inner pages + new prices). IMPORTANT: pushes to main auto-deploy to production
 - **Discovery:** the Vercel project is connected to the GitHub repo, so EVERY `git push` to `main` deploys to production (seen in `vercel ls --prod`: a production deployment per push). Earlier status entries and chat messages that said "production is still v1.1" after 08:40 were WRONG: the redesign and the new price ladder went live with the checkpoint pushes (from about 08:40). From now on: push to `main` only verified work; use a branch for work in progress, or the founder disables auto-deploy in Vercel > Project > Settings > Git.
 - **Live now (f436910):** home page restored to the v1.1 layout (founder request), with current prices, honest copy, logo marquee, Lenis smooth scroll, eye blink; inner pages keep the redesign (rate card, report front page, fix list, etc.). Production smoke test: all routes 200, missing 404, audit of python.org 200 in 2.7 s (79).
 - **Not verified:** PageSpeed Insights on the live site after these changes (the in-app browser pane would not run it). Scroll feel in a visible browser.
-- **Loop rules going forward:** home layout is frozen to v1.1 (critics may report only bugs, untrue copy and a11y there). Work in progress goes to a branch, not main.
+- **Loop rules going forward:** home layout is frozen to v1.1 (critics may report only bugs, untrue copy and a11y there). Founder chose (11:10) to KEEP auto-deploy: work on `main`, and every push goes live, so push only after typecheck, lint, full tests and build are green and the change is checked; never push a work-in-progress checkpoint.
+- **Running:** qa-security T034 round 3 review of the live site -> docs/reviews/R6-live.md. Next: apply its findings (owners per finding), verify, push (= deploy), smoke test production.
 - **Founder decisions open:** NVIDIA_API_KEY; named person on About; payments; DATABASE_URL; privacy wording tweaks (R5 B7, B8); FAQ heading wording; whether to keep the eye blink.
 
 ## 2026-11-23 10:55 IST: round 2 done; founder wants the PREVIOUS home page back; production deploy on hold until it is restored

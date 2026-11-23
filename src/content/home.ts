@@ -7,7 +7,7 @@ export const home = {
     title: "Be seen by people and by the machines they ask.",
     // States the offer on the first screen (Fable's ruling 2): free audit, then fixed-price fixes. 40 words max.
     subtitle:
-      "Get a free audit in about a minute: a ranked list of what stops Google and AI assistants like ChatGPT from reading your site. Then we can fix it at fixed prices from $149, with no contract and before/after proof.",
+      "Get a free audit in about a minute: a ranked list of what stops Google and AI assistants like ChatGPT from reading your site. Then we can fix up to 8 issues for $149, with no contract and before/after proof.",
     primaryCta: { label: "Run a free audit", href: "/audit" },
     secondaryCta: { label: "See services", href: "/services" },
   },

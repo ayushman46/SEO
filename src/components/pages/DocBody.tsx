@@ -194,6 +194,7 @@ export function DocBody({
             <section id={faq.id} aria-labelledby={`${faq.id}-h`} className="border-t border-line pt-10">
               {head(faq.id, faq.title, sections.length)}
               <Accordion
+                marker="circle"
                 className="mt-6"
                 items={faq.items.map((f) => ({ title: f.q, content: <p><PlaceholderText value={f.a} /></p> }))}
               />

@@ -172,7 +172,7 @@ export default function PricingPage() {
                 </Button>
               </div>
             </SectionHeading>
-            <Accordion visible={6} items={pricingFaq.map((f) => ({ title: f.q, content: <p><PlaceholderText value={f.a} /></p> }))} />
+            <Accordion marker="circle" visible={6} items={pricingFaq.map((f) => ({ title: f.q, content: <p><PlaceholderText value={f.a} /></p> }))} />
           </Container>
         </div>
       </section>

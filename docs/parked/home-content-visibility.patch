@@ -1,0 +1,104 @@
+diff --git a/src/app/(marketing)/page.tsx b/src/app/(marketing)/page.tsx
+index 4f4c4ac..699d231 100644
+--- a/src/app/(marketing)/page.tsx
++++ b/src/app/(marketing)/page.tsx
+@@ -4,6 +4,7 @@ import { Container } from "@/components/ui/Container";
+ import { FeatureTabs } from "@/components/home/FeatureTabs";
+ import { FinalCta } from "@/components/home/FinalCta";
+ import { Hero } from "@/components/home/Hero";
++import { LazySection } from "@/components/home/LazySection";
+ import { NightSky } from "@/components/home/NightSky";
+ import { SampleReport } from "@/components/home/SampleReport";
+ import {
+@@ -29,15 +30,34 @@ export default function HomePage() {
+       <JsonLd data={faqLd(home.faq)} />
+       <Hero />
+       <ProofAndEngines />
+-      <Problem />
+-      <FeatureTabs />
+-      <HowItWorks />
+-      <SampleReport />
+-      <ServicesTeaser />
+-      <PricingTeaser />
+-      <NightSky />
+-      <Faq />
+-      <FinalCta />
++      {/* Below the first screen: rendered lazily by the browser (R6 finding 1). Heights at 360/412/768/1024/1280/1920 px. */}
++      <LazySection h={[1946, 1751, 1334, 1180, 1078, 1078]}>
++        <Problem />
++      </LazySection>
++      <LazySection h={[1241, 1293, 1225, 869, 837, 837]}>
++        <FeatureTabs />
++      </LazySection>
++      <LazySection h={[1162, 1108, 738, 719, 726, 734]}>
++        <HowItWorks />
++      </LazySection>
++      <LazySection h={[1594, 1441, 1134, 1039, 908, 908]}>
++        <SampleReport />
++      </LazySection>
++      <LazySection h={[2934, 2909, 1821, 1727, 1214, 1218]}>
++        <ServicesTeaser />
++      </LazySection>
++      <LazySection h={[1199, 1176, 1121, 971, 839, 839]}>
++        <PricingTeaser />
++      </LazySection>
++      <LazySection h={[604, 607, 736, 755, 773, 788]}>
++        <NightSky />
++      </LazySection>
++      <LazySection h={[1055, 1015, 1020, 909, 889, 889]}>
++        <Faq />
++      </LazySection>
++      <LazySection h={[582, 582, 565, 572, 578, 640]}>
++        <FinalCta />
++      </LazySection>
+       <Container className="-mt-8 pb-10 sm:-mt-14">
+         <p className="text-center text-xs text-muted">
+           {updated.label} <time dateTime={updated.iso}>{updated.display}</time>
+diff --git a/src/app/globals.css b/src/app/globals.css
+index 53ce923..45e2b47 100644
+--- a/src/app/globals.css
++++ b/src/app/globals.css
+@@ -595,3 +595,43 @@ html.lenis {
+ }
+ 
+ 
++
++/* Home sections below the first screen (R6 finding 1): the browser skips style, layout
++   and paint for them until they near the viewport, so the first layout pass covers only
++   the hero and the engine strip. The placeholder heights are the measured section
++   heights per layout band (set inline by LazySection), and `auto` keeps the real height
++   once a section has rendered, so the page height and in-page anchors do not jump. */
++.cv-auto {
++  content-visibility: auto;
++  contain-intrinsic-size: auto var(--cv-base);
++}
++@media (min-width: 400px) {
++  .cv-auto {
++    contain-intrinsic-size: auto var(--cv-sm);
++  }
++}
++@media (min-width: 768px) {
++  .cv-auto {
++    contain-intrinsic-size: auto var(--cv-md);
++  }
++}
++@media (min-width: 1024px) {
++  .cv-auto {
++    contain-intrinsic-size: auto var(--cv-lg);
++  }
++}
++@media (min-width: 1280px) {
++  .cv-auto {
++    contain-intrinsic-size: auto var(--cv-xl);
++  }
++}
++@media (min-width: 1600px) {
++  .cv-auto {
++    contain-intrinsic-size: auto var(--cv-2xl);
++  }
++}
++@media print {
++  .cv-auto {
++    content-visibility: visible;
++  }
++}

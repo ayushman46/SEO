@@ -245,7 +245,9 @@ describe("content rules", () => {
     const sub = home.hero.subtitle;
     expect(sub.trim().split(/\s+/).length).toBeLessThanOrEqual(40);
     expect(sub).toMatch(/free audit in about a minute/);
-    expect(sub).toMatch(/from \$149/);
+    // R6 finding 3: the floor price is $19, so the hero names the Fix sprint terms, not "from $149".
+    expect(sub).toMatch(/fix up to 8 issues for \$149/);
+    expect(sub).not.toMatch(/from \$149/);
     expect(sub).toMatch(/no contract/);
     expect(sub).toMatch(/before\/after proof/);
     expect(home.hero.title).toBe("Be seen by people and by the machines they ask.");
@@ -522,6 +524,11 @@ describe("metadata", () => {
     expect(buildMetadata({ title: "X", description: "Y", path: "/x", noindex: true }).robots).toMatchObject({
       index: false,
     });
+  });
+
+  it("root robots is one generic tag with the snippet settings and no googleBot override (R6 finding 8)", () => {
+    expect(rootMetadata.robots).toEqual({ index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 });
+    expect(JSON.stringify(rootMetadata.robots)).not.toContain("googleBot");
   });
 
   it("emits an author and twitter image alt everywhere", () => {

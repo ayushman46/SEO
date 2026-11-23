@@ -180,7 +180,10 @@ export function CurrencySwitch({
           aria-labelledby={tabId(c)}
           hidden={enhanced ? c !== active : undefined}
           tabIndex={-1}
-          className={cx(text ? "rounded-md" : "mt-8 rounded-md focus-visible:outline-offset-8", panelClassName)}
+          // R6 finding 5: tabIndex -1 makes the panel the focus target when the page opens at its
+          // hash (#india-pricing), and Chrome then drew a ring round the whole price table. Tab never
+          // lands here (tabIndex -1), and the tabs keep their own ring, so the panel draws none.
+          className={cx(text ? "rounded-md" : "mt-8 rounded-md", "focus:outline-none focus-visible:outline-none", panelClassName)}
         >
           {panels[c]}
         </div>

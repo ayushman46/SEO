@@ -147,9 +147,10 @@ export function HowItWorks() {
 const PRICE_TOKEN = /^(From\s+)?[$₹][\d,]+(?:\.\d+)?(\/month)?/;
 
 /**
- * "$99 per location" -> the amount ("$99") on one unbreakable line and any
- * qualifier on its own muted line beneath, so price strings never wrap
- * mid-phrase. A line without a leading price ("Included in the Full audit · $39")
+ * "$99 per location" -> the amount ("$99") as one unbreakable run and any
+ * qualifier in muted type inline after it on the same baseline (R6 finding 4:
+ * a qualifier on its own line pushed that card's rule up and broke the row's
+ * alignment), so price strings never wrap mid-phrase. A line without a leading price ("Included in the Full audit · $39")
  * is set whole, with its trailing price kept on the last word's line.
  */
 function PriceLine({ value }: { value: string }) {
@@ -158,7 +159,7 @@ function PriceLine({ value }: { value: string }) {
   const qualifier = m ? v.slice(m[0].length).trim() : "";
   return (
     <span className="mt-auto block pt-6">
-      <span className="flex flex-col gap-1.5 border-t border-line pt-5">
+      <span className="flex flex-wrap items-baseline gap-x-1.5 gap-y-1 border-t border-line pt-5">
         {m ? (
           <PriceText
             value={m[0]}

@@ -5,6 +5,14 @@ import { Container } from "@/components/ui/Container";
 import { SiteChrome } from "@/components/site/SiteChrome";
 import { emphasize } from "@/components/home/Hero";
 import { notFoundCopy } from "@/content/site";
+import type { Metadata } from "next";
+
+/** Own title and a single robots tag, so the 404 never also says "index, follow" (R6 finding 8). */
+export const metadata: Metadata = {
+  title: "Page not found",
+  description: notFoundCopy.body,
+  robots: { index: false, follow: true },
+};
 
 /** Root 404: renders inside the bare root layout, so it composes the site chrome itself. */
 export default function NotFound() {
