@@ -35,8 +35,9 @@ Sky blues come from photography, never from UI fills.
 | `ui/Button` | server | `primary` / `secondary` / `ghost` / `link` / `night`; `sm` / `md` / `lg`; `href` renders `next/link`; optional trailing icon. `buttonClass()` for custom elements. |
 | `ui/Badge` | server | neutral, accent, outline, night, severities, pass. |
 | `ui/Container`, `ui/SectionHeading` | server | Kicker (hairline + uppercase) + serif title + body; `tone="night"`. |
-| `ui/Tabs` | client | Segmented blue bar, white active pill. WAI-ARIA tabs, automatic activation, ←/→ wrap, Home/End, roving tabindex. All panels SSR'd (inactive `hidden`). `layout="split"` adds a per-tab aside (illustration) on the right from lg. |
-| `ui/Accordion` | server | Native `<details>`; optional `name` for exclusive groups. |
+| `ui/Tabs` | client | Segmented paper bar (`bg-paper-2`, hairline), white active pill in ink (T026: no blue fill). WAI-ARIA tabs, automatic activation, ←/→ wrap, Home/End, roving tabindex. All panels SSR'd (inactive `hidden`). `layout="split"` adds a per-tab aside (illustration) on the right from lg. |
+| `ui/Accordion` | server | Native `<details>`; optional `name` for exclusive groups. `visible={6}` shows six and folds the rest into one "More questions" disclosure (all answers stay in the HTML and JSON-LD). Bare 12 px plus, answers at 66ch. |
+| `ui/Steps` | server | The one numbered-steps pattern: ink hairline, muted serif numeral, semibold title, body. `layout="row"` (pricing, audit) or `"list"` (home sample-report column, contact aside). Any count. |
 | `ui/Field` + `ui/Input` | shared | `Field` renders label/error/help with ids; wire the input with `describedBy(id, {help, error})`. `invalid` sets `aria-invalid`. |
 | `ui/ScoreRing` | client | SVG ring; SSR shows the final value; count-up only when it starts below the fold and motion is allowed, and it snaps to the final value when reached by a scroll jump (shares the `Reveal` watcher). `role="img"` with "X out of 100". `null` = unavailable. |
 | `ui/IssueRow` | server | Severity pill + title + category + effort dots (+ impact). `locked` for gated teasers. Exports label maps for severity/effort/category. |
@@ -104,3 +105,24 @@ Fewer, better effects; all transform/opacity, all off under reduced motion. Meas
   - Hero depth: the torn hole with the eye scales to 1.06 and lifts 3% across the hero exit (`view-timeline: --hero` on the collage).
   - Reading progress on `DocBody` / `LegalBody` pages.
 - Tailwind v4 `scale-*`, `translate-*`, `rotate-*` utilities set the individual `scale`/`translate`/`rotate` properties; scroll keyframes animate `transform`, so they compose. Never put a `scale-*` utility on an element whose keyframe starts from it (set the start value in CSS).
+
+## Editorial rules (T026, from the R4 design review)
+
+- **One primary action per view.** Solid `accent-600` fill is for the single primary action in view, plus data marks (score bars, the reading-progress line, the highlighted tier's 2 px rule). Segmented controls, tabs, currency choices, check marks, numerals, the menu button and icon buttons are ink, paper or hairline. The primary button is flat (one 1 px contact shadow, no glow); arrows only on the primary action and on text links.
+- **Type scale (seven sizes).** Serif: `display-xl`, `display-lg`, `display-md`, `display-sm`, `title-lg` (1.75rem), `title` (1.375rem). Body: `text-[0.9375rem]` (UI, cards) and `text-[1.0625rem]` (reading). Nothing read is under 12 px (`text-xs`). No arbitrary serif sizes; the one exception is the report front-page score (`clamp(6rem,15vw,11rem)`), which is a signature moment. Every serif heading has `text-balance`.
+- **Measure.** Body and intros carry a `ch` width: `max-w-[60ch]` for intros, `max-w-[52ch]` centred, `max-w-[66ch]`-`[68ch]` for answers and report text.
+- **Openers vary.** No more than two neighbouring sections open with kicker + heading + paragraph.
+- **No icon tiles, no box in a box.** No icon in a rounded square. A white card does not contain another filled rounded box: use a left rule (`border-l-2`), a hairline or a divider.
+- **Long content collapses.** More than six items of a kind show the important ones and fold the rest into a native `<details>` (FAQ, features, rate-card features, check passes, lower-severity issues).
+- **Money.** Every price goes through `pages/PriceText` (rupee glyph); "From" and suffixes are split from the figure; figures are tabular in fixed-width boxes. Strings without a leading price ("Included in the Full audit · $39") render as a quiet line, never in the figure style.
+- **Steps.** Use `ui/Steps`; render a given "what happens next" block once per page.
+- **Collage usage.** The full collage is the home hero only. Inner pages get one fragment with a reason, as a different crop of the six existing images (`PageHero` motif): services = marble youth, contact = hands, pricing = the gap between the fingers (`hands-gap`), sample report = a single eye (`eye-single`). /about, /methodology, /bot and legal pages have `motif="none"`: a typographic header closed by a hairline. No moon outside home and the night sky. The closing eye card (`ClosingCta variant="eye"`) appears only on /about; home has `FinalCta`; every other inner page ends with the plain ruled band. Torn edges only where materials change (home hero, night sky, footer, the pricing rate card); paper sections on white get a straight `border-line-strong` edge.
+- **Motion.** At most one reveal per section, on an object, never on headings or paragraphs; reveals travel 10-12 px. "settle" replaces the clip-path "tear" wipe.
+- **Dateline.** "Last updated" sits in the kicker row of `PageHero` (kicker left, date right), not as a line under the actions.
+- **Fixed chrome never covers a control.** The fix tray is one row at every width; while it is shown, `html:has([data-fix-tray])` sets `--fix-tray-h` and the sticky email gate shrinks above it.
+
+## Signature moments (T026)
+
+1. **The eye notices you (home).** Two paper lids (`.eye-lid`) inside the hero eye's torn clip close and open once (380 ms) when the URL field takes focus: `.hero-eye-scope:has(input[name="url"]:focus-visible)`, transform only, never on load, never looped, nothing under reduced motion. Files: `collage/HeroCollage.tsx`, `home/Hero.tsx`, globals.css.
+2. **The report front page (/audit report and /sample-report).** `audit/ScoreSummary`: one large serif score with `/100`, a 2 px data bar, a one-line verdict from `audit/verdict.ts` (`reportVerdict`: band from the overall score + one clause from the issue counts; strings in `auditFrontPageCopy`), ruled sub-scores (SEO, GEO, Performance or "not measured", AI readability when present) with the same accessible names as the old rings ("SEO: 72 out of 100"), and "Fix first": the top three issues (`topFixes`) linking to their cards (`issueAnchor`).
+3. **The rate card (/pricing).** One ruled paper sheet under a torn edge; a header strip with "Rates", the fixed-price line and the currency as text (`CurrencySwitch variant="text"`, same tabs, keys and `#india-pricing` behaviour); each tier a column (`pages/PricingCard`) with a fixed-height price block so figures share a baseline; the highlighted tier marked by a white ground, a 2 px accent rule and a text label; per-tier actions are text links and the sheet has one primary button under it. No animation.

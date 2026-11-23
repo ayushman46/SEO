@@ -3,7 +3,7 @@
 import { auditQuoteCopy } from "@/content/audit";
 import { buttonClass } from "@/components/ui/Button";
 import { cx } from "@/components/ui/cx";
-import { Icon } from "@/components/ui/Icon";
+import { PriceText } from "@/components/pages/PriceText";
 import { useQuote } from "./QuoteContext";
 import { CurrencyToggle, QuoteTotal, RequestLink } from "./QuoteParts";
 
@@ -53,15 +53,15 @@ export function QuotePanel({
     >
       <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
-          <H id={headingId} className="font-serif text-display-sm text-ink">
+          <H id={headingId} className="font-serif text-display-sm text-balance text-ink">
             {auditQuoteCopy.title}
           </H>
-          <p className="mt-2 max-w-xl text-[0.9375rem] leading-relaxed text-pretty text-muted">{auditQuoteCopy.intro}</p>
+          <p className="mt-2 max-w-[60ch] text-[0.9375rem] leading-relaxed text-pretty text-muted">{auditQuoteCopy.intro}</p>
         </div>
         <CurrencyToggle q={q} name={`${headingId}-currency`} className="shrink-0" />
       </div>
 
-      {q.sample ? <p className="mt-4 rounded-xl bg-accent-soft px-4 py-2.5 text-sm text-accent-ink">{auditQuoteCopy.sampleNote}</p> : null}
+      {q.sample ? <p className="mt-4 border-l-2 border-accent pl-4 text-sm text-ink-2">{auditQuoteCopy.sampleNote}</p> : null}
 
       {hasLines ? (
         <ul className="mt-6 divide-y divide-line border-y border-line">
@@ -88,15 +88,15 @@ export function QuotePanel({
                   </details>
                 ) : null}
               </div>
-              <p className="font-serif text-[1.5rem] leading-none text-ink tabular-nums sm:text-right">
-                {line.priceText}
+              <p className="text-[0.9375rem] font-semibold text-ink tabular-nums sm:text-right">
+                <PriceText value={line.priceText} />
                 {line.unit === "location" ? <span className="ml-1.5 font-sans text-xs text-muted">{auditQuoteCopy.perLocation}</span> : null}
               </p>
             </li>
           ))}
         </ul>
       ) : (
-        <p className="mt-6 rounded-xl bg-paper px-4 py-3 text-[0.9375rem] text-ink-2">{auditQuoteCopy.noLines}</p>
+        <p className="mt-6 border-l-2 border-line-strong pl-4 text-[0.9375rem] text-ink-2">{auditQuoteCopy.noLines}</p>
       )}
 
       {quote.bundle ? <p className="mt-4 text-sm leading-relaxed text-pretty text-muted">{quote.bundle.reason}</p> : null}
@@ -113,29 +113,38 @@ export function QuotePanel({
             {quote.lines.length > 1 ? auditQuoteCopy.requestMany : auditQuoteCopy.request}
           </RequestLink>
         ) : null}
-        <a href={diyHref} className={buttonClass({ variant: "secondary", size: "md", className: "h-auto! min-h-11 py-2 whitespace-normal! text-center" })}>
+        <a href={diyHref} className={buttonClass({ variant: "link", className: "min-h-11 whitespace-normal!" })}>
           {auditQuoteCopy.diy}
-          <Icon name="arrow-right" size={18} className="shrink-0 rotate-90" />
         </a>
       </div>
 
-      <div className="mt-8 grid gap-6 border-t border-line pt-6 md:grid-cols-2 md:gap-8">
-        <div>
-          <Sub className="text-[0.9375rem] font-semibold text-ink">{auditQuoteCopy.diyTitle}</Sub>
-          {titleList(quote.diyIssueIds, auditQuoteCopy.diyEmpty)}
-        </div>
-        <div>
-          <Sub className="text-[0.9375rem] font-semibold text-ink">{auditQuoteCopy.ignoreTitle}</Sub>
-          {titleList(quote.safeToIgnore, auditQuoteCopy.ignoreEmpty)}
-        </div>
+      <div className="mt-8 grid gap-x-8 border-t border-line md:grid-cols-2">
+        {(
+          [
+            [auditQuoteCopy.diyTitle, quote.diyIssueIds, auditQuoteCopy.diyEmpty],
+            [auditQuoteCopy.ignoreTitle, quote.safeToIgnore, auditQuoteCopy.ignoreEmpty],
+          ] as const
+        ).map(([title, ids, empty]) => (
+          <details key={title} className="group/list border-b border-line py-4 md:border-b-0">
+            <summary className="flex cursor-pointer items-center justify-between gap-3 rounded-sm">
+              <Sub className="text-[0.9375rem] font-semibold text-ink">
+                {title} <span className="font-normal text-muted tabular-nums">({ids.length})</span>
+              </Sub>
+              <span aria-hidden className="text-muted transition-transform duration-200 group-open/list:rotate-90">
+                ›
+              </span>
+            </summary>
+            {titleList(ids, empty)}
+          </details>
+        ))}
       </div>
 
       {alt ? (
-        <div className="mt-8 flex flex-col gap-4 rounded-xl bg-paper p-4 sm:p-5 md:flex-row md:items-center md:justify-between">
+        <div className="mt-6 flex flex-col gap-4 border-t border-line pt-6 md:flex-row md:items-center md:justify-between">
           <div className="min-w-0">
             <Sub className="text-[0.9375rem] font-semibold text-ink">{auditQuoteCopy.alternativeTitle}</Sub>
             <p className="mt-1 text-sm leading-relaxed text-pretty text-ink-2">
-              <span className="font-medium">{alt.label}</span>, <span className="tabular-nums">{alt.priceText}</span>. {alt.note}
+              <span className="font-medium">{alt.label}</span>, <PriceText value={alt.priceText} />. {alt.note}
             </p>
           </div>
           <RequestLink

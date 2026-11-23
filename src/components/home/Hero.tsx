@@ -38,10 +38,10 @@ export function Hero() {
         >
           {emphasize(hero.title)}
         </h1>
-        <p className="mx-auto mt-5 max-w-[52ch] text-[1.0625rem] leading-relaxed text-pretty text-muted">
+        <p className="mx-auto mt-4 max-w-[52ch] sm:mt-5 text-[1.0625rem] leading-relaxed text-pretty text-muted">
           {hero.subtitle}
         </p>
-        <div className="mx-auto mt-7 max-w-2xl text-left">
+        <div className="mx-auto mt-6 max-w-2xl text-left sm:mt-7">
           <AuditUrlForm
             helpAction={
               <Link

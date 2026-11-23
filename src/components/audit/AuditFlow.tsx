@@ -13,7 +13,6 @@ import {
 } from "react";
 import { auditForm, auditResultCopy } from "@/content/audit";
 import type { AuditResult, PartialAuditReport } from "@/lib/audit/types";
-import { SectionTear } from "@/components/collage/SectionTear";
 import { looksLikeUrl } from "@/components/home/AuditUrlForm";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
@@ -33,6 +32,8 @@ import { FixTray } from "./quote/FixTray";
 import { QuotePanel } from "./quote/QuotePanel";
 import { QuoteProvider } from "./quote/QuoteContext";
 import { ScoreSummary } from "./ScoreSummary";
+import { scrollToElement } from "@/components/scroll/smooth";
+import { topFixes } from "./verdict";
 
 /** The API allows ~60 s; give the network a little headroom before calling it a timeout. */
 const CLIENT_TIMEOUT_MS = 75_000;
@@ -212,6 +213,19 @@ export function AuditFlow({
 
   const narrow = "mx-auto w-full max-w-2xl";
 
+  // A run started (often straight from the home form with ?url=): show the progress card once,
+  // if it starts low on the screen. Smooth through Lenis when active, instant under reduced motion.
+  const progressRef = useRef<HTMLDivElement>(null);
+  const runKey = state.status === "running" ? state.run : null;
+  useEffect(() => {
+    if (runKey === null) return;
+    const id = requestAnimationFrame(() => {
+      const el = progressRef.current;
+      if (el && el.getBoundingClientRect().top > window.innerHeight * 0.6) scrollToElement(el, "center");
+    });
+    return () => cancelAnimationFrame(id);
+  }, [runKey]);
+
   return (
     <>
       <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
@@ -239,7 +253,7 @@ export function AuditFlow({
 
       {state.status === "running" ? (
         <Container size="narrow" className="mt-10 min-h-[min(40rem,80svh)] pb-24">
-          <div className={narrow}>
+          <div ref={progressRef} className={narrow}>
             <ProgressSteps
               key={state.run}
               url={state.url}
@@ -310,8 +324,7 @@ function Report({
 
   return (
     <QuoteProvider issues={quoteIssues} pagesScanned={pages} audit={quoteAudit}>
-      <section aria-labelledby={headingId} className="mt-16 sm:mt-20">
-        <SectionTear color="var(--color-paper)" seed={6} grain />
+      <section aria-labelledby={headingId} className="mt-16 border-t border-line-strong sm:mt-20">
         <div className="paper-grain bg-paper pt-8 pb-20 sm:pt-12 sm:pb-28">
           <Container>
             {/* Report header */}
@@ -321,7 +334,7 @@ function Report({
                   id={headingId}
                   ref={resultsHeadingRef}
                   tabIndex={-1}
-                  className="scroll-mt-28 rounded-sm focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+                  className="rounded-sm focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
                 >
                   <span className="mb-3 flex items-center gap-2.5 text-kicker font-semibold text-muted uppercase">
                     <span aria-hidden className="h-px w-6 bg-ink/30" />
@@ -366,6 +379,8 @@ function Report({
             <ScoreSummary
               scores={partial.scores}
               issueCounts={partial.issueCounts}
+              topIssues={full ? topFixes(full.issues) : partial.topIssues}
+              aiClarity={(full?.ai ?? partial.ai)?.clarityScore ?? null}
               className="mt-8"
             />
 
@@ -391,7 +406,6 @@ function Report({
             <FixTray id={`${headingId}-fixlist`} />
           </Container>
         </div>
-        <SectionTear color="var(--color-paper)" seed={10} flip grain />
       </section>
     </QuoteProvider>
   );
@@ -423,8 +437,6 @@ function PartialBody({
   return (
     <div className="mt-14 grid gap-12 sm:mt-16 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-x-12 xl:grid-cols-[minmax(0,1fr)_24rem] xl:gap-x-16">
       <div className="min-w-0 space-y-12">
-        <AiPartialCard ai={partial.ai} headingId={ids.ai} gateHref={`#${ids.gate}`} />
-
         <section aria-labelledby={ids.top}>
           <h3 id={ids.top} className={h3}>
             {auditResultCopy.topIssuesTitle}
@@ -441,6 +453,8 @@ function PartialBody({
             <p className="mt-4 text-[0.9375rem] text-muted">{auditUi.noTopIssues}</p>
           )}
         </section>
+
+        <AiPartialCard ai={partial.ai} headingId={ids.ai} gateHref={`#${ids.gate}`} />
 
         {partial.topIssues.length + partial.lockedIssues.length > 0 ? (
           <QuotePanel headingId={ids.quote} diyHref={`#${ids.top}`} headingLevel={3} />
@@ -468,7 +482,7 @@ function PartialBody({
         <div
           id={ids.gate}
           tabIndex={-1}
-          className="scroll-mt-28 rounded-panel focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent lg:sticky lg:top-28"
+          className="rounded-panel focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent lg:sticky lg:top-28 lg:max-h-[calc(100svh-8rem-var(--fix-tray-h,0px))] lg:overflow-y-auto"
         >
           <EmailGate sealed={sealed} onUnlocked={onUnlocked} onRestart={onRestart} />
         </div>

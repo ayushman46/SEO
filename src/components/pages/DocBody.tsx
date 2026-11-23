@@ -17,9 +17,9 @@ export function checkAnchor(checkId: string): string {
 /** Small tabular chip: "weight 15". */
 function WeightChip({ weight }: { weight: number }) {
   return (
-    <span className="inline-flex h-6 shrink-0 items-center gap-1 rounded-pill bg-paper px-2.5 text-xs whitespace-nowrap text-ink-2 shadow-[inset_0_0_0_1px_var(--color-line)]">
-      <span className="text-muted">weight</span>
-      <span className="font-semibold tabular-nums">{weight}</span>
+    <span className="inline-flex shrink-0 items-baseline gap-1 text-[0.9375rem] whitespace-nowrap">
+      <span className="text-xs text-muted md:sr-only">weight</span>
+      <span className="font-semibold text-ink tabular-nums">{weight}</span>
     </span>
   );
 }
@@ -35,7 +35,7 @@ function ItemList({ items }: { items: DocItem[] }) {
           className="grid gap-1.5 border-b border-line py-4 sm:grid-cols-[minmax(0,12rem)_minmax(0,1fr)] sm:gap-8"
         >
           <dt className="text-[0.9375rem] font-semibold text-ink">{item.label}</dt>
-          <dd className="text-[0.9875rem] leading-relaxed text-pretty text-ink-2">
+          <dd className="text-[0.9375rem] leading-relaxed text-pretty text-ink-2">
             <PlaceholderText value={item.body} />
           </dd>
         </div>
@@ -55,7 +55,7 @@ function GroupBlock({ group, sectionId }: { group: CheckGroup; sectionId: string
   return (
     <div role="group" aria-labelledby={hid} className="mt-12 first:mt-8">
       <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-b border-ink pb-3">
-        <h3 id={hid} className="scroll-mt-2 font-serif text-[1.625rem] leading-tight text-ink sm:text-[1.875rem]">
+        <h3 id={hid} className="font-serif text-title-lg text-balance text-ink">
           {group.title}
         </h3>
         {weighted ? (
@@ -64,7 +64,7 @@ function GroupBlock({ group, sectionId }: { group: CheckGroup; sectionId: string
           </p>
         ) : null}
       </div>
-      <p className="mt-3 max-w-[62ch] text-[0.9875rem] leading-relaxed text-pretty text-muted">
+      <p className="mt-3 max-w-[62ch] text-[0.9375rem] leading-relaxed text-pretty text-muted">
         <PlaceholderText value={group.intro} />
       </p>
       {weighted ? (
@@ -80,7 +80,7 @@ function GroupBlock({ group, sectionId }: { group: CheckGroup; sectionId: string
             key={item.id ?? i}
             id={item.id ? checkAnchor(item.id) : undefined}
             className={cx(
-              "grid scroll-mt-2 grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-2 rounded-xl bg-white p-4 shadow-[inset_0_0_0_1px_var(--color-line)]",
+              "grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-2 rounded-xl bg-white p-4 shadow-[inset_0_0_0_1px_var(--color-line)]",
               "md:items-baseline md:gap-x-6 md:rounded-none md:border-b md:border-line md:bg-transparent md:px-1 md:py-4 md:shadow-none",
               weighted ? "md:grid-cols-[minmax(0,13rem)_minmax(0,1fr)_5.5rem]" : "md:grid-cols-[minmax(0,13rem)_minmax(0,1fr)]",
             )}
@@ -143,7 +143,7 @@ export function DocBody({
       <span aria-hidden className="shrink-0 font-serif text-lg text-muted tabular-nums">
         {numbered(i)}
       </span>
-      <h2 id={`${id}-h`} className="min-w-0 font-serif text-[1.875rem] leading-tight text-balance text-ink sm:text-[2.25rem]">
+      <h2 id={`${id}-h`} className="min-w-0 font-serif text-display-sm text-balance text-ink">
         {title}
       </h2>
       <a
@@ -167,7 +167,7 @@ export function DocBody({
               key={section.id}
               id={section.id}
               aria-labelledby={`${section.id}-h`}
-              className="scroll-mt-2 border-t border-line pt-10 pb-12 first:border-t-0 first:pt-0"
+              className="border-t border-line pt-10 pb-12 first:border-t-0 first:pt-0"
             >
               {head(section.id, section.title, i)}
               <div className="mt-5 grid max-w-[68ch] gap-4 text-[1.0625rem] leading-[1.75] text-pretty text-ink-2">
@@ -191,7 +191,7 @@ export function DocBody({
           ))}
 
           {faq ? (
-            <section id={faq.id} aria-labelledby={`${faq.id}-h`} className="scroll-mt-2 border-t border-line pt-10">
+            <section id={faq.id} aria-labelledby={`${faq.id}-h`} className="border-t border-line pt-10">
               {head(faq.id, faq.title, sections.length)}
               <Accordion
                 className="mt-6"

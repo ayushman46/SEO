@@ -43,8 +43,9 @@ const MOTIFS: Record<Exclude<HeroMotif, "none">, Motif> = {
     src: "/images/eye.webp",
     aspect: "aspect-[4/3]",
     shape: "rect",
-    position: "object-[32%_42%]",
-    scale: "scale-[2.3]",
+    position: "object-[50%_42%]",
+    // transform scale pivots on the box centre (the nose bridge); pivot on the left eye instead
+    scale: "origin-[29%_47%] scale-[2.2]",
     side: "right",
     width: "w-[clamp(5.5rem,13vw,10rem)]",
     rotate: -3,
@@ -72,8 +73,8 @@ const MOTIFS: Record<Exclude<HeroMotif, "none">, Motif> = {
     src: "/images/hands.webp",
     aspect: "aspect-[3/2]",
     shape: "rect",
-    position: "object-[52%_50%]",
-    scale: "scale-[1.8]",
+    position: "object-[50%_50%]",
+    scale: "origin-[52%_52%] scale-[1.8]",
     side: "left",
     width: "w-[clamp(6rem,15vw,11rem)]",
     rotate: -3,
@@ -142,9 +143,9 @@ export function PageHero({
             speed={0.08}
             className={cx(
               "absolute",
-              compact ? "bottom-[14%]" : "bottom-[16%]",
+              // compact strips are short: keep the fragment small and low so it clears the floating nav
+              compact ? "bottom-[16%] w-[clamp(4.5rem,10vw,8rem)]" : cx("bottom-[16%]", m.width),
               m.side === "right" ? "right-[5%] sm:right-[8%] lg:right-[10%]" : "left-[5%] sm:left-[8%] lg:left-[10%]",
-              m.width,
             )}
           >
             <div aria-hidden>

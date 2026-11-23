@@ -103,7 +103,7 @@ export function MobileMenu({ links, cta, className }: { links: Cta[]; cta: Cta; 
                 <Link
                   href={link.href}
                   onClick={close}
-                  className="flex items-center justify-between py-4 font-serif text-[1.875rem] leading-none text-ink transition-colors hover:text-accent-ink"
+                  className="flex items-center justify-between py-4 font-serif text-display-sm leading-none text-ink transition-colors hover:text-accent-ink"
                 >
                   {link.label}
                   <Icon name="arrow-right" size={20} className="text-faint" />

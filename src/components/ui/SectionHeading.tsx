@@ -52,7 +52,7 @@ export function SectionHeading({
       {body ? (
         <p
           className={cx(
-            "mt-5 max-w-2xl text-[1.0625rem] leading-relaxed text-pretty",
+            "mt-5 max-w-[60ch] text-[1.0625rem] leading-relaxed text-pretty",
             align === "center" && "mx-auto",
             night ? "text-night-muted" : "text-muted",
           )}

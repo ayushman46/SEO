@@ -3,7 +3,7 @@ import { auditPage } from "@/content/audit";
 import { JsonLd, innerPageLd, pageMetadata } from "@/lib/seo";
 import { AuditFlow } from "@/components/audit/AuditFlow";
 import { AuditFlowFallback } from "@/components/audit/AuditFlowFallback";
-import { AuditHero } from "@/components/audit/AuditHero";
+import { AuditHero, AuditHeroNotes } from "@/components/audit/AuditHero";
 import { AuditSteps } from "@/components/audit/AuditSteps";
 
 export const metadata = pageMetadata.audit;
@@ -23,7 +23,13 @@ async function AuditFlowFromParams({ searchParams, children }: { searchParams: S
 }
 
 export default function AuditPage({ searchParams }: { searchParams: SearchParams }) {
-  const idle = <AuditSteps />;
+  // idle state under the form: the intro and dateline first, then how it works
+  const idle = (
+    <>
+      <AuditHeroNotes />
+      <AuditSteps />
+    </>
+  );
   return (
     <>
       <JsonLd data={innerPageLd({ name: "Free audit", description: auditPage.metaDescription, path: "/audit" })} />

@@ -14,7 +14,6 @@ import { lastUpdated } from "@/lib/seo";
  */
 export function AuditHero() {
   const tear = tornRect({ seed: 47, steps: 56, amp: 9, edges: { bottom: true } });
-  const u = lastUpdated();
 
   return (
     <header aria-labelledby="audit-title" className="relative">
@@ -45,7 +44,7 @@ export function AuditHero() {
         </div>
       </div>
 
-      <Container size="narrow" className="pt-10 text-center sm:pt-14">
+      <Container size="narrow" className="pt-8 text-center sm:pt-12">
         <p className="inline-flex items-center gap-2.5 text-kicker font-semibold text-muted uppercase">
           <span aria-hidden className="h-px w-6 bg-ink/30" />
           {auditPage.kicker}
@@ -54,22 +53,34 @@ export function AuditHero() {
         <h1 id="audit-title" className="mx-auto mt-5 max-w-[18ch] font-serif text-display-lg text-balance text-ink">
           {auditPage.title}
         </h1>
-        <p className="mx-auto mt-6 max-w-2xl text-[1.0625rem] leading-relaxed text-pretty text-muted sm:text-lg">{auditPage.intro}</p>
-        <p className="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-muted">
-          <span>
-            {u.label} <time dateTime={u.iso}>{u.display}</time>
-          </span>
-          <span aria-hidden className="text-line-strong">
-            ·
-          </span>
-          <Link
-            href={sampleReportLinks.href}
-            className="rounded-sm text-sm font-medium text-accent-ink underline decoration-accent-ink/30 underline-offset-4 hover:decoration-accent-ink"
-          >
-            {sampleReportLinks.hero}
-          </Link>
-        </p>
       </Container>
     </header>
+  );
+}
+
+/**
+ * The intro, the dateline and the sample-report link, rendered under the form while the
+ * page is idle (T026, R4 finding 8: the field comes first, explanations after it).
+ */
+export function AuditHeroNotes() {
+  const u = lastUpdated();
+  return (
+    <Container size="narrow" className="mt-6 text-center">
+      <p className="mx-auto max-w-[60ch] text-[1.0625rem] leading-relaxed text-pretty text-muted">{auditPage.intro}</p>
+      <p className="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-muted">
+        <span>
+          {u.label} <time dateTime={u.iso}>{u.display}</time>
+        </span>
+        <span aria-hidden className="text-line-strong">
+          ·
+        </span>
+        <Link
+          href={sampleReportLinks.href}
+          className="rounded-sm text-sm font-medium text-accent-ink underline decoration-accent-ink/30 underline-offset-4 hover:decoration-accent-ink"
+        >
+          {sampleReportLinks.hero}
+        </Link>
+      </p>
+    </Container>
   );
 }

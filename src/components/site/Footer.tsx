@@ -21,7 +21,7 @@ export function Footer() {
               <Link href="/" aria-label="seenhq home" className="inline-block rounded-lg">
                 <Logo size="lg" />
               </Link>
-              <p className="mt-5 font-serif text-[1.625rem] leading-tight text-ink-2">{site.tagline}</p>
+              <p className="mt-5 max-w-[28ch] font-serif text-title-lg text-balance text-ink-2">{site.tagline}</p>
               <p className="mt-5 text-sm text-muted">
                 {emailIsReal ? (
                   <a href={`mailto:${email}`} className="underline decoration-ink/25 underline-offset-4 hover:decoration-ink">

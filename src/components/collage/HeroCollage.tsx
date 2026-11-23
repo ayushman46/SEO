@@ -61,7 +61,7 @@ export function HeroCollage() {
   const sky = skyProps();
 
   return (
-    <div className="hero-depth-scope relative isolate -mt-(--nav-h) h-[clamp(20rem,46svh,34rem)] overflow-clip">
+    <div className="hero-depth-scope relative isolate -mt-(--nav-h) h-(--hero-h) overflow-clip [--hero-h:clamp(15rem,36svh,32rem)] sm:[--hero-h:clamp(17rem,40svh,32rem)]">
       {/* Sky paper with torn bottom edge */}
       <div className="absolute inset-0" style={{ clipPath: bottomTear }}>
         <Parallax speed={-0.07} className="absolute inset-x-0 -top-[10%] -bottom-[10%]">
@@ -115,7 +115,7 @@ export function HeroCollage() {
       {/* The torn hole and the eye. As the hero scrolls away the hole pushes in
           toward the reader (T025: CSS scroll-driven `transform`, composes with
           the centring `translate`; static under reduced motion). */}
-      <div className="hero-depth absolute top-[58%] left-1/2 w-[min(88vw,46rem,calc(clamp(20rem,46svh,34rem)*1.5))] -translate-x-1/2 -translate-y-1/2">
+      <div className="hero-depth absolute top-[58%] left-1/2 w-[min(88vw,46rem,calc(var(--hero-h)*1.5))] -translate-x-1/2 -translate-y-1/2">
         <TornFrame
           seed={5}
           shape="ellipse"

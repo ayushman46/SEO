@@ -23,3 +23,19 @@ export function reportVerdict(overall: number | null | undefined, counts: Partia
           : c.verdictDetail.none;
   return `${band.label}. ${detail}`;
 }
+
+const SEVERITY_RANK: Record<Severity, number> = { critical: 0, high: 1, medium: 2, low: 3 };
+
+/** The three issues to fix first: most severe, then most points recoverable, then input order. */
+export function topFixes<T extends { severity: Severity; impact?: number }>(issues: readonly T[], n = 3): T[] {
+  return issues
+    .map((issue, i) => ({ issue, i }))
+    .sort(
+      (a, b) =>
+        SEVERITY_RANK[a.issue.severity] - SEVERITY_RANK[b.issue.severity] ||
+        (b.issue.impact ?? 0) - (a.issue.impact ?? 0) ||
+        a.i - b.i,
+    )
+    .slice(0, n)
+    .map((x) => x.issue);
+}

@@ -42,11 +42,11 @@ export function ErrorState({ error, onRetry }: { error: FlowError; onRetry?: () 
           </svg>
         </span>
         <div className="min-w-0">
-          <h2 ref={headingRef} tabIndex={-1} className="font-serif text-[1.75rem] leading-tight text-ink scroll-mt-28 rounded-sm focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">
+          <h2 ref={headingRef} tabIndex={-1} className="font-serif text-title-lg text-balance text-ink rounded-sm focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">
             {title}
           </h2>
-          <p className="mt-2 text-[0.9875rem] leading-relaxed text-pretty text-muted">{error.message}</p>
-          {rate && retry ? <p className="mt-2 text-[0.9875rem] font-medium text-ink-2">{auditUi.retryIn(retry.minutes, retry.at)}</p> : null}
+          <p className="mt-2 text-[0.9375rem] leading-relaxed text-pretty text-muted">{error.message}</p>
+          {rate && retry ? <p className="mt-2 text-[0.9375rem] font-medium text-ink-2">{auditUi.retryIn(retry.minutes, retry.at)}</p> : null}
           {onRetry && isRetryable(error.code) ? (
             <Button onClick={onRetry} size="sm" icon="arrow-right" className="mt-6">
               {auditUi.tryAgain}

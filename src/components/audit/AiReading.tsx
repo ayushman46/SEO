@@ -94,7 +94,7 @@ function Readback({ ai }: { ai: Pick<PartialAiInsights, "readback" | "businessTy
         {readback ? (
           <figure className="mt-4">
             <figcaption className="text-kicker font-semibold text-ink-2 uppercase">{auditAiCopy.readbackLabel}</figcaption>
-            <blockquote className="mt-2 border-l-2 border-accent pl-4 font-serif text-[1.3125rem] leading-snug text-pretty text-ink [overflow-wrap:anywhere] sm:text-[1.5rem]">
+            <blockquote className="mt-2 border-l-2 border-accent pl-4 font-serif text-title text-pretty text-ink [overflow-wrap:anywhere]">
               {readback}
             </blockquote>
           </figure>
@@ -261,7 +261,7 @@ function DraftBlock({ draftKey, text, idPrefix }: { draftKey: keyof AiDrafts; te
     <article aria-labelledby={titleId} className="min-w-0 rounded-card bg-white p-4 shadow-paper ring-1 ring-ink/[0.04] sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 flex-1 basis-56">
-          <h6 id={titleId} className="font-serif text-[1.375rem] leading-tight text-ink">
+          <h6 id={titleId} className="font-serif text-title text-balance text-ink">
             {copy.label}
           </h6>
           <p className="mt-1 text-sm leading-relaxed text-pretty text-muted">{copy.where}</p>
@@ -294,7 +294,7 @@ export function AiFullSection({ ai, hostname, idPrefix }: { ai: AiInsights; host
     return typeof text === "string" && text.trim() ? [{ key: k, text }] : [];
   });
   const ids = { facts: `${idPrefix}-facts`, questions: `${idPrefix}-questions`, drafts: `${idPrefix}-drafts` };
-  const h5 = "font-serif text-[1.5rem] leading-tight text-ink";
+  const h5 = "font-serif text-title-lg text-balance text-ink";
 
   return (
     <div className="space-y-12">

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { reportVerdict } from "./verdict";
+import { reportVerdict, topFixes } from "./verdict";
 
 describe("reportVerdict", () => {
   it("bands the overall score", () => {
@@ -25,5 +25,19 @@ describe("reportVerdict", () => {
   });
   it("handles a missing score", () => {
     expect(reportVerdict(null, { high: 1 })).toBe("Not enough data for an overall score.");
+  });
+});
+
+describe("topFixes", () => {
+  it("orders by severity, then impact, then input order", () => {
+    const issues = [
+      { id: "a", severity: "medium" as const, impact: 9 },
+      { id: "b", severity: "high" as const, impact: 2 },
+      { id: "c", severity: "critical" as const, impact: 1 },
+      { id: "d", severity: "high" as const, impact: 5 },
+      { id: "e", severity: "high" as const, impact: 5 },
+    ];
+    expect(topFixes(issues).map((i) => i.id)).toEqual(["c", "d", "e"]);
+    expect(topFixes(issues.slice(0, 1)).map((i) => i.id)).toEqual(["a"]);
   });
 });

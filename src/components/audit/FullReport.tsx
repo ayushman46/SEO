@@ -60,7 +60,7 @@ function Vitals({ cwv }: { cwv: CoreWebVitals | null }) {
                 {auditUi.cwvMetrics[key]} <span className="text-muted">({key.toUpperCase()})</span>
               </span>
               <span className="flex flex-wrap items-end justify-between gap-2">
-                <span className="font-serif text-[2rem] leading-none text-ink tabular-nums">{formatMetric(key, value)}</span>
+                <span className="font-serif text-display-sm leading-none text-ink tabular-nums">{formatMetric(key, value)}</span>
                 <span className={cx("rounded-pill px-2 py-0.5 text-xs font-semibold", ratingTone[rating])}>
                   {auditUi.cwvRatings[rating]}
                 </span>
@@ -220,7 +220,7 @@ export function FullReport({
   ];
 
   return (
-    <section aria-labelledby={headingId} className="grid gap-10 lg:grid-cols-[12rem_minmax(0,1fr)] lg:gap-14 xl:grid-cols-[14rem_minmax(0,1fr)]">
+    <section aria-labelledby={headingId} className="grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[12rem_minmax(0,1fr)] lg:gap-14 xl:grid-cols-[14rem_minmax(0,1fr)]">
       <div className="lg:col-span-2">
         <Badge tone="pass" dot>
           {badgeLabel}

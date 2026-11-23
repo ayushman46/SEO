@@ -62,7 +62,7 @@ export function ProgressSteps({
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
           <p className="text-kicker font-semibold text-muted uppercase">{auditUi.progressTitle}</p>
-          <p className="mt-2 font-serif text-[1.75rem] leading-tight text-ink [overflow-wrap:anywhere] sm:text-[2rem]">{host}</p>
+          <p className="mt-2 font-serif text-title-lg text-ink [overflow-wrap:anywhere]">{host}</p>
         </div>
         <p aria-hidden className="rounded-pill bg-paper px-3 py-1.5 text-sm font-medium text-ink-2 tabular-nums">
           {elapsed} s
@@ -107,7 +107,7 @@ export function ProgressSteps({
               </span>
               <span
                 className={cx(
-                  "text-[0.9875rem]",
+                  "text-[0.9375rem]",
                   state === "done" && "text-ink-2",
                   state === "current" && "font-medium text-ink",
                   state === "pending" && "text-muted",

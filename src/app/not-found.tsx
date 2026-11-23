@@ -3,6 +3,7 @@ import { TornFrame } from "@/components/collage/TornFrame";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { SiteChrome } from "@/components/site/SiteChrome";
+import { emphasize } from "@/components/home/Hero";
 import { notFoundCopy } from "@/content/site";
 
 /** Root 404: renders inside the bare root layout, so it composes the site chrome itself. */
@@ -25,7 +26,7 @@ export default function NotFound() {
           {notFoundCopy.kicker}
         </p>
         <h1 className="mt-4 max-w-xl font-serif text-display-md text-balance text-ink">
-          {notFoundCopy.title}
+          {emphasize(notFoundCopy.title)}
         </h1>
         <p className="mt-5 max-w-md text-muted">{notFoundCopy.body}</p>
         <div className="mt-9 flex flex-wrap justify-center gap-3">

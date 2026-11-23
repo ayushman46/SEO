@@ -111,10 +111,8 @@ export function EmailGate({
 
   return (
     <section aria-labelledby={titleId} className={cx("rounded-panel bg-white p-6 shadow-float ring-1 ring-ink/[0.05] sm:p-8", className)}>
-      <span aria-hidden className="grid size-11 place-items-center rounded-xl bg-ink text-white">
-        <Icon name="lock" size={20} />
-      </span>
-      <h3 id={titleId} className="mt-5 font-serif text-[1.875rem] leading-[1.08] text-balance text-ink">
+      <h3 id={titleId} className="flex items-baseline gap-2.5 font-serif text-title-lg text-balance text-ink">
+        <Icon name="lock" size={20} className="shrink-0 self-center text-ink-2" />
         {auditEmailGate.title}
       </h3>
       <p className="mt-3 text-[0.9375rem] leading-relaxed text-pretty text-muted">{auditEmailGate.body}</p>

@@ -1,16 +1,19 @@
 "use client";
 
 import { auditQuoteCopy } from "@/content/audit";
-import { cx } from "@/components/ui/cx";
+import { QUOTE_TEXT } from "@/lib/quote";
+import { PriceText } from "@/components/pages/PriceText";
 import { useQuote } from "./QuoteContext";
-import { QuoteTotal, RequestLink } from "./QuoteParts";
+import { RequestLink } from "./QuoteParts";
 
 /**
- * The running "fix list": a bar fixed to the bottom on phones and tablets, a card in the
- * bottom-right corner from lg. Shown only while something is picked; a spacer of the same
- * height keeps the end of the report clear of it. Plain buttons and links in DOM order,
- * so it is reachable by keyboard; changes are announced by the QuoteProvider's live region.
- * No backdrop-filter or will-change (T011).
+ * The running "fix list" (T026, R4 findings 4 and 5): one row fixed to the bottom at every
+ * width (count and total on the left, Clear and the request button on the right), shown only
+ * while something is picked. A spacer of the same height keeps the end of the report clear,
+ * and while it is shown `--fix-tray-h` is set on the page (globals.css) so the sticky email
+ * gate shrinks above it instead of being covered. Tax and confirm notes live in the quote
+ * panel. Plain buttons and links in DOM order; changes are announced by the QuoteProvider's
+ * live region. No backdrop-filter or will-change (T011). Wheel input stays native (Lenis).
  */
 export function FixTray({ id }: { id: string }) {
   const q = useQuote();
@@ -19,45 +22,37 @@ export function FixTray({ id }: { id: string }) {
 
   return (
     <>
-      <div aria-hidden className="h-56 sm:h-48 lg:h-72" />
+      <div aria-hidden className="h-24" />
       <section
         id={id}
+        data-fix-tray
         data-lenis-prevent
         aria-labelledby={`${id}-title`}
-        className={cx(
-          "fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-12px_32px_-18px_rgb(18_30_60/0.35)] sm:px-6",
-          "lg:inset-x-auto lg:right-6 lg:bottom-6 lg:w-[23rem] lg:rounded-panel lg:border-0 lg:p-6 lg:shadow-float lg:ring-1 lg:ring-ink/[0.06]",
-        )}
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white px-4 pt-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))] shadow-[0_-12px_32px_-18px_rgb(18_30_60/0.35)] sm:px-6"
       >
-        <div className="mx-auto flex max-w-3xl flex-col gap-3 lg:max-w-none">
-          <div className="flex items-baseline justify-between gap-3">
-            <h2 id={`${id}-title`} className="text-[0.9375rem] font-semibold text-ink">
+        <div className="mx-auto flex max-w-[1240px] items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h2 id={`${id}-title`} className="sr-only">
               {auditQuoteCopy.trayTitle}
-              <span className="ml-2 font-normal text-muted tabular-nums">{auditQuoteCopy.trayCount(q.selected.length)}</span>
             </h2>
+            <p className="truncate text-sm font-semibold text-ink tabular-nums">
+              {auditQuoteCopy.trayCount(q.selected.length)} · <PriceText value={sq.totalText} />
+            </p>
+            {/* the tax note stays with the total; the confirm note shows from sm (one row on phones) */}
+            <p className="truncate text-xs text-muted">
+              {QUOTE_TEXT.tax}
+              {sq.confirmNote ? <span className="hidden sm:inline"> {QUOTE_TEXT.confirm}</span> : null}
+            </p>
+          </div>
+          <div className="flex shrink-0 items-center gap-3 sm:gap-4">
             <button
               type="button"
               onClick={q.clear}
-              className="shrink-0 rounded-sm text-sm font-medium text-ink-2 underline decoration-line-strong underline-offset-4 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="min-h-10 rounded-sm text-sm font-medium text-ink-2 underline decoration-line-strong underline-offset-4 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
               {auditQuoteCopy.trayClear}
             </button>
-          </div>
-
-          <ul className="hidden space-y-1.5 border-y border-line py-3 text-sm lg:block">
-            {sq.lines.map((l) => (
-              <li key={l.key} className="flex items-baseline justify-between gap-3">
-                <span className="min-w-0 text-ink-2">
-                  {l.label} <span className="text-muted tabular-nums">({l.covers.length})</span>
-                </span>
-                <span className="shrink-0 font-medium text-ink tabular-nums">{l.priceText}</span>
-              </li>
-            ))}
-          </ul>
-
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between lg:flex-col lg:items-stretch">
-            <QuoteTotal quote={sq} compact />
-            <RequestLink q={q} quote={sq} className="shrink-0 sm:w-auto lg:w-full">
+            <RequestLink q={q} quote={sq} className="h-11! min-h-0! px-4 sm:px-5">
               {sq.lines.length > 1 || q.selected.length > 1 ? auditQuoteCopy.requestMany : auditQuoteCopy.request}
             </RequestLink>
           </div>

@@ -13,7 +13,7 @@ export default function BotPage() {
   const hasFaqLd = Array.isArray(faq.mainEntity) && faq.mainEntity.length > 0;
 
   const userAgents = (
-    <div className="grid gap-6">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-6">
       <div>
         <h3 className="text-[0.9375rem] font-semibold text-ink">Normal requests</h3>
         <CodeBlock label="seenhqbot user agent" className="mt-2.5">
@@ -22,7 +22,7 @@ export default function BotPage() {
       </div>
       <div>
         <h3 className="text-[0.9375rem] font-semibold text-ink">Simulated AI-crawler requests</h3>
-        <ul className="mt-2.5 grid gap-2">
+        <ul className="mt-2.5 grid grid-cols-[minmax(0,1fr)] gap-2">
           {botSimulatedTokens.map((t) => (
             <li key={t}>
               <CodeBlock label={`Simulated ${t.split("/")[0]} user agent`}>{botSimulatedUserAgent(t, origin)}</CodeBlock>

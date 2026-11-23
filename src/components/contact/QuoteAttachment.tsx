@@ -2,6 +2,7 @@ import type { ContactQuoteField } from "@/app/actions/contact-schema";
 import { contactQuoteCopy } from "@/content/contact";
 import type { StoredQuote } from "@/components/audit/quote/handoff";
 import { buttonClass } from "@/components/ui/Button";
+import { PriceText } from "@/components/pages/PriceText";
 
 /** Hidden quote fields; the names are checked against the server's CONTACT_QUOTE_FIELDS by type. */
 export function quoteFields(q: StoredQuote): Record<ContactQuoteField, string> {
@@ -18,7 +19,7 @@ export function QuoteSummary({ quote, onRemove }: { quote: StoredQuote; onRemove
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 id="contact-quote-title" className="font-serif text-[1.5rem] leading-tight text-ink">
+          <h3 id="contact-quote-title" className="font-serif text-title text-balance text-ink">
             {contactQuoteCopy.title}
           </h3>
           <p className="mt-1 text-sm leading-relaxed text-pretty text-muted [overflow-wrap:anywhere]">
@@ -44,14 +45,14 @@ export function QuoteSummary({ quote, onRemove }: { quote: StoredQuote; onRemove
                 </span>
               ) : null}
             </span>
-            <span className="shrink-0 font-medium text-ink tabular-nums">{l.priceText}</span>
+            <span className="shrink-0 font-medium text-ink tabular-nums"><PriceText value={l.priceText} /></span>
           </li>
         ))}
       </ul>
       <p className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <span className="text-sm text-muted">{contactQuoteCopy.totalLabel}</span>
-        <span className="font-serif text-[1.75rem] leading-none text-ink tabular-nums">
-          {s.totalText}
+        <span className="font-serif text-title-lg leading-none text-ink tabular-nums">
+          <PriceText value={s.totalText} />
         </span>
       </p>
       {s.notes.map((n, i) => (

@@ -2,9 +2,9 @@ import type { Severity } from "@/lib/audit/types";
 import { sampleReportMeta } from "@/content/home";
 import { sampleReportCopy, sampleReportPage, sampleReportResult } from "@/content/sample-report";
 import { JsonLd, formatContentDate, innerPageLd, pageMetadata } from "@/lib/seo";
-import { SectionTear } from "@/components/collage/SectionTear";
 import { FullReport } from "@/components/audit/FullReport";
 import { ScoreSummary } from "@/components/audit/ScoreSummary";
+import { topFixes } from "@/components/audit/verdict";
 import { FixTray } from "@/components/audit/quote/FixTray";
 import { QuoteProvider } from "@/components/audit/quote/QuoteContext";
 import { auditUi } from "@/components/audit/labels";
@@ -39,19 +39,19 @@ export default function SampleReportPage() {
         kicker={sampleReportPage.kicker}
         title={sampleReportPage.title}
         intro={sampleReportPage.intro}
-        motif="hands"
+        motif="eye-single"
         seed={91}
+        compact
       >
         <Button href={copy.cta.href} size="lg" icon="arrow-right">
           {copy.cta.label}
         </Button>
-        <Button href={copy.methodologyCta.href} size="lg" variant="secondary">
+        <Button href={copy.methodologyCta.href} variant="link">
           {copy.methodologyCta.label}
         </Button>
       </PageHero>
 
-      <section aria-labelledby="sample-report-title" className="mt-16 sm:mt-20">
-        <SectionTear color="var(--color-paper)" seed={96} grain />
+      <section aria-labelledby="sample-report-title" className="mt-16 border-t border-line-strong sm:mt-20">
         <div className="paper-grain bg-paper pt-8 pb-20 sm:pt-12 sm:pb-28">
           <Container>
             <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
@@ -74,14 +74,20 @@ export default function SampleReportPage() {
               </p>
             </div>
 
-            <div className="mt-6 rounded-xl bg-white px-4 py-3.5 text-[0.9375rem] leading-relaxed text-pretty shadow-[inset_0_0_0_1px_var(--color-line)] sm:px-5">
+            <div className="mt-6 max-w-[68ch] border-l-2 border-line-strong pl-4 text-[0.9375rem] leading-relaxed text-pretty">
               <p className="font-medium text-ink">
                 {copy.ranFor(r.hostname)} <time dateTime={ran.iso}>{ran.display}</time>.
               </p>
               <p className="mt-1 text-muted">{copy.disclaimer}</p>
             </div>
 
-            <ScoreSummary scores={r.scores} issueCounts={issueCounts} className="mt-8" />
+            <ScoreSummary
+              scores={r.scores}
+              issueCounts={issueCounts}
+              topIssues={topFixes(r.issues)}
+              aiClarity={r.ai?.clarityScore ?? null}
+              className="mt-8"
+            />
 
             <QuoteProvider
               issues={r.issues}
@@ -96,7 +102,6 @@ export default function SampleReportPage() {
             </QuoteProvider>
           </Container>
         </div>
-        <SectionTear color="var(--color-paper)" seed={97} flip grain />
       </section>
 
       <ClosingCta
@@ -105,7 +110,6 @@ export default function SampleReportPage() {
         body={copy.closing.body}
         primaryCta={copy.cta}
         secondaryCta={copy.methodologyCta}
-        seed={93}
       />
     </>
   );

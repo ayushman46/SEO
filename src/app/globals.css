@@ -190,6 +190,12 @@
   }
 }
 
+/* Fix tray (audit/quote/FixTray): while it is shown, sticky panels (the email gate)
+   size themselves above it instead of sliding under it (T026). */
+html:has([data-fix-tray]) {
+  --fix-tray-h: 5.25rem;
+}
+
 /* Mobile menu sheet (native <dialog>). Lock page scroll while open. */
 html:has(dialog.menu-sheet[open]) {
   overflow: hidden;
@@ -338,18 +344,18 @@ html.lenis {
 [data-reveal="pending"]:not([data-reveal-stagger]),
 [data-reveal="pending"][data-reveal-stagger] > * {
   opacity: 0;
-  transform: translateY(22px);
+  transform: translateY(10px);
 }
 [data-reveal="pending"][data-reveal-variant="settle"] {
-  transform: translateY(26px) rotate(-0.8deg) scale(0.985);
+  transform: translateY(14px) rotate(-0.6deg) scale(0.99);
 }
 [data-reveal="done"]:not([data-reveal-stagger]),
 [data-reveal="done"][data-reveal-stagger] > * {
   opacity: 1;
   transform: none;
   transition:
-    opacity 700ms var(--ease-paper),
-    transform 900ms var(--ease-paper);
+    opacity 400ms var(--ease-paper),
+    transform 500ms var(--ease-paper);
   transition-delay: var(--reveal-delay, 0ms);
 }
 [data-reveal="done"][data-reveal-stagger] > :nth-child(2) {
@@ -365,7 +371,7 @@ html.lenis {
 @keyframes reveal-rise {
   from {
     opacity: 0;
-    transform: translateY(28px);
+    transform: translateY(12px);
   }
 }
 @keyframes nav-settle {
@@ -409,7 +415,7 @@ html.lenis {
     [data-reveal-variant="fade"][data-reveal-stagger] > * {
       animation: reveal-rise linear none;
       animation-timeline: view();
-      animation-range: entry var(--reveal-shift, 0px) entry calc(240px + var(--reveal-shift, 0px));
+      animation-range: entry var(--reveal-shift, 0px) entry calc(160px + var(--reveal-shift, 0px));
     }
     [data-reveal-variant="fade"][data-reveal-stagger] > :nth-child(2) {
       --reveal-shift: 40px;

@@ -30,13 +30,13 @@ export function LegalBody({ doc }: { doc: LegalDoc }) {
               key={section.id}
               id={section.id}
               aria-labelledby={`${section.id}-h`}
-              className="scroll-mt-2 border-t border-line pt-8 pb-10 first:border-t-0 first:pt-0"
+              className="border-t border-line pt-8 pb-10 first:border-t-0 first:pt-0"
             >
               <div className="group flex items-baseline gap-3">
                 <span aria-hidden className="shrink-0 font-serif text-lg text-muted tabular-nums">
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <h2 id={`${section.id}-h`} className="min-w-0 font-serif text-[1.75rem] leading-tight text-balance text-ink sm:text-[2rem]">
+                <h2 id={`${section.id}-h`} className="min-w-0 font-serif text-display-sm text-balance text-ink">
                   {section.heading}
                 </h2>
                 <a

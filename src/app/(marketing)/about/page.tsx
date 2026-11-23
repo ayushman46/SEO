@@ -2,6 +2,7 @@ import { aboutClosing, aboutPage, aboutSections } from "@/content/about";
 import { JsonLd, innerPageLd, lastUpdated, pageMetadata } from "@/lib/seo";
 import { AboutCollage } from "@/components/pages/AboutCollage";
 import { ClosingCta } from "@/components/pages/ClosingCta";
+import { emphasize } from "@/components/home/Hero";
 import { PageHero } from "@/components/pages/PageHero";
 import { Container } from "@/components/ui/Container";
 import { cx } from "@/components/ui/cx";
@@ -36,7 +37,7 @@ export default function AboutPage() {
     <>
       <JsonLd data={innerPageLd({ name: "About", description: aboutPage.metaDescription, path: "/about" })} />
       {/* typographic header: the eye closes this page (ClosingCta variant="eye"), the collage sits beside the text */}
-      <PageHero kicker={aboutPage.kicker} title={aboutPage.title} intro={aboutPage.intro} seed={42} updated={u} />
+      <PageHero kicker={aboutPage.kicker} title={emphasize(aboutPage.title)} intro={aboutPage.intro} seed={42} updated={u} />
 
       <div className="py-20 sm:py-28">
         <Container className="grid gap-14 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-20">

@@ -6,7 +6,6 @@ import { TornFrame } from "@/components/collage/TornFrame";
 import { mulberry32 } from "@/components/collage/torn";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
-import { Reveal } from "@/components/ui/Reveal";
 
 /** A circle as path data, so a whole group of stars is one DOM node. */
 const dot = (x: number, y: number, r: number) =>
@@ -130,7 +129,7 @@ export function NightSky() {
         </Parallax>
 
         <Container className="relative py-28 sm:py-40">
-          <Reveal className="max-w-2xl">
+          <div className="max-w-2xl">
             <p className="mb-5 inline-flex items-center gap-2.5 text-kicker font-semibold text-night-muted uppercase">
               <span aria-hidden className="h-px w-6 bg-night-muted/60" />
               {nightSky.kicker}
@@ -146,7 +145,7 @@ export function NightSky() {
                 {nightSky.cta.label}
               </Button>
             </div>
-          </Reveal>
+          </div>
         </Container>
       </div>
       <SectionTear color="var(--color-night)" seed={31} flip />

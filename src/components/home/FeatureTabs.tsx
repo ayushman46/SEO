@@ -4,7 +4,6 @@ import type { FeatureItem } from "@/content/types";
 import { FeatureCollage, FloatingCard } from "@/components/collage/FeatureCollage";
 import { Container } from "@/components/ui/Container";
 import { cx } from "@/components/ui/cx";
-import { Icon } from "@/components/ui/Icon";
 import { IssueRow } from "@/components/ui/IssueRow";
 import { ScoreRing } from "@/components/ui/ScoreRing";
 import { Tabs, TabsAsideSlot, type TabItem } from "@/components/ui/Tabs";

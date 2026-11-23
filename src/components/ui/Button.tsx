@@ -11,7 +11,7 @@ const base =
 
 const variants: Record<ButtonVariant, string> = {
   primary:
-    "rounded-pill bg-accent-600 text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.22),0_1px_2px_rgb(17_79_173/0.35),0_8px_20px_-10px_rgb(26_111_232/0.8)] hover:bg-accent-700 active:translate-y-px active:bg-accent-800",
+    "rounded-pill bg-accent-600 text-white shadow-[0_1px_2px_rgb(17_79_173/0.35)] hover:bg-accent-700 active:translate-y-px active:bg-accent-800",
   secondary:
     "rounded-pill bg-white text-ink shadow-[inset_0_0_0_1px_var(--color-line-strong)] hover:bg-paper hover:shadow-[inset_0_0_0_1px_var(--color-ink)] active:translate-y-px",
   ghost: "rounded-pill text-ink hover:bg-ink/[0.05] active:bg-ink/[0.08]",
