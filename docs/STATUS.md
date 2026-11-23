@@ -1,5 +1,12 @@
 # Status log (newest on top)
 
+## 2026-11-23 11:25 IST: v1.2 LIVE (restored v1.1 home + redesigned inner pages + new prices). IMPORTANT: pushes to main auto-deploy to production
+- **Discovery:** the Vercel project is connected to the GitHub repo, so EVERY `git push` to `main` deploys to production (seen in `vercel ls --prod`: a production deployment per push). Earlier status entries and chat messages that said "production is still v1.1" after 08:40 were WRONG: the redesign and the new price ladder went live with the checkpoint pushes (from about 08:40). From now on: push to `main` only verified work; use a branch for work in progress, or the founder disables auto-deploy in Vercel > Project > Settings > Git.
+- **Live now (f436910):** home page restored to the v1.1 layout (founder request), with current prices, honest copy, logo marquee, Lenis smooth scroll, eye blink; inner pages keep the redesign (rate card, report front page, fix list, etc.). Production smoke test: all routes 200, missing 404, audit of python.org 200 in 2.7 s (79).
+- **Not verified:** PageSpeed Insights on the live site after these changes (the in-app browser pane would not run it). Scroll feel in a visible browser.
+- **Loop rules going forward:** home layout is frozen to v1.1 (critics may report only bugs, untrue copy and a11y there). Work in progress goes to a branch, not main.
+- **Founder decisions open:** NVIDIA_API_KEY; named person on About; payments; DATABASE_URL; privacy wording tweaks (R5 B7, B8); FAQ heading wording; whether to keep the eye blink.
+
 ## 2026-11-23 10:55 IST: round 2 done; founder wants the PREVIOUS home page back; production deploy on hold until it is restored
 - **Committed + pushed (a54bf4c):** round 2 copy fixes (R5-copy), wiring, rendered design QA fixes (R5-design-qa: tray on phones, focus not obscured, rate card alignment). 721 tests, typecheck, lint, build green. Preview of that state: https://seenhq-pa0z65w2t-ayushs-projects-32c1d225.vercel.app (routes 200, audit + unlock OK, new prices visible).
 - **Founder (10:50):** "go back to the previous home landing page, it was better." Running: frontend-designer T033 restores the HOME page (route / only) to the v1.1 design (commit afe001d), keeping current prices, honest copy, logo marquee, smooth scroll, a11y/perf fixes. Inner-page redesign stays.
