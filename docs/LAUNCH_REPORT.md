@@ -1,4 +1,30 @@
-# seenhq v1 launch report
+# seenhq launch report
+
+## v1.1 (deployed to production 2026-11-23 07:10 IST)
+**Live:** https://seenhq.vercel.app · 675 tests, typecheck, lint, build green · independent review R3: 16 findings, all fixed.
+
+| Page (PageSpeed Insights, mobile) | Performance | Accessibility | Best Practices | SEO |
+|---|---|---|---|---|
+| / | 98 | 100 | 100 | 100 |
+| /audit | 99 | 100 | 100 | 100 |
+| /sample-report | 96 | 100 | 100 | 100 |
+| /methodology | 98 | 100 | 100 | 100 |
+
+Our own audit of the live site: 98 overall (SEO 99, GEO 98). Three low warnings: no machine-readable contact detail, no Bing verification, no review profiles.
+
+**New in v1.1**
+- AI reading through an NVIDIA-hosted model (off until `NVIDIA_API_KEY` is set): read-back, 7 core facts, customer questions, ready-to-paste drafts. Hardened against prompt injection; score computed by our code.
+- Nine new checks: crossed-out/hidden/conflicting facts, image-only and PDF-only content, raw-HTML facts, simulated AI-crawler test that names the blocking layer, snippet eligibility, review signals, Bing/IndexNow, soft 404, AI readability.
+- Platform-aware fix steps: 11 platforms detected, 135 vendor-verified where-to-click entries (dated, sourced).
+- Free-to-paid path: instant quote before the email gate (USD/INR), free DIY list, per-issue "Fix it myself" / "Have us fix this", order hand-off to the contact form with server-side price verification.
+- Trust pages: /methodology, /bot, /sample-report. Developer export (tickets, coding-agent prompt). Logo marquee.
+- Research: docs/MARKET_RESEARCH.md, _2_PRODUCT.md, _3_FULL.md, CONVERSION_RESEARCH.md.
+
+**Open for the founder:** `NVIDIA_API_KEY`; Fix sprint fixed vs "From $199"; contact email; Bing verification; `DATABASE_URL` + `npm run db:migrate` (0001, 0002); `PAGESPEED_API_KEY`; `ADMIN_PASSWORD`; payments (Razorpay/UPI); follow-up emails; founder identity on About. Known limit: Shopify's bot check sometimes refuses our crawler.
+
+---
+
+# v1 launch report
 
 **Live:** https://seenhq.vercel.app (Vercel production, deployed 2026-11-22 23:50 IST, about 12.5 h before the deadline)
 **Repo:** https://github.com/ayushman46/SEO, branch `main`
