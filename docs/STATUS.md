@@ -1,5 +1,11 @@
 # Status log (newest on top)
 
+## 2026-11-23 10:55 IST: round 2 done; founder wants the PREVIOUS home page back; production deploy on hold until it is restored
+- **Committed + pushed (a54bf4c):** round 2 copy fixes (R5-copy), wiring, rendered design QA fixes (R5-design-qa: tray on phones, focus not obscured, rate card alignment). 721 tests, typecheck, lint, build green. Preview of that state: https://seenhq-pa0z65w2t-ayushs-projects-32c1d225.vercel.app (routes 200, audit + unlock OK, new prices visible).
+- **Founder (10:50):** "go back to the previous home landing page, it was better." Running: frontend-designer T033 restores the HOME page (route / only) to the v1.1 design (commit afe001d), keeping current prices, honest copy, logo marquee, smooth scroll, a11y/perf fixes. Inner-page redesign stays.
+- **Founder (10:05):** deploy the new version to production once fixes are done; keep the fixing loop running until the session limit. => After T033: build, screenshots vs v1.1, preview, smoke test, then `npx vercel deploy --prod --yes` (approved), PageSpeed Insights, then next critic round (critics must NOT redesign the home page again: home layout is frozen to v1.1; only bugs, copy truth and a11y there).
+- **Production is still v1.1 with old prices.**
+
 ## 2026-11-23 09:20 IST: feedback loop round 1 done and on preview; round 2 critics running
 - **Committed + pushed (13f3c91):** copy rewrite (115 edits, docs/COPY_STYLE.md + style tests), below-market price ladder (Full audit $39/₹2,999, Fix sprint fixed $149/₹9,999 up to 8 fixes, Monitoring $19/₹999, fact-check $59/₹3,999, local setup $99/₹3,999, unblock $49/₹2,999, content from $99/₹6,999), Lenis smooth scroll (gated, self-disabling guard, docs/SCROLL_PERF.md), design review R4 (56 findings), three signature moments (eye blink, report front page, pricing rate card). 711 tests, typecheck, lint, build green.
 - **Preview:** https://seenhq-8jlrmdrps-ayushs-projects-32c1d225.vercel.app. **Production is still v1.1 with the OLD prices and copy.**
