@@ -45,7 +45,7 @@ export const botPage = {
   kicker: "Crawler",
   title: "About seenhqbot",
   intro:
-    "seenhqbot is the web crawler behind the free seenhq website audit. It fetches a handful of public pages from a site only when someone asks us to audit that site, and it never crawls the web on its own.",
+    "seenhqbot fetches up to six public pages from a site, only when someone asks seenhq to audit that site. It never crawls on its own.",
 } satisfies PageCopy;
 
 export const botSections: DocSection[] = [
@@ -53,7 +53,7 @@ export const botSections: DocSection[] = [
     id: "who-we-are",
     title: "Who runs seenhqbot",
     body: [
-      "seenhq is a small SEO and GEO studio. Our free audit checks a website for Google and for AI answer engines, and seenhqbot is the part that fetches the pages. It is not a search engine, it does not build an index, and we do not use the pages it fetches to train AI models.",
+      "seenhq is a small SEO and GEO studio, and seenhqbot fetches pages for its free website audit. It builds no index, and the pages are not used to train AI models.",
       "If you saw seenhqbot in your logs, someone entered your website address on our audit page. That is usually the site owner, an agency or a developer working on the site.",
     ],
     cta: { label: "How the audit works", href: "/methodology" },
@@ -82,7 +82,7 @@ export const botSections: DocSection[] = [
     id: "rate",
     title: "How often and how fast",
     body: [
-      "One audit makes a small, bounded number of requests: up to six pages, a few site files, and the simulated requests. At most three pages are fetched at the same time and each request gives up after 8 seconds. The simulated requests mostly ask for headers only (HEAD requests), run at most four at a time with a 2.5-second timeout, and stop after 6 seconds in total. The whole audit stops after 55 seconds.",
+      "One audit requests up to six pages, a few site files and the simulated requests. At most three pages are fetched at the same time and each request gives up after 8 seconds. The simulated requests mostly ask for headers only (HEAD requests), run at most four at a time with a 2.5-second timeout, and stop after 6 seconds in total. The whole audit stops after 55 seconds.",
       "seenhqbot does not come back on a schedule. It only returns if someone audits the site again, and we limit how many audits one visitor can start per hour.",
     ],
   },
@@ -91,7 +91,7 @@ export const botSections: DocSection[] = [
     title: "How to block seenhqbot",
     body: [
       "Add this rule to your robots.txt to stop seenhqbot from fetching your internal pages. Rules under \"User-agent: *\" also apply to seenhqbot unless you add a group just for it.",
-      "robots.txt does not stop the single page a person enters, for the reason above. To refuse that request too, block the seenhqbot user agent in your server or firewall settings.",
+      "robots.txt does not stop the one page a person enters. To refuse that request too, block the seenhqbot user agent in your server or firewall settings.",
     ],
   },
   {
@@ -111,7 +111,7 @@ export const botFaq: FaqItem[] = [
   },
   {
     q: "Does seenhqbot respect robots.txt?",
-    a: "Yes, for internal pages. seenhqbot skips any internal page your robots.txt disallows for it. The one page a person enters on our audit page is always fetched, because a person asked for it, much like opening it in a browser.",
+    a: "Yes, for internal pages. seenhqbot skips any internal page your robots.txt disallows for it. The one page a person enters on our audit page is always fetched, because a person asked for it.",
   },
   {
     q: "How do I block seenhqbot?",

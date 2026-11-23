@@ -109,10 +109,10 @@ async function runProbe(ctx: AuditContext, remainingMs: number, signal?: AbortSi
 
 function probeNotes(p: CrawlerProbe): string[] {
   if (p.status === "inconclusive") {
-    return [`Your site refused our own crawler (status ${p.baselineStatus}), so the live AI-crawler test is inconclusive.`];
+    return [`Your site refused our own crawler (status ${p.baselineStatus}), so the simulated AI-crawler test is inconclusive.`];
   }
   if (p.status === "skipped" && p.reason === "no_time") {
-    return ["There wasn't enough time left for the live AI-crawler test, so it was skipped."];
+    return ["There wasn't enough time left for the simulated AI-crawler test, so it was skipped."];
   }
   return [];
 }

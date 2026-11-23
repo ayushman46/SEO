@@ -19,7 +19,19 @@ const LOGOS: Record<string, { src: string; width: number; height: number }> = {
   "Microsoft Copilot": { src: "/logos/copilot.svg", width: 26, height: 24 },
   "Google Search": { src: "/logos/google.svg", width: 24, height: 24 },
   Bing: { src: "/logos/bing.svg", width: 16, height: 24 },
+  "Google Search + AI Overviews": { src: "/logos/google.svg", width: 24, height: 24 },
 };
+
+const GOOGLE_PAIR = ["Google Search", "Google AI Overviews"] as const;
+
+/** Google's mark once (T026): both Google products collapse into one item, at the first one's position. */
+function collapseGoogle(engines: readonly string[]) {
+  if (!GOOGLE_PAIR.every((g) => engines.includes(g))) return engines;
+  const first = Math.min(...GOOGLE_PAIR.map((g) => engines.indexOf(g)));
+  return engines.flatMap((e, i) =>
+    (GOOGLE_PAIR as readonly string[]).includes(e) ? (i === first ? ["Google Search + AI Overviews"] : []) : [e],
+  );
+}
 
 function EngineList({ engines, label, hidden }: { engines: readonly string[]; label?: string; hidden?: boolean }) {
   return (
@@ -69,13 +81,16 @@ export function EngineStrip({
   className?: string;
 }) {
   const trackId = useId();
+  const list = collapseGoogle(engines);
   return (
     <div className={cx("engine-strip", className)}>
-      <p className="text-center text-kicker font-semibold text-muted uppercase">{label}</p>
+      <p aria-hidden className="mx-auto max-w-2xl text-center text-[0.9375rem] leading-relaxed text-balance text-ink-2">
+        {label}
+      </p>
       <div className="engine-strip-viewport mt-6 border-y border-line">
         <div id={trackId} className="engine-strip-track">
-          <EngineList engines={engines} label={label} />
-          <EngineList engines={engines} hidden />
+          <EngineList engines={list} label={label} />
+          <EngineList engines={list} hidden />
         </div>
       </div>
       <div className="mt-4 flex items-center justify-center gap-3">

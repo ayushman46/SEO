@@ -4,9 +4,12 @@ import { services } from "@/content/services";
 import { pricingIndiaExtras, pricingTiers, pricingTiersInr } from "@/content/pricing";
 import { CONTACT_SERVICES } from "@/app/actions/contact-schema";
 
-/** "From $199" → {from, 199}; "$49 as part of…" → {fixed, 49}; "₹9,999 per location" → {fixed, 9999}. */
+/**
+ * "From $99" → {from, 99}; "$149" → {fixed, 149}; "Included in the Full audit · $39" → {fixed, 39};
+ * "₹3,999 per location" → {fixed, 3999}. The first price in the string counts.
+ */
 function parsePrice(text: string, symbol: "$" | "₹"): CatalogPrice {
-  const re = new RegExp(`^(From )?\\${symbol}([0-9][0-9,]*)(?![0-9,])`);
+  const re = new RegExp(`(?:^|\\s)(From )?\\${symbol}([0-9][0-9,]*)(?![0-9,])`);
   const m = re.exec(text.trim());
   if (!m) throw new Error(`Cannot parse price "${text}"`);
   return { kind: m[1] ? "from" : "fixed", amount: Number(m[2].replace(/,/g, "")) };
@@ -21,6 +24,7 @@ const INDIA_EXTRA_KEYS: Record<string, CatalogKey> = {
   "AI fact-check & fix": "ai-fact-check",
   "Local AI visibility setup": "local-ai-setup",
   "AI crawler unblock": "ai-crawler-unblock",
+  "Content & entity": "content-entity",
 };
 
 describe("catalog matches the published prices", () => {
@@ -68,9 +72,9 @@ describe("catalog matches the published prices", () => {
     }
   });
 
-  it("Content & entity has no rupee price, so the catalog has none (update both together)", () => {
-    expect(catalogItem("content-entity").inr).toBeNull();
-    expect(pricingIndiaExtras.some((e) => /content/i.test(e.name))).toBe(false);
+  it("Content & entity has a rupee starting price in both the catalog and the India extras", () => {
+    expect(catalogItem("content-entity").inr).toEqual({ amount: 6999, kind: "from" });
+    expect(pricingIndiaExtras.find((e) => /content/i.test(e.name))?.price).toBe("From ₹6,999");
   });
 
   it("every catalog slug is an orderable contact-form service", () => {

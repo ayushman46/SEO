@@ -31,7 +31,10 @@ export function groupChecks(checks: CheckItem[]) {
   return groups.filter((g) => g.items.length > 0);
 }
 
-/** Checks grouped by category, each a chip with a status glyph + text (never color alone). */
+/**
+ * Checks grouped by category (T026): failures, warnings and not-run checks as hairline rows,
+ * passes folded into a native disclosure. Status is a glyph + text (never color alone).
+ */
 export function CheckGrid({
   checks,
   headingLevel = 4,
@@ -45,12 +48,26 @@ export function CheckGrid({
   // An unknown status from a newer engine reads as "Not run" rather than breaking the glyph lookup.
   const normalized = checks.map((c) => (KNOWN_STATUS.has(c.status) ? c : { ...c, status: "unavailable" as const }));
   const groups = groupChecks(normalized);
-  const detailed = normalized.some((c) => c.summary);
 
   return (
     <div className={cx("space-y-8", className)}>
       {groups.map(({ key, label, items }) => {
         const count = (s: CheckItem["status"]) => items.filter((c) => c.status === s).length;
+        // T026: what needs attention first as hairline rows; passes fold into "<n> passed"
+        const open = items.filter((c) => c.status !== "pass");
+        const passed = items.filter((c) => c.status === "pass");
+        const row = (c: CheckItem) => (
+          <li key={c.id} className="flex items-start gap-3 py-3">
+            <StatusIcon status={c.status} className="mt-px" />
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
+                <span className="text-sm leading-snug font-medium text-ink [overflow-wrap:anywhere]">{checkLabel(c)}</span>
+                <span className={cx("text-xs font-semibold", statusText[c.status])}>{auditUi.checkStatus[c.status]}</span>
+              </div>
+              {c.summary ? <p className="mt-1 max-w-[68ch] text-sm leading-relaxed text-pretty text-muted">{c.summary}</p> : null}
+            </div>
+          </li>
+        );
         return (
           <div key={key}>
             <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-line pb-3">
@@ -59,23 +76,18 @@ export function CheckGrid({
                 {auditUi.checkCounts(count("pass"), count("warn"), count("fail"), count("unavailable"))}
               </p>
             </div>
-            <ul className={cx("mt-3 grid gap-2", detailed ? "md:grid-cols-2" : "sm:grid-cols-2")}>
-              {items.map((c) => (
-                <li
-                  key={c.id}
-                  className="flex items-start gap-3 rounded-xl bg-white px-3.5 py-3 shadow-[inset_0_0_0_1px_var(--color-line)]"
-                >
-                  <StatusIcon status={c.status} className="mt-px" />
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
-                      <span className="text-sm leading-snug font-medium text-ink [overflow-wrap:anywhere]">{checkLabel(c)}</span>
-                      <span className={cx("text-xs font-semibold", statusText[c.status])}>{auditUi.checkStatus[c.status]}</span>
-                    </div>
-                    {c.summary ? <p className="mt-1 text-sm leading-relaxed text-pretty text-muted">{c.summary}</p> : null}
-                  </div>
-                </li>
-              ))}
-            </ul>
+            {open.length ? <ul className="divide-y divide-line">{open.map(row)}</ul> : null}
+            {passed.length ? (
+              <details className="group/pass">
+                <summary className="inline-flex cursor-pointer items-center gap-2 rounded-sm py-3 text-sm font-medium text-ink-2 hover:text-ink">
+                  {auditUi.checkCounts(passed.length, 0, 0).split(" · ")[0]}
+                  <span aria-hidden className="text-muted transition-transform duration-200 group-open/pass:rotate-90">
+                    ›
+                  </span>
+                </summary>
+                <ul className="divide-y divide-line border-t border-line">{passed.map(row)}</ul>
+              </details>
+            ) : null}
           </div>
         );
       })}

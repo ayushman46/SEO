@@ -24,7 +24,7 @@ export function CurrencyToggle({ q, name, className }: { q: QuoteState; name: st
   return (
     <fieldset className={cx("min-w-0", className)}>
       <legend className="sr-only">{auditQuoteCopy.currencyLabel}</legend>
-      <div className="inline-flex max-w-full items-center gap-1 rounded-pill bg-accent-600 p-1 shadow-[inset_0_1px_0_rgb(255_255_255/0.18),0_10px_24px_-14px_rgb(26_111_232/0.9)]">
+      <div className="inline-flex max-w-full items-center gap-1 rounded-pill bg-paper-2 p-1 shadow-[inset_0_0_0_1px_var(--color-line)]">
         {CURRENCIES.map((c) => {
           const checked = q.currency === c.value;
           return (
@@ -32,8 +32,8 @@ export function CurrencyToggle({ q, name, className }: { q: QuoteState; name: st
               key={c.value}
               className={cx(
                 "relative inline-flex h-9 cursor-pointer items-center rounded-pill px-4 text-sm font-medium whitespace-nowrap tabular-nums transition-[background-color,color] duration-300 ease-(--ease-paper)",
-                "has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-white",
-                checked ? "bg-white text-accent-ink shadow-[0_1px_2px_rgb(17_79_173/0.35)]" : "text-white hover:bg-white/[0.14]",
+                "has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-accent",
+                checked ? "bg-white text-ink shadow-paper" : "text-ink-2 hover:text-ink",
               )}
             >
               <input

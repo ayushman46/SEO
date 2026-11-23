@@ -110,7 +110,7 @@ describe("per-issue actions", () => {
     const i = issue("seo.canonical:missing");
     const html = withQuote(createElement(IssueCard, { issue: i }), { issues: [i] });
     expect(html).toContain(auditQuoteCopy.fixMyself);
-    expect(html).toContain(esc(auditQuoteCopy.haveUsFix("From $199")));
+    expect(html).toContain(esc(auditQuoteCopy.haveUsFix("$149")));
     expect(html).toContain('aria-pressed="false"');
   });
 

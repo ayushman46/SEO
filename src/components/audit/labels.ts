@@ -1,12 +1,13 @@
+import { auditFlowCopy } from "@/content/audit";
+
 /**
- * Short UI labels for the audit flow that are not (yet) in src/content/audit.ts.
- * Long copy always comes from src/content; these are button/heading-sized strings.
- * TODO(content-seo): candidates to move into src/content/audit.ts.
+ * Short UI labels for the audit flow. Sentence-length strings come from auditFlowCopy in
+ * src/content/audit.ts (single source); the rest are button/heading-sized strings.
  */
 export const auditUi = {
   progressTitle: "Auditing",
-  timeHint: "This usually takes 15 to 40 seconds.",
-  slowHint: "Still working. Larger or slower sites can take up to a minute.",
+  timeHint: auditFlowCopy.timeHint,
+  slowHint: auditFlowCopy.slowHint,
   cancel: "Cancel",
   cancelled: "Audit cancelled.",
   resultsReady: "Your results are ready.",
@@ -25,8 +26,8 @@ export const auditUi = {
   siteWide: "Site-wide issue",
   impact: (n: number) => `Up to +${n} pts`,
   impactLabel: "Estimated overall score gain",
-  noTopIssues: "We found no issues worth flagging on the pages we checked.",
-  lockedHint: "Unlock with your email to see the details and fixes.",
+  noTopIssues: auditFlowCopy.noTopIssues,
+  lockedHint: auditFlowCopy.lockedHint,
   checksTitle: "Checks",
   checkStatus: { pass: "Pass", warn: "Needs work", fail: "Fail", unavailable: "Not run" },
   checkCounts: (pass: number, warn: number, fail: number, notRun = 0) =>
@@ -38,10 +39,10 @@ export const auditUi = {
     "geo.content-format": "Facts as plain text",
     "geo.fact-consistency": "Consistent facts",
     "geo.raw-html-facts": "Facts without JavaScript",
-    "geo.ai-crawler-probe": "AI crawler access test",
+    "geo.ai-crawler-probe": "AI crawler access (simulated test)",
   } as Record<string, string>,
   fullReportTitle: "Full report",
-  fullReportUnlocked: "Unlocked. Every issue and every fix is below.",
+  fullReportUnlocked: auditFlowCopy.fullReportUnlocked,
   howWeScore: "How we score",
   allIssuesTitle: "All issues",
   categoryIssues: (label: string, n: number) => `${label} issues (${n})`,
@@ -61,8 +62,8 @@ export const auditUi = {
   missing: "Missing",
   noTitle: "No title",
   cwvTitle: "Core Web Vitals",
-  cwvSource: "Mobile, measured by Google PageSpeed Insights.",
-  cwvUnavailable: "PageSpeed data was not available for this audit.",
+  cwvSource: auditFlowCopy.cwvSource,
+  cwvUnavailable: auditFlowCopy.cwvUnavailable,
   cwvRatings: { good: "Good", improve: "Needs work", poor: "Poor", none: "No data" },
   cwvMetrics: {
     lcp: "Largest Contentful Paint",
@@ -73,14 +74,13 @@ export const auditUi = {
   },
   notesTitle: "Notes from the crawl",
   nextTitle: "What next?",
-  errorTitle: "We couldn't finish this audit",
-  rateTitle: "Please wait a little",
-  genericTitle: "Something went wrong",
+  errorTitle: auditFlowCopy.errorTitle,
+  rateTitle: auditFlowCopy.rateTitle,
+  genericTitle: auditFlowCopy.genericTitle,
   tryAgain: "Try again",
   runAgain: "Run the audit again",
-  retryIn: (mins: number, at: string) =>
-    mins <= 1 ? `You can try again in about a minute (around ${at}).` : `You can try again in about ${mins} minutes (around ${at}).`,
-  unlockRateLimited: "Too many unlock attempts. Please wait a little before trying again.",
+  retryIn: auditFlowCopy.retryIn,
+  unlockRateLimited: auditFlowCopy.unlockRateLimited,
   lockedPrefix: "Locked:",
   privacyLinkText: "privacy policy",
   opensInNewTab: "(opens in a new tab)",

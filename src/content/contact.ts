@@ -7,7 +7,7 @@ export const contactPage = {
   kicker: "Contact",
   title: "Tell us about your website",
   intro:
-    "Share a few details and we will reply by email with next steps and a fixed quote. If you haven't run the free audit yet, it is a good place to start.",
+    "Tell us what you need. We reply by email within two working days with a fixed quote.",
 } satisfies PageCopy;
 
 /** Service values match the contact server action enum. */
@@ -69,7 +69,7 @@ export const contactForm = {
     rateLimited: "You have sent several messages in a short time. Please wait a while and try again.",
     fieldsInvalid: "Please check the highlighted fields.",
   },
-  directEmailLabel: "Prefer email? Use the contact form and we'll reply by email.",
+  directEmailLabel: "No public email: use the form and we reply by email.",
 } as const;
 
 /** "What happens next" panel beside the contact form (added by frontend-designer for T006; content-seo may refine). */

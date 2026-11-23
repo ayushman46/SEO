@@ -81,3 +81,8 @@ export function formatMetric(key: MetricKey, value: number | null): string {
 export function formatNumber(n: number): string {
   return Math.round(n).toLocaleString("en-US");
 }
+
+/** Stable anchor id for an issue card, e.g. "issue-seo-missing-title" (front page "Fix first" links). */
+export function issueAnchor(issueId: string): string {
+  return `issue-${issueId.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`;
+}

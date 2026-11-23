@@ -83,7 +83,7 @@ export function FloatingCard({
     >
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm font-semibold">{title}</p>
-        <span className="rounded-pill bg-paper px-2 py-0.5 text-[0.6875rem] font-medium tracking-wide text-muted uppercase">
+        <span className="rounded-pill bg-paper px-2 py-0.5 text-xs font-medium tracking-wide text-muted uppercase">
           Illustrative
         </span>
       </div>

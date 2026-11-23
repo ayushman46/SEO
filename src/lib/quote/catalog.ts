@@ -70,8 +70,8 @@ export const CATALOG: readonly CatalogItem[] = [
     serviceSlug: "ai-crawler-unblock",
     alsoMatches: [],
     label: "AI crawler unblock",
-    usd: { amount: 149, kind: "fixed" },
-    inr: { amount: 9999, kind: "fixed" },
+    usd: { amount: 49, kind: "fixed" },
+    inr: { amount: 2999, kind: "fixed" },
     unit: "site",
     quotable: true,
   },
@@ -80,8 +80,8 @@ export const CATALOG: readonly CatalogItem[] = [
     serviceSlug: "technical-fixes",
     alsoMatches: [],
     label: "Technical fix sprint",
-    usd: { amount: 199, kind: "from" },
-    inr: { amount: 14999, kind: "from" },
+    usd: { amount: 149, kind: "fixed" },
+    inr: { amount: 9999, kind: "fixed" },
     unit: "site",
     quotable: true,
   },
@@ -90,8 +90,8 @@ export const CATALOG: readonly CatalogItem[] = [
     serviceSlug: "content-entity",
     alsoMatches: [],
     label: "Content & entity",
-    usd: { amount: 149, kind: "from" },
-    inr: null,
+    usd: { amount: 99, kind: "from" },
+    inr: { amount: 6999, kind: "from" },
     unit: "site",
     quotable: true,
   },
@@ -100,8 +100,8 @@ export const CATALOG: readonly CatalogItem[] = [
     serviceSlug: "local-ai-setup",
     alsoMatches: [],
     label: "Local AI visibility setup",
-    usd: { amount: 149, kind: "fixed" },
-    inr: { amount: 9999, kind: "fixed" },
+    usd: { amount: 99, kind: "fixed" },
+    inr: { amount: 3999, kind: "fixed" },
     unit: "location",
     quotable: true,
   },
@@ -110,8 +110,8 @@ export const CATALOG: readonly CatalogItem[] = [
     serviceSlug: "ai-fact-check",
     alsoMatches: [],
     label: "AI fact-check & fix",
-    usd: { amount: 69, kind: "from" },
-    inr: { amount: 4999, kind: "from" },
+    usd: { amount: 59, kind: "fixed" },
+    inr: { amount: 3999, kind: "fixed" },
     unit: "site",
     quotable: true,
   },
@@ -120,8 +120,8 @@ export const CATALOG: readonly CatalogItem[] = [
     serviceSlug: "seo-audit",
     alsoMatches: ["geo-audit"],
     label: "Full audit (SEO + GEO, reviewed by a person)",
-    usd: { amount: 49, kind: "fixed" },
-    inr: { amount: 3999, kind: "fixed" },
+    usd: { amount: 39, kind: "fixed" },
+    inr: { amount: 2999, kind: "fixed" },
     unit: "site",
     quotable: true,
   },
@@ -130,8 +130,8 @@ export const CATALOG: readonly CatalogItem[] = [
     serviceSlug: "monitoring",
     alsoMatches: [],
     label: "Monitoring",
-    usd: { amount: 29, kind: "fixed" },
-    inr: { amount: 1999, kind: "fixed" },
+    usd: { amount: 19, kind: "fixed" },
+    inr: { amount: 999, kind: "fixed" },
     unit: "month",
     quotable: false,
   },
@@ -141,9 +141,9 @@ export const CATALOG: readonly CatalogItem[] = [
  * Written scope of an instant quote. Above either cap the quote still lists prices but is not
  * fixed: a person confirms it within 1 business day.
  * - maxPagesScanned: the free audit reads the homepage plus up to five pages.
- * - maxPaidIssues: more distinct issues than this is more work than the base prices assume.
+ * - maxPaidIssues: the fixed-price Fix sprint covers up to 8 fixes; above that a person quotes the larger job.
  */
-export const QUOTE_SCOPE_CAP = { maxPagesScanned: 6, maxPaidIssues: 20 } as const;
+export const QUOTE_SCOPE_CAP = { maxPagesScanned: 6, maxPaidIssues: 8 } as const;
 
 /** Max line items an order may carry (mirrors the contact form validation). */
 export const MAX_ORDER_ITEMS = 12;

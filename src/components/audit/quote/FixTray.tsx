@@ -22,6 +22,7 @@ export function FixTray({ id }: { id: string }) {
       <div aria-hidden className="h-56 sm:h-48 lg:h-72" />
       <section
         id={id}
+        data-lenis-prevent
         aria-labelledby={`${id}-title`}
         className={cx(
           "fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-12px_32px_-18px_rgb(18_30_60/0.35)] sm:px-6",

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { enginesDisclaimer, site } from "@/content/site";
+import { enginesDisclaimer, enginesHeading, site } from "@/content/site";
 import { home } from "@/content/home";
 import { FeatureCollage, FloatingCard } from "@/components/collage/FeatureCollage";
 import { SectionTear } from "@/components/collage/SectionTear";
@@ -235,7 +235,7 @@ export default function DesignPreviewPage() {
       </Block>
 
       <Block title="Engine strip">
-        <EngineStrip label="Checks how you show up in" engines={site.enginesTracked} disclaimer={enginesDisclaimer} />
+        <EngineStrip label={enginesHeading} engines={site.enginesTracked} disclaimer={enginesDisclaimer} />
       </Block>
 
       <Block title="Placeholder copy">
@@ -271,7 +271,7 @@ export default function DesignPreviewPage() {
           <Reveal>
             <p className="font-serif text-display-sm">Fades up when scrolled into view (no-op with reduced motion).</p>
           </Reveal>
-          <Reveal variant="tear" className="mt-8">
+          <Reveal variant="settle" className="mt-8">
             <div className="rounded-card bg-white p-6 shadow-paper">Paper-tear wipe variant.</div>
           </Reveal>
         </div>

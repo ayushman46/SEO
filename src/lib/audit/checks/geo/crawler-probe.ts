@@ -8,10 +8,10 @@ import type { Severity } from "../../types";
 import { plural, unavailable, type BotProbe, type CheckOutcome, type CrawlerProbe, type IssueSeed, type ProbeResponse, type ProbeTarget } from "../../context";
 import type { IssueKey } from "../../issues";
 
-const def = { id: "geo.ai-crawler-probe", category: "geo", label: "AI crawler access (live test)" } as const;
+const def = { id: "geo.ai-crawler-probe", category: "geo", label: "AI crawler access (simulated test)" } as const;
 
 export const PROBE_HONESTY =
-  "Simulated from our servers with a labelled test user agent; sites that verify crawler IP addresses may treat the real bot differently.";
+  "Simulated from our servers, so a site that verifies crawler IP addresses may treat the real bot differently.";
 
 export const PROBE_BOTS = [
   { name: "GPTBot", token: "GPTBot/1.3", product: "OpenAI training", kind: "training" },
@@ -147,10 +147,10 @@ function pathOf(u: string): string {
 }
 
 const SKIP_SUMMARY: Record<Extract<CrawlerProbe, { status: "skipped" }>["reason"], string> = {
-  not_run: "The live AI-crawler test wasn't run for this audit.",
-  no_time: "There wasn't enough time left for the live AI-crawler test, so it was skipped.",
-  aborted: "The live AI-crawler test was cancelled.",
-  error: "The live AI-crawler test couldn't be completed.",
+  not_run: "The simulated AI-crawler test wasn't run for this audit.",
+  no_time: "There wasn't enough time left for the simulated AI-crawler test, so it was skipped.",
+  aborted: "The simulated AI-crawler test was cancelled.",
+  error: "The simulated AI-crawler test couldn't be completed.",
 };
 
 export function crawlerProbeOutcome(probe: CrawlerProbe, bodyCap = 64 * 1024): CheckOutcome {
@@ -184,7 +184,7 @@ export function crawlerProbeOutcome(probe: CrawlerProbe, bodyCap = 64 * 1024): C
     (rateLimited.size ? ` Not tested (rate limited): ${untestedByRate.length ? untestedByRate.join(", ") : "some requests"}.` : "") +
     (probe.cached ? " (Result reused from a test of this site in the last 15 minutes.)" : "");
   if (byBot.size === 0) {
-    return unavailable(def, `The live AI-crawler test got no usable responses in time.${rateNote} ${PROBE_HONESTY}`);
+    return unavailable(def, `The simulated AI-crawler test got no usable responses in time.${rateNote} ${PROBE_HONESTY}`);
   }
 
   // Classify every refusal once.

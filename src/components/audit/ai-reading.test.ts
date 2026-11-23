@@ -147,7 +147,7 @@ describe("FullReport", () => {
 
 describe("checks with new ids", () => {
   it("falls back to friendly labels and reads 'Not run' for unavailable", () => {
-    expect(checkLabel({ id: "geo.ai-crawler-probe", label: "" })).toBe("AI crawler access test");
+    expect(checkLabel({ id: "geo.ai-crawler-probe", label: "" })).toBe("AI crawler access (simulated test)");
     expect(checkLabel({ id: "geo.brand-new-thing", label: "" })).toBe("Brand new thing");
     expect(checkLabel({ id: "seo.title", label: "Title tags" })).toBe("Title tags");
     const html = render(

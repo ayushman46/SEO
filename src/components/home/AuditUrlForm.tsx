@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useRef, useState, useTransition, type FormEvent } from "react";
+import { useId, useRef, useState, useTransition, type FormEvent, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { auditForm } from "@/content/audit";
 import { cx } from "@/components/ui/cx";
@@ -32,10 +32,13 @@ export function AuditUrlForm({
   tone = "light",
   className,
   showHelp = true,
+  helpAction,
 }: {
   tone?: "light" | "night";
   className?: string;
   showHelp?: boolean;
+  /** a link set on the help line, outside the field's description (e.g. the sample report) */
+  helpAction?: ReactNode;
 }) {
   const router = useRouter();
   const uid = useId();
@@ -118,8 +121,9 @@ export function AuditUrlForm({
         ) : null}
       </div>
       {showHelp ? (
-        <p id={helpId} className={cx("mt-3 text-sm", night ? "text-night-muted" : "text-muted")}>
-          {auditForm.help}
+        <p className={cx("mt-3 text-sm text-pretty", night ? "text-night-muted" : "text-muted")}>
+          <span id={helpId}>{auditForm.help}</span>
+          {helpAction ? <> {helpAction}</> : null}
         </p>
       ) : null}
     </form>

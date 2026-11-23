@@ -61,7 +61,7 @@ export function HeroCollage() {
   const sky = skyProps();
 
   return (
-    <div className="relative isolate -mt-(--nav-h) h-[clamp(27rem,68svh,44rem)] overflow-clip">
+    <div className="hero-depth-scope relative isolate -mt-(--nav-h) h-[clamp(20rem,46svh,34rem)] overflow-clip">
       {/* Sky paper with torn bottom edge */}
       <div className="absolute inset-0" style={{ clipPath: bottomTear }}>
         <Parallax speed={-0.07} className="absolute inset-x-0 -top-[10%] -bottom-[10%]">
@@ -112,8 +112,10 @@ export function HeroCollage() {
         </TornFrame>
       </Parallax>
 
-      {/* The torn hole and the eye */}
-      <div className="absolute top-[56%] left-1/2 w-[min(90vw,48rem)] -translate-x-1/2 -translate-y-1/2">
+      {/* The torn hole and the eye. As the hero scrolls away the hole pushes in
+          toward the reader (T025: CSS scroll-driven `transform`, composes with
+          the centring `translate`; static under reduced motion). */}
+      <div className="hero-depth absolute top-[58%] left-1/2 w-[min(88vw,46rem,calc(clamp(20rem,46svh,34rem)*1.5))] -translate-x-1/2 -translate-y-1/2">
         <TornFrame
           seed={5}
           shape="ellipse"
@@ -127,9 +129,13 @@ export function HeroCollage() {
             alt="The painted eyes of Leonardo da Vinci's Mona Lisa, looking out through a hole torn in a blue sky"
             fill
             loading="eager"
-            sizes="(min-width: 854px) 816px, 96vw"
+            sizes="(min-width: 840px) 736px, 88vw"
             className="scale-[1.06] object-cover object-[50%_42%]"
           />
+          {/* Signature moment 1 (T026): paper eyelids, parked outside the torn clip.
+              They close once when the URL field takes focus (CSS :has(), transform only). */}
+          <div aria-hidden className="eye-lid eye-lid-top paper-grain" />
+          <div aria-hidden className="eye-lid eye-lid-bottom paper-grain" />
           {/* depth: the sky casts a shadow into the hole */}
           <div
             aria-hidden

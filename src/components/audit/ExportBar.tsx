@@ -47,7 +47,7 @@ export function ExportBar({ result, headingId, className }: { result: AuditResul
           : done === "failed"
             ? auditExportCopy.copyFailed
             : "";
-  const btn = buttonClass({ variant: "secondary", size: "sm", className: "h-auto! min-h-9 w-full justify-start py-2 text-left whitespace-normal! sm:w-auto" });
+  const btn = buttonClass({ variant: "secondary", size: "sm", className: "h-auto! min-h-9 w-full justify-start rounded-control! py-2 text-left whitespace-normal! sm:w-auto" });
 
   return (
     <section
@@ -56,7 +56,7 @@ export function ExportBar({ result, headingId, className }: { result: AuditResul
     >
       <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
         <div className="min-w-0 xl:max-w-md">
-          <h4 id={headingId} className="font-serif text-[1.5rem] leading-tight text-ink">
+          <h4 id={headingId} className="font-serif text-title text-balance text-ink">
             {auditExportCopy.title}
           </h4>
           <p className="mt-1.5 text-sm leading-relaxed text-pretty text-muted">{auditExportCopy.helper}</p>

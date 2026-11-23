@@ -18,7 +18,7 @@ export interface IssueCopy {
 
 /** Required caveat on every crawler-probe string (ADR-017). Kept in sync with PROBE_HONESTY. */
 const PROBE_CAVEAT =
-  "Simulated from our servers with a labelled test user agent; sites that verify crawler IP addresses may treat the real bot differently.";
+  "Simulated from our servers, so a site that verifies crawler IP addresses may treat the real bot differently.";
 
 const CMS_HINT =
   "On WordPress this lives in your SEO plugin (Yoast, Rank Math); on Wix, Squarespace and Shopify it's in each page's SEO settings.";
@@ -200,7 +200,7 @@ export const ISSUE_CATALOG = {
     effort: "quick",
     title: "No robots.txt file",
     description:
-      "robots.txt is a small file that tells search engines and AI crawlers what they may visit and where your sitemap is. It's a basic signal of a well-kept site.",
+      "robots.txt is a small file that tells search engines and AI crawlers what they may visit and where your sitemap is.",
     howToFix:
       "Create `/robots.txt` with: `User-agent: *` / `Allow: /` / `Sitemap: https://yourdomain.com/sitemap.xml`. Most CMSs and SEO plugins can generate it for you.",
   },
@@ -403,7 +403,7 @@ export const ISSUE_CATALOG = {
     effort: "quick",
     title: "No llms.txt file",
     description:
-      "llms.txt is an emerging, optional standard: a short plain-text guide to your site written for AI tools. It's cheap to add and helps AI assistants find your key pages.",
+      "llms.txt is an optional, proposed standard: a short plain-text guide to your site for AI tools. It is quick to add.",
     howToFix:
       "Create `/llms.txt` starting with `# Your Business Name`, a one-line summary in `> quotes`, then a list of your most important pages as `- [Page name](https://…): what it covers`.",
   },
@@ -446,7 +446,7 @@ export const ISSUE_CATALOG = {
     effort: "moderate",
     title: "No questions and answers on your site",
     description:
-      "People ask AI assistants questions. Pages that answer common customer questions directly are far more likely to be quoted.",
+      "AI assistants quote pages that answer a customer's question directly.",
     howToFix:
       "Add an FAQ section with 5–8 real customer questions as headings (e.g. `<h2>How much does a boiler service cost?</h2>`) each followed by a short, direct answer. Mark it up with `FAQPage` schema if your plugin supports it.",
   },
@@ -456,7 +456,7 @@ export const ISSUE_CATALOG = {
     severity: "low",
     effort: "moderate",
     title: "Only a few questions are answered on your site",
-    description: "A handful of Q&As is a start; more coverage of real customer questions gives AI assistants more to quote.",
+    description: "More answered customer questions give AI assistants more to quote.",
     howToFix:
       "Expand to at least 3–5 question-style headings with direct answers, or add an FAQ page with `FAQPage` schema.",
   },
@@ -467,7 +467,7 @@ export const ISSUE_CATALOG = {
     effort: "quick",
     title: "No author or owner information found",
     description:
-      "AI assistants and Google favour content from identifiable people. Showing who wrote or stands behind your content builds trust.",
+      "Content with a named author or owner is easier for Google and AI assistants to trust and attribute.",
     howToFix:
       "Add a byline to articles and key pages (e.g. \"By Jane Smith, Head Chef\"), link it to an About page, and add `<meta name=\"author\" content=\"Jane Smith\">` or an `author` in your Article schema.",
   },
@@ -487,7 +487,7 @@ export const ISSUE_CATALOG = {
     category: "geo",
     severity: "medium",
     effort: "moderate",
-    title: "Content isn't written in quotable, answer-first blocks",
+    title: "Sections don't start with a direct answer",
     description:
       "AI assistants lift short, self-contained answers. Sections that start with a clear 1–3 sentence answer (20–60 words) right under the heading are much easier to quote.",
     howToFix:
@@ -810,7 +810,7 @@ export const ISSUE_CATALOG = {
     effort: "quick",
     title: "Snippet length is limited to a few characters",
     description:
-      "A very low `max-snippet` value lets search engines quote only a few characters from these pages, which Google lists among the controls that limit what's shown from your pages in Search and its AI features. Google doesn't publish which values matter.",
+      "A very low `max-snippet` value lets search engines quote only a few characters from these pages, in Search and in Google's AI features.",
     howToFix:
       "Remove the `max-snippet` directive or set it to `-1` (no limit), e.g. `<meta name=\"robots\" content=\"max-snippet:-1, max-image-preview:large\">`.",
   },
@@ -843,7 +843,7 @@ export const ISSUE_CATALOG = {
     effort: "quick",
     title: "Your site doesn't link to any review profiles",
     description:
-      "We found no links to profiles on Google Business Profile, Trustpilot, G2, Capterra, Yelp, Tripadvisor, Justdial, Practo or similar sites. Some vendor studies associate review profiles with more AI citations; that evidence is mostly vendor-run and correlational. We don't read the review sites themselves.",
+      "We found no links to review profiles such as Google Business Profile, Trustpilot, G2 or Yelp. Evidence that this affects AI answers is mostly vendor-run and correlational, so it counts for little. We don't read the review sites themselves.",
     howToFix:
       "Link your real review profiles from the footer or a \"Reviews\" page and add them to your Organization schema `sameAs`. In regulated fields (e.g. clinics in India) check the rules on soliciting reviews first.",
   },
@@ -854,7 +854,7 @@ export const ISSUE_CATALOG = {
     effort: "quick",
     title: "Rating markup with no visible reviews",
     description:
-      "These pages have AggregateRating or Review structured data, but we couldn't find reviews or ratings in the visible text. Markup that doesn't match the page is a mismatch risk: Google's review snippet guidelines require the reviews to be visible.",
+      "These pages have AggregateRating or Review structured data, but we couldn't find reviews or ratings in the visible text. Google's review snippet guidelines require the reviews to be visible.",
     howToFix:
       "Either show the reviews and rating on the page (with reviewer names) or remove the AggregateRating/Review markup from it.",
   },
@@ -865,7 +865,7 @@ export const ISSUE_CATALOG = {
     effort: "quick",
     title: "Testimonials don't say who gave them",
     description:
-      "Most testimonials we found have no named source. Quotes without a name, role or company are harder for people and AI tools to trust. Evidence that this changes AI recommendations is mostly vendor-run and correlational.",
+      "Most testimonials we found have no name, role or company, which makes them harder to trust. Evidence that this changes AI answers is weak.",
     howToFix:
       "Add the person's name and context under each quote (with permission), e.g. `<blockquote>Fixed our boiler the same day.<cite>— Priya S., Leeds</cite></blockquote>`.",
   },
@@ -876,7 +876,7 @@ export const ISSUE_CATALOG = {
     effort: "quick",
     title: "No sign your site is set up in Bing Webmaster Tools",
     description:
-      "We didn't find Bing's verification tag (`msvalidate.01`) on your homepage. Bing's index is confirmed to feed Microsoft Copilot; whether it feeds other assistants isn't confirmed. Bing also allows verification by DNS or an XML file we can't see, so if you've verified another way, ignore this.",
+      "We didn't find Bing's verification tag (`msvalidate.01`) on your homepage. Bing's index is confirmed to feed Microsoft Copilot; whether it feeds other assistants isn't confirmed. If you verified by DNS or an XML file, which we can't see, ignore this.",
     howToFix:
       "1) Sign in to Bing Webmaster Tools and add your site (you can import it from Google Search Console). 2) Submit your sitemap there. 3) Turn on IndexNow (many hosts and SEO plugins have a switch; otherwise host the key file Bing gives you and ping IndexNow when pages change). Then check the AI Performance report.",
   },
@@ -907,7 +907,7 @@ export const ISSUE_CATALOG = {
     category: "seo",
     severity: "medium",
     effort: "moderate",
-    title: "Missing pages return \"200 OK\" (soft 404)",
+    title: "Missing pages don't return a 404 error",
     description:
       "We requested a made-up address on your site and got a normal page with status 200 instead of 404. Search engines and AI agents can then treat broken links and junk URLs as real pages. We tested one URL only.",
     howToFix:
@@ -1014,7 +1014,7 @@ export const ISSUE_CATALOG = {
     description:
       "Google's PageSpeed test rates your homepage's mobile performance poorly. Slow pages lose visitors and rank lower.",
     howToFix:
-      "Start with the biggest wins: compress and resize images (use WebP/AVIF), remove unused plugins/apps and third-party scripts, and enable caching on your host or a CDN.",
+      "Compress and resize images (use WebP/AVIF), remove unused plugins, apps and third-party scripts, and turn on caching on your host or a CDN.",
   },
   "performance.cwv:lcp": {
     checkId: "performance.cwv",

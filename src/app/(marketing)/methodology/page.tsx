@@ -24,7 +24,6 @@ export default function MethodologyPage() {
         kicker={methodologyPage.kicker}
         title={methodologyPage.title}
         intro={methodologyPage.intro}
-        motif="eye"
         seed={53}
         updated={u}
       >

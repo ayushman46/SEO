@@ -17,8 +17,9 @@ const base = {
 };
 
 const items = (list: unknown[]): string => JSON.stringify(list);
-const unblock = { serviceSlug: "ai-crawler-unblock", label: "AI crawler unblock", price: 149, from: false };
-const sprint = { serviceSlug: "technical-fixes", label: "Technical fix sprint", price: 199, from: true };
+const unblock = { serviceSlug: "ai-crawler-unblock", label: "AI crawler unblock", price: 49, from: false };
+/** A "from" (starting) price: since T028 Content & entity is the only quotable one. */
+const sprint = { serviceSlug: "content-entity", label: "Content & entity", price: 99, from: true };
 
 describe("contact quote attachment (T019)", () => {
   it("field names are stable", () => {
@@ -93,22 +94,22 @@ describe("contact quote attachment (T019)", () => {
 
 describe("verifyOrder: client prices are checked, never trusted", () => {
   it("accepts catalog prices", () => {
-    const v = verifyOrder({ currency: "USD", items: [unblock, sprint], submittedTotal: 348, submittedFixed: false });
-    expect(v).toMatchObject({ valid: true, fixed: false, catalogTotal: 348 });
+    const v = verifyOrder({ currency: "USD", items: [unblock, sprint], submittedTotal: 148, submittedFixed: false });
+    expect(v).toMatchObject({ valid: true, fixed: false, catalogTotal: 148 });
   });
 
   it("flags a tampered price and does not count it", () => {
-    const v = verifyOrder({ currency: "USD", items: [{ ...unblock, price: 1 }, sprint], submittedTotal: 200, submittedFixed: false });
+    const v = verifyOrder({ currency: "USD", items: [{ ...unblock, price: 1 }, sprint], submittedTotal: 100, submittedFixed: false });
     expect(v.valid).toBe(false);
-    expect(v.items[0]).toMatchObject({ valid: false, problem: "price-mismatch", catalogPrice: 149 });
-    expect(v.catalogTotal).toBe(199);
+    expect(v.items[0]).toMatchObject({ valid: false, problem: "price-mismatch", catalogPrice: 49 });
+    expect(v.catalogTotal).toBe(99);
   });
 
   it("flags a 'from' price presented as fixed, and never upgrades to fixed", () => {
-    const v = verifyOrder({ currency: "USD", items: [{ ...sprint, from: false }], submittedTotal: 199, submittedFixed: true });
+    const v = verifyOrder({ currency: "USD", items: [{ ...sprint, from: false }], submittedTotal: 99, submittedFixed: true });
     expect(v.items[0].problem).toBe("from-mismatch");
     expect(v.fixed).toBe(false);
-    const w = verifyOrder({ currency: "USD", items: [sprint], submittedTotal: 199, submittedFixed: true });
+    const w = verifyOrder({ currency: "USD", items: [sprint], submittedTotal: 99, submittedFixed: true });
     expect(w.valid).toBe(true);
     expect(w.fixed).toBe(false);
   });
@@ -120,25 +121,25 @@ describe("verifyOrder: client prices are checked, never trusted", () => {
     expect(verifyOrder({ currency: "INR", items: [unblock], submittedTotal: 149, submittedFixed: true }).items[0].problem).toBe("price-mismatch");
   });
 
-  it("handles INR price-on-request lines (Content & entity)", () => {
+  it("checks the INR starting price for Content & entity (no longer price-on-request)", () => {
     const ok = verifyOrder({
+      currency: "INR",
+      items: [{ serviceSlug: "content-entity", label: "Content & entity", price: 6999, from: true }],
+      submittedTotal: 6999,
+      submittedFixed: false,
+    });
+    expect(ok).toMatchObject({ valid: true, fixed: false, catalogTotal: 6999 });
+    const bad = verifyOrder({
       currency: "INR",
       items: [{ serviceSlug: "content-entity", label: "Content & entity", price: null, from: true }],
       submittedTotal: 0,
-      submittedFixed: false,
-    });
-    expect(ok).toMatchObject({ valid: true, fixed: false, catalogTotal: 0 });
-    const bad = verifyOrder({
-      currency: "INR",
-      items: [{ serviceSlug: "content-entity", label: "Content & entity", price: 5000, from: true }],
-      submittedTotal: 5000,
       submittedFixed: false,
     });
     expect(bad.valid).toBe(false);
   });
 
   it("accepts the geo-audit alias for the Full audit", () => {
-    const v = verifyOrder({ currency: "USD", items: [{ serviceSlug: "geo-audit", label: "Full audit (SEO + GEO, reviewed by a person)", price: 49, from: false }], submittedTotal: 49, submittedFixed: true });
+    const v = verifyOrder({ currency: "USD", items: [{ serviceSlug: "geo-audit", label: "Full audit (SEO + GEO, reviewed by a person)", price: 39, from: false }], submittedTotal: 39, submittedFixed: true });
     expect(v).toMatchObject({ valid: true, fixed: true });
   });
 });

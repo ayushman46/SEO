@@ -41,7 +41,7 @@ export const methodologyPage = {
   kicker: "Methodology",
   title: "How the seenhq audit works",
   intro:
-    "The seenhq audit is a free, automated check that reads up to six public pages of a website and scores them for SEO, GEO (Generative Engine Optimization) and mobile performance. This page lists what it fetches, every check it runs, how the scores are calculated, what the AI reading is and is not, and the limits we know about.",
+    "The free audit reads up to six public pages of a website and scores them for SEO, GEO (Generative Engine Optimization) and mobile speed. Every check, weight and known limit is below.",
 } satisfies PageCopy;
 
 export const methodologySections: DocSection[] = [
@@ -89,7 +89,7 @@ export const methodologySections: DocSection[] = [
       {
         id: "seo",
         title: "SEO",
-        intro: "Can Google and Bing find, read and show your pages?",
+        intro: "Checks that affect Google and Bing.",
         items: [
           { id: "seo.indexability", weight: 15, label: "Indexability", body: "Pages answer with a normal status and are not marked noindex." },
           { id: "seo.title", weight: 12, label: "Title tags", body: "Every page has a title that is present, unique and a sensible length." },
@@ -121,7 +121,7 @@ export const methodologySections: DocSection[] = [
       {
         id: "geo",
         title: "GEO",
-        intro: "Can AI answer engines read, understand and quote your site?",
+        intro: "Checks that affect AI answer engines.",
         items: [
           {
             id: "geo.ai-crawlers",
@@ -132,7 +132,7 @@ export const methodologySections: DocSection[] = [
           {
             id: "geo.ai-crawler-probe",
             weight: 8,
-            label: "AI crawler access (live test)",
+            label: "AI crawler access (simulated test)",
             body: "We request your homepage and a few key files as GPTBot, OAI-SearchBot, ChatGPT-User, ClaudeBot, PerplexityBot and bingbot, using labelled test user agents, compare the answers with our own crawler's, and name the layer that refuses a bot, such as a firewall, CDN or host. It is simulated from our servers, so sites that verify crawler IP addresses may treat the real bots differently.",
           },
           {
@@ -207,7 +207,7 @@ export const methodologySections: DocSection[] = [
   },
   {
     id: "ai-reading",
-    title: "What the AI reading is, and what it is not",
+    title: "The AI reading and its limits",
     body: [
       "The AI reading is one model's reading of your pages. We send the text of the pages we fetched (titles, descriptions, headings and visible text, shortened to a fixed length) to an open-weight language model hosted on NVIDIA's API, and ask how an AI model would describe the business from that text alone.",
       "It is not what ChatGPT, Gemini, Perplexity, Claude or Google AI Overviews say about you. Those assistants use their own models, search results and many other sources, and their answers change between runs. We do not query them and we do not track their answers.",
@@ -218,7 +218,7 @@ export const methodologySections: DocSection[] = [
   {
     id: "limits",
     title: "Known limits",
-    body: ["The audit is a guide, not a guarantee. These are the limits we know about."],
+    body: ["These are the limits we know about."],
     items: [
       { id: "limit.pages", label: "Six pages at most", body: "Problems on pages we did not fetch are not in the report. Slow sites may get fewer pages before the 55-second limit." },
       { id: "limit.javascript", label: "No JavaScript", body: "We read the HTML a plain fetcher receives. Content that only appears after scripts run counts as missing, even though Google and some AI systems do run JavaScript." },
@@ -249,11 +249,11 @@ export const methodologySections: DocSection[] = [
 export const methodologyFaq: FaqItem[] = [
   {
     q: "Is the AI reading what ChatGPT says about my business?",
-    a: "No. The AI reading is one open-weight language model, hosted on NVIDIA's API, reading the text of the pages we fetched from your site. ChatGPT, Gemini, Perplexity and other assistants use their own models and sources, and we do not query them. Use the AI reading to see whether your pages state your key facts clearly, not as a record of what any assistant says.",
+    a: "No. It is one open-weight language model, hosted on NVIDIA's API, reading the pages we fetched. We do not query ChatGPT, Gemini, Perplexity or any other assistant.",
   },
   {
     q: "Does the seenhq audit run JavaScript?",
-    a: "No. The audit reads the HTML a plain fetcher receives, without running scripts. If your core facts only appear after JavaScript runs, the audit reports them as missing from the raw HTML, because fetchers that do not run JavaScript will not see them either.",
+    a: "No. It reads the HTML your server sends. Facts that only appear after JavaScript runs are reported as missing, because many AI crawlers will not see them either.",
   },
   {
     q: "Does the audit read PDFs and images?",

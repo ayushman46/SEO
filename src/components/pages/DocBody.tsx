@@ -7,6 +7,7 @@ import { Container } from "@/components/ui/Container";
 import { cx } from "@/components/ui/cx";
 import { PlaceholderText } from "@/components/ui/PlaceholderText";
 import { InPageNav } from "./InPageNav";
+import { ReadingProgress } from "./ReadingProgress";
 
 /** Anchor for a scored check, e.g. "seo.title" -> "check-seo-title". Stable, so issue cards can deep-link. */
 export function checkAnchor(checkId: string): string {
@@ -157,6 +158,7 @@ export function DocBody({
 
   return (
     <div className="pt-14 pb-24 sm:pt-20 sm:pb-32">
+      <ReadingProgress />
       <Container className="grid gap-12 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-16 xl:grid-cols-[17rem_minmax(0,1fr)] xl:gap-24">
         <InPageNav variant="list" label={`${label}: contents`} heading="On this page" items={nav} />
         <article aria-label={label} className="max-w-[52rem] min-w-0">

@@ -124,7 +124,7 @@ export const QUOTE_TEXT = {
     "from-price": "Some prices are starting prices; the final price depends on the work involved.",
     "price-on-request": "One service has no published price in this currency yet.",
     "pages-over-cap": `The quote covers the ${QUOTE_SCOPE_CAP.maxPagesScanned} pages the free audit reads; a larger site needs a person to look.`,
-    "issues-over-cap": `More than ${QUOTE_SCOPE_CAP.maxPaidIssues} issues is more work than our starting prices assume.`,
+    "issues-over-cap": `More than ${QUOTE_SCOPE_CAP.maxPaidIssues} fixes is a larger job than the fixed-price Fix sprint covers, so a person quotes it.`,
     "involved-work": "At least one fix needs a developer, so a person scopes it first.",
   } satisfies Record<QuoteReviewReason, string>,
 } as const;
@@ -134,13 +134,13 @@ const MAX_TITLE_CHARS = 200;
 
 const LINE_NOTES: Partial<Record<CatalogKey, string>> = {
   "local-ai-setup": "Priced for one location; each extra location costs the same.",
-  "ai-fact-check": "The starting price is the check itself; fixing the sources is confirmed before we start.",
-  "fix-sprint": "Covers the issues listed here, on the pages the free audit read.",
+  "ai-fact-check": "Up to 10 questions on 4 assistants, fixes to the sources you control and one re-test after 30 days.",
+  "fix-sprint": `Up to ${QUOTE_SCOPE_CAP.maxPaidIssues} fixes from this list on one site, with before/after proof for each.`,
   "content-entity": "Covers the pages and sections listed here; the price depends on how many there are.",
 };
 
 const FULL_AUDIT_NOTE =
-  "A person reviews up to 50 pages and writes a plan: what to fix first, what can wait and what to ignore.";
+  "A person reviews up to 15 pages and emails you a plan: what to fix first, what can wait and what to ignore.";
 
 const plural = (n: number, one: string, many: string): string => (n === 1 ? one : many);
 

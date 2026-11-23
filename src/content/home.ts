@@ -5,18 +5,18 @@ export const home = {
     eyebrow: "SEO + GEO audits for startups and local businesses",
     title: "Be seen by people and by the machines they ask.",
     subtitle:
-      "seenhq checks your website for Google and for AI answer engines like ChatGPT, Perplexity and Gemini. Paste your address to get scores, a separate AI model's reading of your pages and a ranked list of fixes, in about a minute.",
+      "Paste your website address. In about a minute you get scores and a ranked list of what stops Google and AI answer engines like ChatGPT and Perplexity from reading and quoting your site, with the fix for each.",
     primaryCta: { label: "Run a free audit", href: "/audit" },
     secondaryCta: { label: "See services", href: "/services" },
   },
 
   proofLine:
-    "Checks your site against what search engines and AI answer engines need to find, trust and cite you.",
+    "Reads up to six public pages, plus the robots.txt, sitemap and llms.txt files crawlers use.",
 
   problem: {
-    kicker: "The shift",
+    kicker: "Problem",
     title: "People still search. More and more, they ask.",
-    body: "Many buyers now ask ChatGPT, Perplexity or Google's AI Overviews and get a single written answer instead of ten blue links. If your site is hard for those systems to read, trust or quote, you are left out of the answer, even when your Google rankings look fine.",
+    body: "Many buyers now ask ChatGPT, Perplexity or Google's AI Overviews and get one written answer instead of a list of links. If those systems can't read or quote your site, you are not in the answer, however well you rank on Google. In BrightLocal's October 2026 survey of 1,002 US local business owners, 46% had not checked or did not know whether they appear in AI results.",
     points: [
       {
         icon: "bot",
@@ -45,13 +45,13 @@ export const home = {
     {
       id: "seo",
       label: "SEO",
-      title: "The fundamentals Google still runs on",
+      title: "What Google needs to index you",
       body: "We read your homepage and up to five key pages the way a crawler does, and check the basics that decide whether you get indexed and clicked.",
       bullets: [
         {
           icon: "search",
           title: "Titles and descriptions",
-          body: "Present, unique and the right length, so your result reads well on the page.",
+          body: "Present, unique and short enough not to be cut off in results.",
         },
         {
           icon: "list",
@@ -74,7 +74,7 @@ export const home = {
       id: "geo",
       label: "GEO",
       title: "Ready to be read and cited by AI",
-      body: "GEO (Generative Engine Optimization) is making your site easy for AI answer engines to read, trust and quote. We check the signals that make a site easier for them to use as a source, and have a language model read your pages to see how clearly they describe you.",
+      body: "GEO (Generative Engine Optimization) means making your site easy for AI answer engines to read and quote. We check what gets in their way.",
       bullets: [
         {
           icon: "bot",
@@ -84,7 +84,7 @@ export const home = {
         {
           icon: "sparkles",
           title: "How an AI model reads you",
-          body: "A language model reads your pages and reports how it would describe you, which core facts are clear, vague or missing, and which customer questions you answer. It is one model's reading, not what ChatGPT or Gemini say.",
+          body: "A language model reads your pages and reports which core facts are clear, vague or missing and which customer questions you answer. One model's reading, not what ChatGPT or Gemini say.",
         },
         {
           icon: "eye",
@@ -103,8 +103,8 @@ export const home = {
         },
         {
           icon: "shield",
-          title: "Identity and trust signals",
-          body: "Structured data that states who you are (Organization or LocalBusiness schema), a consistent name, authors and visible dates.",
+          title: "Who you are",
+          body: "Structured data that names your business, the same name everywhere, named authors and visible dates.",
         },
       ],
     },
@@ -140,7 +140,7 @@ export const home = {
         {
           icon: "list",
           title: "Prioritised by impact",
-          body: "Critical issues first, each labelled as a quick fix, a moderate job or involved work, so you can plan your week.",
+          body: "Critical issues first, each labelled quick, moderate or involved.",
         },
         {
           icon: "file",
@@ -163,11 +163,11 @@ export const home = {
 
   howItWorks: {
     kicker: "How it works",
-    title: "From address to action plan in three steps",
+    title: "Three steps, about a minute",
     steps: [
       {
         title: "Paste your website address",
-        body: "No setup and no code to install. We fetch only the public pages anyone can see.",
+        body: "Nothing to install. We read only public pages.",
       },
       {
         title: "Get your scores in about a minute",
@@ -182,39 +182,35 @@ export const home = {
 
   sampleReport: {
     kicker: "What you get",
-    title: "A report written for people, not just developers",
-    body: "Each issue says what is wrong, why it matters for search and AI answers, and exactly how to fix it. Pages, checks, Core Web Vitals and the AI reading are laid out in one place.",
+    title: "A report a business owner can read",
+    body: "Each issue says what is wrong, why it matters and how to fix it.",
     note: "Illustrative sample report",
   },
 
   servicesTeaser: {
     kicker: "Services",
-    title: "Prefer it done for you?",
-    body: "Eight focused services: a Full audit that covers SEO and GEO together, hands-on technical fixes, content and entity work, monthly monitoring, an AI fact-check and fix, local AI visibility setup and AI crawler unblocking. Fixed scope, plain pricing, all done by a person.",
+    title: "We can fix it for you",
+    body: "Eight services, each with a fixed scope and a price shown up front, each done by a person. Before/after proof: we re-run the audit after the work and send you what changed.",
   },
 
   pricingTeaser: {
     kicker: "Pricing",
-    title: "Start free. Pay only when you want more.",
-    body: "The audit is free. A full expert audit, a one-time fix sprint and monthly monitoring are priced for small teams and local businesses, not enterprise budgets.",
+    title: "Free audit. Paid work is quoted first.",
+    body: "A person-reviewed Full audit, a one-time fix sprint and monthly monitoring. Fixed prices. No contract, no minimum term, no exit fee.",
     cta: { label: "See pricing", href: "/pricing" },
   },
 
   nightSky: {
-    kicker: "After dark",
+    kicker: "AI search",
     title: "The answer is written before anyone visits your site.",
-    body: "When someone asks an AI assistant for the best tool, clinic or café near them, the engine has already decided which sources to trust. The free audit shows whether your site gives those engines what they need to read, understand and quote you, and what to change if it doesn't. It checks readiness; it does not track what the engines say about you.",
+    body: "When someone asks an AI assistant for the best clinic or café nearby, it has already chosen its sources. The free audit checks whether those engines can read and quote your site, and lists what to change if they can't.",
     cta: { label: "Check my site", href: "/audit" },
   },
 
   faq: [
     {
       q: "What is GEO (Generative Engine Optimization)?",
-      a: "GEO, or Generative Engine Optimization, is the practice of making your website easy for AI answer engines such as ChatGPT, Perplexity, Claude, Gemini and Google AI Overviews to read, trust and cite. It builds on SEO and adds things like allowing AI crawlers, writing answer-ready content and publishing clear structured data about who you are.",
-    },
-    {
-      q: "How is GEO different from SEO?",
-      a: "SEO helps your pages rank in a list of search results; GEO helps your content get quoted inside an AI-written answer. Most of the foundations are shared, such as crawlable pages, fast load times and clear titles. GEO adds extra weight on direct answers, a clear and consistent identity for your business, and letting AI crawlers in.",
+      a: "GEO, or Generative Engine Optimization, is making your website easy for AI answer engines such as ChatGPT, Perplexity, Claude, Gemini and Google AI Overviews to read and quote. SEO gets a page ranked in a list of results; GEO gets its content quoted inside an AI-written answer. The foundations are shared, and GEO adds direct answers, one consistent description of your business and letting AI crawlers in.",
     },
     {
       q: "What are Google AI Overviews?",
@@ -222,40 +218,45 @@ export const home = {
     },
     {
       q: "What is llms.txt?",
-      a: "llms.txt is a plain-text file at the root of a website, for example example.com/llms.txt, that gives AI tools a short summary of the site and links to its most useful pages. It is a proposed standard described at llmstxt.org. It is not required, but it is quick to add and makes your site easier for language models to understand.",
+      a: "llms.txt is a plain-text file at the root of a website, for example example.com/llms.txt, that gives AI tools a short summary of the site and links to its most useful pages. It is a proposed standard described at llmstxt.org. It is optional and quick to add.",
     },
     {
       q: "What does the free seenhq audit check?",
-      a: "The free audit checks your homepage and up to five internal pages for SEO basics, GEO readiness and mobile performance. That includes titles, headings, canonicals, robots.txt, sitemap, structured data, AI crawler access, llms.txt, answer-ready content and Google PageSpeed Insights results. It also flags key facts that exist only in images, PDFs or JavaScript, crossed-out or conflicting prices, phone numbers and hours, snippet settings that keep pages out of AI Overviews, missing pages that don't return 404, Bing readiness and review signals, and it runs a simulated AI-crawler test. It usually finishes in about a minute.",
+      a: "Your homepage and up to five more pages. It checks whether Google and AI crawlers can reach and read them, whether your name, prices, hours and contact details are in plain text and agree from page to page, and how fast the page loads on a phone. It also runs a simulated AI-crawler test. Every check and its weight is on the methodology page.",
     },
     {
       q: "Does the audit use AI?",
-      a: "Yes, for one part. Most checks are fixed rules that read your HTML, robots.txt and sitemap. The AI reading is separate: an open-weight language model hosted on NVIDIA's API reads the text of the pages we fetch and reports how an AI model would describe your business, which of seven core facts are clear, vague or missing, and which customer questions you answer. It also drafts a title, meta description, llms.txt, Organization schema and an answer-ready paragraph, using only facts from your site. It is one model's reading of your pages, not what ChatGPT, Gemini or Perplexity say about you, and it can be wrong, so review every draft before you use it.",
+      a: "Yes, for one part. Most checks are fixed rules. Separately, an open-weight language model hosted on NVIDIA's API reads your page text, reports which basic facts about your business are clear, vague or missing, and drafts fixes from facts already on your site. It is one model's reading, not what ChatGPT, Gemini or Perplexity say about you, and it can be wrong, so check every draft before you publish it.",
     },
     {
       q: "Why do you ask for my email to see the full report?",
-      a: "Your scores and top three issues are free with no strings. To see every issue and fix, we ask for your email and for your agreement that we may store it with the report and contact you about it. You can ask us to delete it at any time. No password, no card and nothing to install.",
-    },
-    {
-      q: "Is seenhq useful for a local business, not just a startup?",
-      a: "Yes. Local businesses are increasingly recommended by AI assistants when someone asks for a nearby service. We check LocalBusiness schema, a consistent business name and the basics that help both Google and AI engines connect your website to your real-world location.",
+      a: "Because we may contact you about the report, and we store your email with it. Scores and your top three issues need no email, and you can ask us to delete yours at any time.",
     },
     {
       q: "What if an AI assistant says something wrong about my business?",
-      a: "Fix the sources it learns from, because you cannot edit an AI answer directly. Assistants such as ChatGPT, Gemini and Google AI Overviews build answers from your website, your business profiles and other pages about you, so a wrong phone number, an old price or a \"permanently closed\" label usually traces back to a page somewhere. Correct the facts on your own site and profiles first, then ask other sites to fix theirs and use each assistant's feedback button. Our AI fact-check & fix service does this for you and re-tests after 30 days. Nobody can control what an AI says, and answers vary between runs, so we report what changed rather than promise a result.",
+      a: "You cannot edit an AI answer, so fix what it reads. A wrong phone number, an old price or a \"permanently closed\" label usually traces back to your site, a business profile or a directory. Correct your own site and profiles first, then ask the other sites to fix theirs. Our AI fact-check & fix service does this and re-tests after 30 days. Answers vary between runs, so we cannot promise a result.",
     },
     {
       q: "Can you guarantee rankings or AI citations?",
-      a: "No. Nobody controls what Google or an AI engine chooses to show, and anyone who promises a specific ranking or citation is guessing. What we can do is remove the problems that stop you being considered and make your site clear enough to be a strong candidate.",
+      a: "No. Nobody controls what Google or an AI engine shows. We remove what stops your site being read and quoted.",
     },
   ],
 
   finalCta: {
     title: "See how your site looks to search and AI.",
-    body: "Free, about a minute, no setup. Just your website address.",
+    body: "Free. Takes about a minute.",
     cta: { label: "Run a free audit", href: "/audit" },
   },
 } satisfies HomeContent;
+
+/**
+ * Source of the one statistic on the home page (named in home.problem.body). Optional for the UI:
+ * render it as a small "Source" link under the problem paragraph if there is room.
+ */
+export const homeProblemSource = {
+  label: "BrightLocal, October 2026",
+  href: "https://www.brightlocal.com/research/smb-report-confident-visibility/",
+} as const;
 
 /** Home page meta. The title is used as-is (no " · seenhq" suffix), so it carries the brand itself. */
 export const homeMeta = {

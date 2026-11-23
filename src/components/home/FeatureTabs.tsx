@@ -9,23 +9,53 @@ import { IssueRow } from "@/components/ui/IssueRow";
 import { ScoreRing } from "@/components/ui/ScoreRing";
 import { Tabs, TabsAsideSlot, type TabItem } from "@/components/ui/Tabs";
 
-export function FeatureList({ items, className }: { items: FeatureItem[]; className?: string }) {
+function FeatureItems({ items }: { items: FeatureItem[] }) {
   return (
-    <ul className={cx("grid gap-x-8 gap-y-7 sm:grid-cols-2", className)}>
+    <ul className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
       {items.map((item) => (
-        <li key={item.title} className="flex gap-4">
-          <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-paper text-ink shadow-[inset_0_0_0_1px_var(--color-line)]">
-            <Icon name={item.icon} size={20} />
-          </span>
-          <div className="min-w-0">
-            <h4 className="text-[0.9875rem] font-semibold text-ink">{item.title}</h4>
-            <p className="mt-1.5 text-[0.9375rem] leading-relaxed text-pretty text-muted">
-              {item.body}
-            </p>
-          </div>
+        <li key={item.title} className="min-w-0 border-t border-line pt-4">
+          <h4 className="text-[0.9375rem] font-semibold text-ink">{item.title}</h4>
+          <p className="mt-1.5 text-[0.9375rem] leading-relaxed text-pretty text-muted">{item.body}</p>
         </li>
       ))}
     </ul>
+  );
+}
+
+/**
+ * Feature bullets as hairline items, no icon tiles (T026). With `visible`, the
+ * first N show and the rest fold into a native <details> ("More checks").
+ */
+export function FeatureList({
+  items,
+  visible,
+  moreLabel = "More checks",
+  className,
+}: {
+  items: FeatureItem[];
+  visible?: number;
+  moreLabel?: string;
+  className?: string;
+}) {
+  const cut = visible && items.length > visible + 1 ? visible : items.length;
+  const rest = items.slice(cut);
+  return (
+    <div className={className}>
+      <FeatureItems items={items.slice(0, cut)} />
+      {rest.length ? (
+        <details className="group/more mt-6">
+          <summary className="inline-flex cursor-pointer items-center gap-2 rounded-sm text-[0.9375rem] font-medium text-ink-2 hover:text-ink">
+            {moreLabel} <span className="text-muted tabular-nums">({rest.length})</span>
+            <span aria-hidden className="text-muted transition-transform duration-200 group-open/more:rotate-90">
+              ›
+            </span>
+          </summary>
+          <div className="mt-6">
+            <FeatureItems items={rest} />
+          </div>
+        </details>
+      ) : null}
+    </div>
   );
 }
 
@@ -35,7 +65,7 @@ function StatusDot({ status }: { status: "pass" | "warn" | "fail" }) {
   return (
     <span
       className={cx(
-        "inline-flex h-5 items-center rounded-pill px-2 text-[0.6875rem] font-semibold",
+        "inline-flex h-5 items-center rounded-pill px-2 text-xs font-semibold",
         status === "pass" && "bg-pass-soft text-pass",
         status === "warn" && "bg-medium-soft text-medium",
         status === "fail" && "bg-critical-soft text-critical",
@@ -109,7 +139,7 @@ function PerformanceCard() {
         {bars.map(([label, h, active]) => (
           <div key={label} className="flex h-full flex-1 flex-col items-center justify-end gap-2">
             {active ? (
-              <span className="text-[0.6875rem] font-semibold whitespace-nowrap text-accent-ink tabular-nums">
+              <span className="text-xs font-semibold whitespace-nowrap text-accent-ink tabular-nums">
                 3.9 s
               </span>
             ) : null}
@@ -128,7 +158,7 @@ function PerformanceCard() {
           <span
             key={label}
             className={cx(
-              "flex-1 text-center text-[0.6875rem] font-medium",
+              "flex-1 text-center text-xs font-medium",
               active ? "text-ink" : "text-muted",
             )}
           >
@@ -195,10 +225,7 @@ export function FeatureTabs() {
       content: (
         <div>
           <h3 className="max-w-xl font-serif text-display-sm text-balance text-ink">{tab.title}</h3>
-          <p className="mt-4 max-w-xl text-[1.0625rem] leading-relaxed text-pretty text-muted">
-            {tab.body}
-          </p>
-          <FeatureList items={tab.bullets} className="mt-9" />
+          <FeatureList items={tab.bullets} visible={4} className="mt-8" />
         </div>
       ),
       aside: <Card />,
@@ -206,9 +233,9 @@ export function FeatureTabs() {
   });
 
   return (
-    <section aria-labelledby="features-title" className="relative overflow-clip py-24 sm:py-32">
+    <section aria-labelledby="features-title" className="relative overflow-clip py-20 sm:py-28">
       <Container>
-        <h2 id="features-title" className="sr-only">
+        <h2 id="features-title" className="mb-10 max-w-3xl font-serif text-display-md text-balance text-ink">
           What the audit checks
         </h2>
         {/* One shared collage; only the floating card swaps with the tab. */}

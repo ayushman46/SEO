@@ -5,7 +5,12 @@ import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 
-/** Closing card for inner pages: the eye peeks over a paper card, title, body, two next steps. */
+/**
+ * Closing call to action for inner pages. Default (T026): a plain band, a
+ * hairline in ink, heading and body left, actions right, no image and no card.
+ * `variant="eye"` keeps the paper card with the eye peeking over it; it is
+ * reserved for /about (home has its own FinalCta).
+ */
 export function ClosingCta({
   id = "closing-title",
   title,
@@ -13,6 +18,7 @@ export function ClosingCta({
   primaryCta,
   secondaryCta,
   seed = 81,
+  variant = "band",
 }: {
   id?: string;
   title: string;
@@ -20,7 +26,39 @@ export function ClosingCta({
   primaryCta: Cta;
   secondaryCta?: Cta;
   seed?: number;
+  variant?: "band" | "eye";
 }) {
+  const actions = (
+    <>
+      <Button href={primaryCta.href} size="lg" icon="arrow-right">
+        {primaryCta.label}
+      </Button>
+      {secondaryCta ? (
+        <Button href={secondaryCta.href} size="lg" variant="secondary">
+          {secondaryCta.label}
+        </Button>
+      ) : null}
+    </>
+  );
+
+  if (variant === "band") {
+    return (
+      <section aria-labelledby={id} className="pt-16 pb-20 sm:pt-20 sm:pb-28">
+        <Container>
+          <div className="flex flex-col gap-8 border-t border-ink pt-10 md:flex-row md:items-end md:justify-between md:gap-12">
+            <div className="max-w-2xl">
+              <h2 id={id} className="font-serif text-display-md text-balance text-ink">
+                {title}
+              </h2>
+              <p className="mt-4 max-w-[60ch] text-[1.0625rem] leading-relaxed text-pretty text-muted">{body}</p>
+            </div>
+            <div className="flex shrink-0 flex-col gap-3 sm:flex-row sm:items-center">{actions}</div>
+          </div>
+        </Container>
+      </section>
+    );
+  }
+
   return (
     <section aria-labelledby={id} className="relative overflow-clip pt-20 pb-24 sm:pb-32">
       <Container>
@@ -34,17 +72,8 @@ export function ClosingCta({
             <h2 id={id} className="mx-auto max-w-2xl font-serif text-display-md text-balance text-ink">
               {title}
             </h2>
-            <p className="mx-auto mt-5 max-w-lg text-[1.0625rem] leading-relaxed text-pretty text-muted">{body}</p>
-            <div className="mt-9 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
-              <Button href={primaryCta.href} size="lg" icon="arrow-right">
-                {primaryCta.label}
-              </Button>
-              {secondaryCta ? (
-                <Button href={secondaryCta.href} size="lg" variant="secondary">
-                  {secondaryCta.label}
-                </Button>
-              ) : null}
-            </div>
+            <p className="mx-auto mt-5 max-w-[52ch] text-[1.0625rem] leading-relaxed text-pretty text-muted">{body}</p>
+            <div className="mt-9 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">{actions}</div>
           </div>
         </Reveal>
       </Container>

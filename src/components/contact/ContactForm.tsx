@@ -21,7 +21,6 @@ import type {
 import {
   contactBudgetOptions,
   contactForm,
-  contactNextSteps,
   contactQuoteCopy,
   contactServiceOptions,
 } from "@/content/contact";
@@ -261,9 +260,7 @@ export function ContactForm({ honeypotName }: { honeypotName: string }) {
 
       {state?.ok ? (
         <div className="rounded-panel bg-white p-6 shadow-paper sm:p-10">
-          <span className="grid size-12 place-items-center rounded-full bg-accent-600 text-white">
-            <Icon name="check" size={24} strokeWidth={2.2} />
-          </span>
+          <Icon name="check" size={28} strokeWidth={2} className="text-pass" />
           <h2
             ref={successRef}
             tabIndex={-1}
@@ -274,7 +271,8 @@ export function ContactForm({ honeypotName }: { honeypotName: string }) {
           <p className="mt-4 max-w-lg text-[1.0625rem] leading-relaxed text-pretty text-muted">
             <PlaceholderText value={contactForm.success.body} />
           </p>
-          <NextSteps steps={sentWithQuote ? contactQuoteCopy.nextSteps : contactNextSteps} />
+          {/* the generic steps are already beside the form; repeat steps only when they differ (quote sent) */}
+          {sentWithQuote ? <NextSteps steps={contactQuoteCopy.nextSteps} /> : null}
           <div className="mt-8">
             <Button href={contactForm.success.cta.href} icon="arrow-right">
               {contactForm.success.cta.label}

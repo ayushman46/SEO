@@ -68,6 +68,12 @@
   --text-display-sm: clamp(1.625rem, 1.3rem + 1.2vw, 2.25rem);
   --text-display-sm--line-height: 1.1;
   --text-display-sm--letter-spacing: -0.012em;
+  /* T026: two serif title steps under the display scale (adjacent levels differ by >= 1.25x) */
+  --text-title-lg: 1.75rem;
+  --text-title-lg--line-height: 1.12;
+  --text-title-lg--letter-spacing: -0.01em;
+  --text-title: 1.375rem;
+  --text-title--line-height: 1.2;
   --text-kicker: 0.75rem;
   --text-kicker--line-height: 1rem;
   --text-kicker--letter-spacing: 0.14em;
@@ -193,8 +199,8 @@ dialog.menu-sheet {
   max-height: none;
 }
 dialog.menu-sheet::backdrop {
-  background: rgb(7 11 25 / 0.45);
-  backdrop-filter: blur(2px);
+  /* no backdrop-filter (T011): a slightly deeper scrim instead of a blur */
+  background: rgb(7 11 25 / 0.5);
 }
 @media (prefers-reduced-motion: no-preference) {
   dialog.menu-sheet[open] {
@@ -283,9 +289,10 @@ dialog.menu-sheet::backdrop {
     transform: translate3d(-50%, 0, 0);
   }
 }
-/* Reduced motion: no movement, no duplicate, no pause control; the names wrap
-   into a centred static row inside the hairline band. */
-@media (prefers-reduced-motion: reduce) {
+/* Reduced motion, and from lg for everyone (T026: no logo marquee on desktop):
+   no movement, no duplicate, no pause control; the names wrap into a centred
+   static row inside the hairline band. */
+@media (prefers-reduced-motion: reduce), (min-width: 1024px) {
   .engine-strip-track {
     width: 100%;
     animation: none;
@@ -311,45 +318,207 @@ dialog.menu-sheet::backdrop {
   }
 }
 
-/* Reveal: only elements the script marks as pending (below the fold, motion
-   allowed) start hidden, so no-JS and reduced-motion users always see content. */
-[data-reveal="pending"] {
+/* ---------- Scroll motion (T025) ----------
+   Everything here is transform/opacity only, runs on the compositor, and is off
+   under prefers-reduced-motion. Where CSS scroll-driven animations exist they do
+   the work with no script; elsewhere the IntersectionObserver path in ui/Reveal
+   takes over and the decorative effects (nav settle, hero depth, progress bar)
+   are simply absent. */
+
+/* Lenis (components/scroll) glides programmatic and anchor scrolls itself; the
+   native smooth behaviour must not animate underneath it (route changes and
+   back/forward restoration stay instant, as before Next 16 overrode them). */
+html.lenis {
+  scroll-behavior: auto;
+}
+
+/* Reveal fallback (no scroll-driven animations): only elements the script marks
+   as pending (below the fold, motion allowed) start hidden, so no-JS and
+   reduced-motion users always see content. */
+[data-reveal="pending"]:not([data-reveal-stagger]),
+[data-reveal="pending"][data-reveal-stagger] > * {
   opacity: 0;
-  transform: translateY(18px);
+  transform: translateY(22px);
 }
-[data-reveal="pending"][data-reveal-variant="tear"] {
-  opacity: 1;
-  transform: none;
-  clip-path: inset(0 0 100% 0);
+[data-reveal="pending"][data-reveal-variant="settle"] {
+  transform: translateY(26px) rotate(-0.8deg) scale(0.985);
 }
-[data-reveal="done"][data-reveal-variant="tear"] {
-  /* end outside the box so shadows are not clipped */
-  clip-path: inset(-12% -12% -12% -12%);
-}
-[data-reveal="done"] {
+[data-reveal="done"]:not([data-reveal-stagger]),
+[data-reveal="done"][data-reveal-stagger] > * {
   opacity: 1;
   transform: none;
   transition:
     opacity 700ms var(--ease-paper),
-    transform 900ms var(--ease-paper),
-    clip-path 1000ms var(--ease-paper);
+    transform 900ms var(--ease-paper);
   transition-delay: var(--reveal-delay, 0ms);
+}
+[data-reveal="done"][data-reveal-stagger] > :nth-child(2) {
+  transition-delay: calc(var(--reveal-delay, 0ms) + 80ms);
+}
+[data-reveal="done"][data-reveal-stagger] > :nth-child(3) {
+  transition-delay: calc(var(--reveal-delay, 0ms) + 160ms);
+}
+[data-reveal="done"][data-reveal-stagger] > :nth-child(n + 4) {
+  transition-delay: calc(var(--reveal-delay, 0ms) + 240ms);
+}
+
+@keyframes reveal-rise {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+}
+@keyframes nav-settle {
+  to {
+    transform: translateY(-0.375rem);
+  }
+}
+@keyframes nav-pill-tighten {
+  to {
+    transform: scale(0.965, 0.9);
+  }
+}
+@keyframes fade-in {
+  to {
+    opacity: 1;
+  }
+}
+@keyframes hero-push {
+  to {
+    transform: translateY(-3%) scale(1.06);
+  }
+}
+@keyframes progress-grow {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Reading progress (pages/ReadingProgress): hidden unless it can be scroll-driven. */
+.reading-progress {
+  display: none;
+  transform: scaleX(0);
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* Fade reveals scrub with scroll over the first 240px after the element
+       enters. Fill "none": outside that range the element is plain content, so
+       nothing stays hidden or composited once it has arrived. */
+    [data-reveal-variant="fade"]:not([data-reveal-stagger]),
+    [data-reveal-variant="fade"][data-reveal-stagger] > * {
+      animation: reveal-rise linear none;
+      animation-timeline: view();
+      animation-range: entry var(--reveal-shift, 0px) entry calc(240px + var(--reveal-shift, 0px));
+    }
+    [data-reveal-variant="fade"][data-reveal-stagger] > :nth-child(2) {
+      --reveal-shift: 40px;
+    }
+    [data-reveal-variant="fade"][data-reveal-stagger] > :nth-child(3) {
+      --reveal-shift: 80px;
+    }
+    [data-reveal-variant="fade"][data-reveal-stagger] > :nth-child(n + 4) {
+      --reveal-shift: 110px;
+    }
+
+    /* Nav: over the first 30vh the pills rise a little and the main pill's
+       paper tightens around its links (only the background layer scales, so
+       text is never resampled). */
+    .nav-settle {
+      animation: nav-settle linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 30vh;
+    }
+    .nav-pill-bg {
+      animation: nav-pill-tighten linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 30vh;
+    }
+    .nav-pill-bg::after {
+      animation: fade-in linear both;
+      animation-timeline: scroll(root);
+      animation-range: 10vh 40vh;
+    }
+
+    /* Hero depth: as the collage scrolls away the torn hole pushes in toward
+       the reader (the eye comes closer: "being seen"). */
+    .hero-depth-scope {
+      view-timeline: --hero block;
+    }
+    .hero-depth {
+      animation: hero-push linear both;
+      animation-timeline: --hero;
+      animation-range: exit 0% exit 100%;
+    }
+
+    .reading-progress {
+      display: block;
+      animation: progress-grow linear both;
+      animation-timeline: scroll(root block);
+    }
+  }
+}
+
+/* ---------- Signature moment 1 (T026): the eye notices you ----------
+   Two paper lids live inside the eye's torn clip, parked just outside it. When
+   the home URL field takes focus they close and open once (380 ms). CSS only,
+   transform only; it replays only on a new focus, never loops, never on load,
+   and does nothing under reduced motion. */
+.eye-lid {
+  position: absolute;
+  inset-inline: 0;
+  height: 52%;
+  background-color: var(--color-paper-edge);
+  background-size: 128px 128px;
+  pointer-events: none;
+}
+.eye-lid-top {
+  top: 0;
+  transform: translateY(-101%);
+}
+.eye-lid-bottom {
+  bottom: 0;
+  transform: translateY(101%);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero-eye-scope:has(input[name="url"]:focus-visible) .eye-lid-top {
+    animation: lid-top 380ms var(--ease-paper) 1;
+  }
+  .hero-eye-scope:has(input[name="url"]:focus-visible) .eye-lid-bottom {
+    animation: lid-bottom 380ms var(--ease-paper) 1;
+  }
+}
+@keyframes lid-top {
+  0%,
+  100% {
+    transform: translateY(-101%);
+  }
+  45%,
+  55% {
+    transform: translateY(0);
+  }
+}
+@keyframes lid-bottom {
+  0%,
+  100% {
+    transform: translateY(101%);
+  }
+  45%,
+  55% {
+    transform: translateY(0);
+  }
 }
 
 @media print {
-  [data-reveal] {
+  [data-reveal],
+  [data-reveal] > * {
     opacity: 1 !important;
     transform: none !important;
-    clip-path: none !important;
+    animation: none !important;
+  }
+  .reading-progress {
+    display: none !important;
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
+

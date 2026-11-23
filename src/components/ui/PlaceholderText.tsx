@@ -37,7 +37,7 @@ export function PlaceholderText({ value, tone = "light", className }: { value: s
             key={i}
             title="Placeholder: replace before launch"
             className={cx(
-              "mx-0.5 inline-block rounded-[5px] border border-dashed px-1.5 align-[0.1em] font-sans text-[0.625rem] leading-[1.35] font-semibold tracking-[0.06em] uppercase",
+              "mx-0.5 inline-block rounded-[5px] border border-dashed px-1.5 align-[0.1em] font-sans text-xs leading-[1.35] font-semibold tracking-[0.06em] uppercase",
               tone === "night" ? "border-white/40 text-night-muted" : "border-ink/35 text-muted",
             )}
           >

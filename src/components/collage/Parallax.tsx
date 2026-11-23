@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
+import { onScrollFrame } from "@/components/scroll/loop";
 
 /*
  * Scroll parallax for collage layers, driven by ONE shared controller: one
- * IntersectionObserver, one passive scroll/resize listener (attached only while
- * some layer is on screen) and one rAF that reads every rect first, then writes
- * every transform. Does nothing under prefers-reduced-motion.
+ * IntersectionObserver, and a subscription to the shared scroll frame
+ * (components/scroll/loop, the same rAF that advances Lenis) held only while
+ * some layer is on screen. Each frame reads every rect first, then writes every
+ * transform. Does nothing under prefers-reduced-motion.
  *
  * Performance notes (T011): no `will-change` (it pinned large GPU layers for the
  * whole page life and cost seconds of raster on mobile). The first, at-rest offset
@@ -19,58 +21,46 @@ type Layer = { outer: HTMLElement; inner: HTMLElement; speed: number; visible: b
 const layers = new Map<HTMLElement, Layer>();
 let io: IntersectionObserver | null = null;
 let mq: MediaQueryList | null = null;
-let raf = 0;
-let listening = false;
+let unsubscribe: (() => void) | null = null;
+let startY = 0;
 let scrolled = false;
+let moves: [HTMLElement, number][] = [];
 
-function update() {
-  raf = 0;
+function read() {
+  if (!scrolled && window.scrollY !== startY) scrolled = true;
   const vh = window.innerHeight;
-  const moves: [HTMLElement, number][] = [];
+  moves = [];
   for (const l of layers.values()) {
     if (!l.visible) continue;
     const rect = l.outer.getBoundingClientRect();
     moves.push([l.inner, -(rect.top + rect.height / 2 - vh / 2) * l.speed]);
   }
+}
+
+function write() {
   for (const [inner, y] of moves) {
     inner.style.transform = scrolled ? `translate3d(0, ${y.toFixed(1)}px, 0)` : `translate(0, ${y.toFixed(1)}px)`;
   }
-}
-
-function schedule() {
-  if (!raf) raf = requestAnimationFrame(update);
-}
-
-function onScroll() {
-  scrolled = true;
-  schedule();
+  moves = [];
 }
 
 function syncListening() {
   const want = !mq?.matches && [...layers.values()].some((l) => l.visible);
-  if (want && !listening) {
-    listening = true;
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", schedule, { passive: true });
-    schedule();
-  } else if (!want && listening) {
-    listening = false;
-    window.removeEventListener("scroll", onScroll);
-    window.removeEventListener("resize", schedule);
+  if (want && !unsubscribe) unsubscribe = onScrollFrame({ read, write });
+  else if (!want && unsubscribe) {
+    unsubscribe();
+    unsubscribe = null;
   }
 }
 
 function onMotionChange() {
-  if (mq?.matches) {
-    if (raf) cancelAnimationFrame(raf);
-    raf = 0;
-    for (const l of layers.values()) l.inner.style.transform = "";
-  }
+  if (mq?.matches) for (const l of layers.values()) l.inner.style.transform = "";
   syncListening();
 }
 
 function register(layer: Layer) {
   if (!io) {
+    startY = window.scrollY;
     mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     mq.addEventListener("change", onMotionChange);
     io = new IntersectionObserver((entries) => {
@@ -97,8 +87,6 @@ function unregister(outer: HTMLElement) {
     io = null;
     mq?.removeEventListener("change", onMotionChange);
     mq = null;
-    if (raf) cancelAnimationFrame(raf);
-    raf = 0;
     scrolled = false;
   }
 }

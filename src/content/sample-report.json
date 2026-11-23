@@ -268,11 +268,11 @@
     {
       "id": "geo.ai-crawler-probe",
       "category": "geo",
-      "label": "AI crawler access (live test)",
+      "label": "AI crawler access (simulated test)",
       "status": "warn",
       "score": 0.857,
       "weight": 8,
-      "summary": "GPTBot, ClaudeBot were refused (Cloudflare) although robots.txt allows them. Simulated from our servers with a labelled test user agent; sites that verify crawler IP addresses may treat the real bot differently."
+      "summary": "GPTBot, ClaudeBot were refused (Cloudflare) although robots.txt allows them. Simulated from our servers, so a site that verifies crawler IP addresses may treat the real bot differently."
     },
     {
       "id": "geo.ai-clarity",
@@ -301,7 +301,7 @@
       "severity": "high",
       "title": "Your site is slow on mobile",
       "description": "Google's PageSpeed test rates your homepage's mobile performance poorly. Slow pages lose visitors and rank lower. Google's mobile score for your homepage is 44/100.",
-      "howToFix": "Start with the biggest wins: compress and resize images (use WebP/AVIF), remove unused plugins/apps and third-party scripts, and enable caching on your host or a CDN.",
+      "howToFix": "Compress and resize images (use WebP/AVIF), remove unused plugins, apps and third-party scripts, and turn on caching on your host or a CDN.",
       "effort": "involved",
       "impact": 7.5,
       "affectedUrls": [
@@ -426,7 +426,7 @@
       "category": "geo",
       "severity": "medium",
       "title": "Cloudflare is blocking AI crawlers that your robots.txt allows",
-      "description": "Requests labelled as AI crawlers were refused or challenged by Cloudflare, even though your robots.txt lets them in. Simulated from our servers with a labelled test user agent; sites that verify crawler IP addresses may treat the real bot differently. Refused by Cloudflare (server: cloudflare / cf-ray): GPTBot, ClaudeBot got 403 on /, /treatments/, /fees/, /robots.txt, while robots.txt allows them and our own crawler got a normal response.",
+      "description": "Requests labelled as AI crawlers were refused or challenged by Cloudflare, even though your robots.txt lets them in. Simulated from our servers, so a site that verifies crawler IP addresses may treat the real bot differently. Refused by Cloudflare (server: cloudflare / cf-ray): GPTBot, ClaudeBot got 403 on /, /treatments/, /fees/, /robots.txt, while robots.txt allows them and our own crawler got a normal response.",
       "howToFix": "In the Cloudflare dashboard for this domain, check Security → Bots (the \"Block AI bots\" / AI Scrapers and Crawlers setting and Bot Fight Mode), AI Crawl Control (allow the crawlers you want), and any Security → WAF custom rules that match these user agents. Menu names change over time; Cloudflare's docs list the current ones.",
       "effort": "quick",
       "impact": 0.3,
@@ -443,7 +443,7 @@
       "category": "geo",
       "severity": "low",
       "title": "No llms.txt file",
-      "description": "llms.txt is an emerging, optional standard: a short plain-text guide to your site written for AI tools. It's cheap to add and helps AI assistants find your key pages.",
+      "description": "llms.txt is an optional, proposed standard: a short plain-text guide to your site for AI tools. It is quick to add.",
       "howToFix": "Create `/llms.txt` starting with `# Your Business Name`, a one-line summary in `> quotes`, then a list of your most important pages as `- [Page name](https://…): what it covers`.",
       "effort": "quick",
       "impact": 1.5,
@@ -487,7 +487,7 @@
       "category": "seo",
       "severity": "low",
       "title": "No sign your site is set up in Bing Webmaster Tools",
-      "description": "We didn't find Bing's verification tag (`msvalidate.01`) on your homepage. Bing's index is confirmed to feed Microsoft Copilot; whether it feeds other assistants isn't confirmed. Bing also allows verification by DNS or an XML file we can't see, so if you've verified another way, ignore this.",
+      "description": "We didn't find Bing's verification tag (`msvalidate.01`) on your homepage. Bing's index is confirmed to feed Microsoft Copilot; whether it feeds other assistants isn't confirmed. If you verified by DNS or an XML file, which we can't see, ignore this.",
       "howToFix": "1) Sign in to Bing Webmaster Tools and add your site (you can import it from Google Search Console). 2) Submit your sitemap there. 3) Turn on IndexNow (many hosts and SEO plugins have a switch; otherwise host the key file Bing gives you and ping IndexNow when pages change). Then check the AI Performance report.",
       "effort": "quick",
       "impact": 0.5,
@@ -535,7 +535,7 @@
       "category": "geo",
       "severity": "low",
       "title": "Your site doesn't link to any review profiles",
-      "description": "We found no links to profiles on Google Business Profile, Trustpilot, G2, Capterra, Yelp, Tripadvisor, Justdial, Practo or similar sites. Some vendor studies associate review profiles with more AI citations; that evidence is mostly vendor-run and correlational. We don't read the review sites themselves.",
+      "description": "We found no links to review profiles such as Google Business Profile, Trustpilot, G2 or Yelp. Evidence that this affects AI answers is mostly vendor-run and correlational, so it counts for little. We don't read the review sites themselves.",
       "howToFix": "Link your real review profiles from the footer or a \"Reviews\" page and add them to your Organization schema `sameAs`. In regulated fields (e.g. clinics in India) check the rules on soliciting reviews first.",
       "effort": "quick",
       "impact": 0.2,

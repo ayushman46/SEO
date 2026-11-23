@@ -2,6 +2,7 @@ import type { LegalDoc } from "@/content/types";
 import { Container } from "@/components/ui/Container";
 import { PlaceholderText } from "@/components/ui/PlaceholderText";
 import { InPageNav } from "./InPageNav";
+import { ReadingProgress } from "./ReadingProgress";
 
 function slugify(s: string) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -15,6 +16,7 @@ export function LegalBody({ doc }: { doc: LegalDoc }) {
   const sections = doc.sections.map((s) => ({ ...s, id: slugify(s.heading) }));
   return (
     <div className="pt-14 pb-24 sm:pt-20 sm:pb-32">
+      <ReadingProgress />
       <Container className="grid gap-12 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-16 xl:grid-cols-[17rem_minmax(0,1fr)] xl:gap-24">
         <InPageNav
           variant="list"

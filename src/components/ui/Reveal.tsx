@@ -1,10 +1,16 @@
 "use client";
 
 import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
+import { invalidateScroll, onScrollFrame } from "@/components/scroll/loop";
 
 /*
- * Shared scroll-reveal watcher (one IntersectionObserver, one rAF-throttled
- * scroll check, one slow failsafe interval for every Reveal and ScoreRing).
+ * Shared scroll-reveal watcher (one IntersectionObserver, a read/write pass in
+ * the shared scroll frame from components/scroll/loop, one slow failsafe
+ * interval for every Reveal and ScoreRing).
+ *
+ * T025: where the browser supports scroll-driven animations, fade reveals are
+ * pure CSS (animation-timeline: view(), see globals.css) and skip this watcher;
+ * this path stays as the fallback and for the time-based "settle" variant.
  *
  * Content is never hidden by default: server HTML is fully visible, and an
  * element is only marked "pending" by script when it starts below the fold and
@@ -25,8 +31,9 @@ const FAILSAFE_MS = 900;
 
 const watched = new Map<Element, RevealCallback>();
 let io: IntersectionObserver | null = null;
-let raf = 0;
+let unsubscribe: (() => void) | null = null;
 let failsafe = 0;
+let hits: [Element, boolean][] = [];
 
 function release(el: Element, animate: boolean) {
   const cb = watched.get(el);
@@ -35,21 +42,21 @@ function release(el: Element, animate: boolean) {
   cb(animate);
 }
 
-function sweep() {
-  raf = 0;
+// Reads every rect first (together with every other scroll subscriber), then writes.
+function sweepRead() {
   const vh = window.innerHeight;
-  const hits: [Element, boolean][] = [];
-  // read every rect first, then write, so the sweep never thrashes layout
+  hits = [];
   for (const el of watched.keys()) {
     const top = el.getBoundingClientRect().top;
     if (top < vh * JUMP) hits.push([el, false]);
     else if (top < vh * (1 + AHEAD)) hits.push([el, true]);
   }
-  for (const [el, animate] of hits) release(el, animate);
 }
 
-function schedule() {
-  if (!raf) raf = requestAnimationFrame(sweep);
+function sweepWrite() {
+  const now = hits;
+  hits = [];
+  for (const [el, animate] of now) release(el, animate);
 }
 
 function start() {
@@ -65,24 +72,22 @@ function start() {
     },
     { rootMargin: `0px 0px ${AHEAD * 100}% 0px` },
   );
-  window.addEventListener("scroll", schedule, { passive: true });
-  window.addEventListener("resize", schedule, { passive: true });
-  window.addEventListener("hashchange", schedule);
-  window.addEventListener("pageshow", schedule);
-  failsafe = window.setInterval(schedule, FAILSAFE_MS);
+  unsubscribe = onScrollFrame({ read: sweepRead, write: sweepWrite });
+  window.addEventListener("hashchange", invalidateScroll);
+  window.addEventListener("pageshow", invalidateScroll);
+  failsafe = window.setInterval(invalidateScroll, FAILSAFE_MS);
 }
 
 function stop() {
   if (!io || watched.size) return;
   io.disconnect();
   io = null;
-  window.removeEventListener("scroll", schedule);
-  window.removeEventListener("resize", schedule);
-  window.removeEventListener("hashchange", schedule);
-  window.removeEventListener("pageshow", schedule);
+  unsubscribe?.();
+  unsubscribe = null;
+  window.removeEventListener("hashchange", invalidateScroll);
+  window.removeEventListener("pageshow", invalidateScroll);
   window.clearInterval(failsafe);
-  if (raf) cancelAnimationFrame(raf);
-  raf = 0;
+  hits = [];
 }
 
 function unwatch(el: Element) {
@@ -142,26 +147,46 @@ export function watchReveal(el: Element, cb: RevealCallback) {
   return () => unwatch(el);
 }
 
+let cssReveal: boolean | null = null;
+/** Fade reveals run as CSS scroll-driven animations where supported (globals.css). */
+function hasCssReveal() {
+  if (cssReveal === null) {
+    cssReveal =
+      typeof CSS !== "undefined" && typeof CSS.supports === "function" && CSS.supports("animation-timeline: view()");
+  }
+  return cssReveal;
+}
+
 /**
- * Fade-up (or paper-tear wipe) on scroll. Server HTML is fully visible, so there
- * is no flash, no LCP delay, and no hidden content without JS.
+ * Scroll reveal. Server HTML is fully visible, so there is no flash, no LCP
+ * delay, and no hidden content without JS.
+ * - "fade": rises in, scrubbed by scroll where CSS scroll-driven animations are
+ *   supported, otherwise a one-off transition as it nears the viewport.
+ * - "settle": a paper sheet settling (slight lift and tilt), time-based.
+ *   ("tear" is accepted as its old name; the clip-path wipe was retired in T025.)
+ * `delay` (ms) staggers siblings; `stagger` staggers this element's own children.
+ * Transform and opacity only (T011): no clip-path, no filters, no will-change.
  */
 export function Reveal({
   children,
   variant = "fade",
   delay = 0,
+  stagger = false,
   className,
 }: {
   children: ReactNode;
-  variant?: "fade" | "tear";
+  variant?: "fade" | "settle" | "tear";
   delay?: number;
+  stagger?: boolean;
   className?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const v = variant === "tear" ? "settle" : variant;
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    if (v === "fade" && hasCssReveal()) return;
     return whenBelowFold(el, () => {
       el.dataset.reveal = "pending";
       const cleanup = watchReveal(el, (animate) => {
@@ -174,14 +199,19 @@ export function Reveal({
         delete el.dataset.reveal;
       };
     });
-  }, []);
+  }, [v]);
+
+  const style = delay
+    ? ({ "--reveal-delay": `${delay}ms`, "--reveal-shift": `${Math.min(delay * 0.5, 120)}px` } as CSSProperties)
+    : undefined;
 
   return (
     <div
       ref={ref}
-      data-reveal-variant={variant}
+      data-reveal-variant={v}
+      data-reveal-stagger={stagger ? "" : undefined}
       className={className}
-      style={delay ? ({ "--reveal-delay": `${delay}ms` } as CSSProperties) : undefined}
+      style={style}
     >
       {children}
     </div>

@@ -20,6 +20,7 @@ import {
   pricingIndiaNotes,
   pricingNoteInr,
   pricingTiersInr,
+  pricingTaxNote,
 } from "@/content/pricing";
 import { aboutClosing, aboutPage, aboutSections } from "@/content/about";
 import { contactForm, contactNextSteps, contactPage, contactServiceOptions } from "@/content/contact";
@@ -177,8 +178,8 @@ describe("content rules", () => {
     const geo = services.find((s) => s.slug === "geo-audit")!;
     const full = pricingTiers.find((t) => t.name === "Full audit")!;
     expect(seo.priceFrom).toBe(geo.priceFrom);
-    expect(seo.priceFrom).toBe("$49 as part of the Full audit");
-    expect(full.price).toBe("$49");
+    expect(seo.priceFrom).toBe("Included in the Full audit · $39");
+    expect(full.price).toBe("$39");
     expect(full.price).not.toMatch(/^From/);
     for (const s of [seo, geo]) expect(s.description).toContain("Full audit");
   });
@@ -199,12 +200,12 @@ describe("content rules", () => {
 
   it("service prices are the agreed list prices", () => {
     const price = (slug: string) => services.find((s) => s.slug === slug)!.priceFrom;
-    expect(price("technical-fixes")).toBe("From $199");
-    expect(price("content-entity")).toBe("From $149");
-    expect(price("monitoring")).toBe("$29/month");
-    expect(price("ai-fact-check")).toBe("From $69");
-    expect(price("local-ai-setup")).toBe("$149 per location");
-    expect(price("ai-crawler-unblock")).toBe("$149");
+    expect(price("technical-fixes")).toBe("$149");
+    expect(price("content-entity")).toBe("From $99");
+    expect(price("monitoring")).toBe("$19/month");
+    expect(price("ai-fact-check")).toBe("$59");
+    expect(price("local-ai-setup")).toBe("$99 per location");
+    expect(price("ai-crawler-unblock")).toBe("$49");
   });
 
   it("service descriptions carry no placeholders, so Service JSON-LD keeps them", () => {
@@ -276,17 +277,20 @@ describe("content rules", () => {
   it("USD tier prices are the agreed list prices", () => {
     expect(pricingTiers.map((t) => [t.name, t.price])).toEqual([
       ["Free audit", "$0"],
-      ["Full audit", "$49"],
-      ["Fix sprint", "From $199"],
-      ["Monitoring", "$29"],
+      ["Full audit", "$39"],
+      ["Fix sprint", "$149"],
+      ["Monitoring", "$19"],
     ]);
   });
 
-  it("pricing states taxes and the written quote, with no GST claim", () => {
-    const line =
-      "Prices are per site and exclude applicable taxes. We confirm scope and a fixed quote in writing before any paid work starts.";
-    expect(pricingPage.intro).toContain(line);
-    expect(pricingIndiaHeading.intro).toContain(line);
+  it("pricing states taxes once per currency view and the written quote once, with no GST claim", () => {
+    const tax = /Prices are per site and exclude applicable taxes\./g;
+    // The hero intro is shared by both views; each currency panel adds its own copy.
+    const usdView = [pricingPage.intro, pricingNote, pricingTaxNote].join(" ");
+    const inrView = [pricingPage.intro, pricingIndiaHeading.intro, ...pricingIndiaNotes, pricingNoteInr].join(" ");
+    expect(usdView.match(tax)?.length).toBe(1);
+    expect(inrView.match(tax)?.length).toBe(1);
+    expect(pricingPage.intro).toContain("We confirm scope and a fixed quote in writing before any paid work starts.");
     expect(allCopy).not.toMatch(/\bGST\b/);
   });
 
@@ -301,14 +305,15 @@ describe("content rules", () => {
   });
 
   it("INR prices and India extras are the agreed list prices, with no Hindi add-on", () => {
-    expect(pricingTiersInr.map((t) => t.price)).toEqual(["₹0", "₹3,999", "From ₹14,999", "₹1,999"]);
+    expect(pricingTiersInr.map((t) => t.price)).toEqual(["₹0", "₹2,999", "₹9,999", "₹999"]);
     expect(pricingIndiaExtras.map((x) => [x.name, x.price])).toEqual([
-      ["AI fact-check & fix", "From ₹4,999"],
-      ["Local AI visibility setup", "₹9,999 per location"],
-      ["AI crawler unblock", "₹9,999"],
+      ["AI fact-check & fix", "₹3,999"],
+      ["Local AI visibility setup", "₹3,999 per location"],
+      ["AI crawler unblock", "₹2,999"],
+      ["Content & entity", "From ₹6,999"],
     ]);
     expect(allCopy).not.toMatch(/Hindi|Hinglish/);
-    expect(pricingIndiaNotes).toContain("Pay by bank transfer, UPI or card. We send an invoice before work starts.");
+    expect(pricingIndiaNotes).toContain("UPI, bank transfer or card, against an invoice we send before work starts");
     expect(pricingIndiaNotes).toContain("No retainer and no minimum term");
     expect(pricingIndiaComparison.source.href).toMatch(/^https:\/\//);
     expect(currencyLabels.usd).toContain("$");
@@ -336,13 +341,14 @@ describe("content rules", () => {
     const offers = offerCatalogLd(pricingTiers).itemListElement as Array<Record<string, unknown>>;
     expect(offers.map((o) => [o.name, o.price, o.priceCurrency])).toEqual([
       ["Free audit", 0, "USD"],
-      ["Full audit", 49, "USD"],
-      ["Fix sprint", 199, "USD"],
-      ["Monitoring", 29, "USD"],
+      ["Full audit", 39, "USD"],
+      ["Fix sprint", 149, "USD"],
+      ["Monitoring", 19, "USD"],
     ]);
     for (const o of offers) expect(typeof o.price).toBe("number");
-    expect(offers[2].priceSpecification).toMatchObject({ minPrice: 199, priceCurrency: "USD" });
-    expect(offers[3].priceSpecification).toMatchObject({ price: 29, priceCurrency: "USD", unitText: "MONTH" });
+    // The Fix sprint is now a fixed price, so it carries no minimum-price specification.
+    expect(offers[2].priceSpecification).toBeUndefined();
+    expect(offers[3].priceSpecification).toMatchObject({ price: 19, priceCurrency: "USD", unitText: "MONTH" });
   });
 
   it("payment, refund, cancellation, reply time and governing law use the agreed neutral wording", () => {

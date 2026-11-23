@@ -5,9 +5,9 @@ export const auditPage = {
   metaDescription:
     "Free check for Google and AI answer engines: SEO, GEO and speed scores, an AI model's reading of your pages and a ranked fix list, in about a minute.",
   kicker: "Free audit",
-  title: "How does your site look to search and AI?",
+  title: "Audit your site for Google and AI search",
   intro:
-    "Enter your website address. seenhq checks your homepage and up to five key pages for SEO, GEO and mobile performance, has a language model read them to see how clearly they describe your business, then scores everything and ranks what to fix first.",
+    "Enter your website address. We read your homepage and up to five more pages, score them for SEO, GEO and mobile speed, and rank what to fix first. It takes about a minute.",
 } satisfies PageCopy;
 
 export const auditForm = {
@@ -67,10 +67,10 @@ export const auditEmailGate = {
  * plus API-level codes from the audit and unlock routes.
  */
 export const auditErrors = {
-  invalid_url: "That doesn't look like a valid website address. Check the spelling and try again, for example example.com.",
+  invalid_url: auditForm.invalidInput,
   blocked_host: "We can't audit that address. It points to a private or reserved network, which we don't scan for security reasons.",
   unreachable: "We couldn't reach that website. Check that it is online and publicly accessible, then try again.",
-  timeout: "The website took too long to respond. It may be slow or busy right now, so please try again in a few minutes.",
+  timeout: "The website took too long to respond. Try again in a few minutes.",
   not_html: "That address doesn't return a web page. Try your homepage address instead.",
   too_large: "That page is too large for us to scan. Try your homepage address or a lighter page.",
   rate_limited: "You've run several audits in a short time. Please wait a little while before running another one.",
@@ -80,13 +80,13 @@ export const auditErrors = {
 } as const;
 
 /**
- * Sentence-length strings for the audit flow UI, mirrored from src/components/audit/labels.ts
- * (wording unchanged) so the frontend can read them from content.
+ * Sentence-length strings for the audit flow UI. Single source: src/components/audit/labels.ts
+ * imports these, so edit them here only.
  */
 export const auditFlowCopy = {
   timeHint: "This usually takes 15 to 40 seconds.",
   slowHint: "Still working. Larger or slower sites can take up to a minute.",
-  noTopIssues: "We found no issues worth flagging on the pages we checked.",
+  noTopIssues: "No issues found on the pages we checked.",
   lockedHint: "Unlock with your email to see the details and fixes.",
   fullReportUnlocked: "Unlocked. Every issue and every fix is below.",
   cwvSource: "Mobile, measured by Google PageSpeed Insights.",
@@ -175,14 +175,14 @@ export const auditExportCopy = {
  */
 export const auditQuoteCopy = {
   title: "Your fixed quote",
-  intro: "What it would cost for us to fix what this audit found, worked out from the issues above. You can also fix everything yourself: every issue has the steps.",
+  intro: "Our price to fix what this audit found. Or fix it yourself: every issue has the steps.",
   currencyLabel: "Currency",
   currencyUsd: "USD $",
   currencyInr: "India ₹",
   covers: "Covers",
   totalLabel: "Total",
   perLocation: "per location",
-  alternativeTitle: "Want a person to look first?",
+  alternativeTitle: "Have a person look first",
   diyTitle: "You can fix these yourself for free",
   diyEmpty: "None of these issues is a quick do-it-yourself fix.",
   ignoreTitle: "Safe to ignore for now",
@@ -207,4 +207,31 @@ export const auditQuoteCopy = {
   /** sample report: the same panel, pointing to the audit instead of an order */
   sampleRequest: "Run this on your own site",
   sampleNote: "This quote is for the fictional sample site. Run the audit on your own site for yours.",
+} as const;
+
+/**
+ * Report "front page" and issue-action strings (added by frontend-designer for T026, additive).
+ * Verdicts describe the result plainly: no promises, no alarm. Bands follow the overall score;
+ * the second clause comes from the issue counts.
+ */
+export const auditFrontPageCopy = {
+  outOf: "out of 100",
+  fixFirstTitle: "Fix first",
+  notMeasured: "not measured",
+  aiReadability: "AI readability",
+  verdictBands: [
+    { min: 90, label: "Excellent" },
+    { min: 70, label: "In good shape" },
+    { min: 50, label: "Findable, with gaps" },
+    { min: 0, label: "Hard to find" },
+  ],
+  verdictDetail: {
+    critical: (n: number) => `${n} critical ${n === 1 ? "issue holds" : "issues hold"} it back.`,
+    high: (n: number) => `${n} high-priority ${n === 1 ? "issue is" : "issues are"} the place to start.`,
+    some: (n: number) => `${n} smaller ${n === 1 ? "issue" : "issues"} left to tidy.`,
+    none: "No issues found on the pages we checked.",
+  },
+  unavailable: "Not enough data for an overall score.",
+  /** per-issue DIY path: a plain label, not a button (Fable's ruling on R4 finding 11) */
+  fixMyselfNote: "Fix it myself: the steps are above",
 } as const;

@@ -21,16 +21,16 @@ export const privacy = {
       heading: "Who we are",
       body: [
         "This website and its services are operated under the seenhq name. In this policy, \"seenhq\", \"we\" and \"us\" mean the operator of seenhq.",
-        "If you have any question about this policy or your data, contact us via the contact form at /contact and we will reply by email.",
+        "For any question about this policy or your data, use the contact form at /contact and we will reply by email.",
       ],
     },
     {
       heading: "What we collect and why",
       body: [
-        "When you run an audit: the website address you enter and the results of the audit (scores, checks, issues, a summary of the pages we scanned and, when it runs, the AI reading of those pages and its drafts). We keep these so we can show you the report and improve the service.",
+        "When you run an audit: the website address you enter and the results of the audit (scores, checks, issues, a summary of the pages we scanned and, when it runs, the AI reading of those pages and its drafts). We use these to show you the report. Today we do not store them on our servers (see \"How long we keep it\").",
         "When you unlock a full report: your email address, the audit it belongs to, the website address and score, a record that you ticked the consent box, and the browser's user-agent string. Ticking that box is required to unlock the report; it covers storing your email with the report and contacting you about it. You can withdraw it at any time (see \"Your rights\").",
         "When you use the contact form: your name, email, and any business name, website, service, budget and message you choose to send. We use this only to reply to your enquiry and to deliver any work you ask for.",
-        "For all of the above we also store a one-way, salted hash of your IP address. We use it to limit abuse (for example, too many audits per hour). We do not store your IP address itself.",
+        "For all of the above we also use a one-way, salted hash of your IP address. We use it to limit abuse (for example, too many audits per hour). We do not store your IP address itself.",
       ],
     },
     {
@@ -59,14 +59,15 @@ export const privacy = {
     {
       heading: "Who processes your data",
       body: [
-        "We use a small number of service providers to run seenhq: our hosting provider (Vercel), which also provides our cookie-free analytics and server logs; if we store data, our database provider; if we send email notifications, our email provider; Google PageSpeed Insights for performance checks; and NVIDIA's hosted model API for the AI reading of audited public pages (it receives page text only, never visitor data).",
+        "We use a small number of service providers to run seenhq: our hosting provider (Vercel), which also provides our cookie-free analytics and server logs; if we send email notifications, our email provider; if we add a database, our database provider; Google PageSpeed Insights for performance checks; and NVIDIA's hosted model API for the AI reading of audited public pages (it receives page text only, never visitor data).",
         "We do not sell your personal data and we do not share it with anyone for their own marketing.",
       ],
     },
     {
       heading: "How long we keep it",
       body: [
-        "We keep audit records, leads and contact messages for up to 24 months, then delete them, or sooner if you ask.",
+        "As of 23 November 2026 we do not run a database. Audit requests, unlocked-report emails and contact messages are processed in memory and appear in our hosting provider's server logs, which Vercel keeps for a limited time under its own retention settings. Notifications we receive by email are deleted within 24 months, or sooner if you ask.",
+        "If we add a database, we will update this page first. We keep audit records, leads and contact messages for up to 24 months, then delete them, or sooner if you ask.",
       ],
     },
     {
@@ -80,7 +81,7 @@ export const privacy = {
     {
       heading: "Security",
       body: [
-        "Data is sent over HTTPS. Where we store it in a database, only our server can access that database. Full audit reports held in your browser are encrypted. No system is perfectly secure, but we limit what we collect so there is less to protect.",
+        "Data is sent over HTTPS. If we add a database, only our server will be able to access it. Full audit reports held in your browser are encrypted. No system is perfectly secure, but we limit what we collect so there is less to protect.",
       ],
     },
     {
@@ -156,7 +157,7 @@ export const terms = {
     {
       heading: "Changes and contact",
       body: [
-        "We may update these terms from time to time. The date at the top shows when they last changed. Questions? Use the contact form at /contact and we'll reply by email.",
+        "We may update these terms. The date at the top shows when they last changed. For questions, use the contact form at /contact and we'll reply by email.",
       ],
     },
   ],

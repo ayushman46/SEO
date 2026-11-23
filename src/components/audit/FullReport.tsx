@@ -3,7 +3,7 @@ import type { AuditResult, CoreWebVitals, PageSummary } from "@/lib/audit/types"
 import { auditResultCopy } from "@/content/audit";
 import { Badge } from "@/components/ui/Badge";
 import { cx } from "@/components/ui/cx";
-import { auditAiCopy, auditQuoteCopy } from "@/content/audit";
+import { auditAiCopy, auditExportCopy, auditQuoteCopy } from "@/content/audit";
 import { toTicketsMarkdown } from "@/lib/audit/export";
 import { AiFullSection, AiUnavailableNote } from "./AiReading";
 import { CheckGrid } from "./CheckGrid";
@@ -22,9 +22,11 @@ const ratingTone: Record<Rating, string> = {
 
 function SubHeading({ id, children, count }: { id: string; children: ReactNode; count?: number }) {
   return (
-    <h4 id={id} className="flex items-baseline gap-3 font-serif text-[1.75rem] leading-tight text-ink sm:text-[2rem]">
+    <h4 id={id} className="font-serif text-display-sm text-balance text-ink">
       {children}
-      {typeof count === "number" ? <span className="font-sans text-sm font-medium text-muted tabular-nums">{count}</span> : null}
+      {typeof count === "number" ? (
+        <span className="ml-3 font-sans text-sm font-medium whitespace-nowrap text-muted tabular-nums">{count}</span>
+      ) : null}
     </h4>
   );
 }
@@ -208,6 +210,7 @@ export function FullReport({
   const hasNotes = result.notes.length > 0 || result.truncated;
   const toc = [
     { id: ids.issues, label: auditUi.allIssuesTitle, count: result.issues.length },
+    { id: ids.export, label: auditExportCopy.title },
     ...(result.issues.length ? [{ id: ids.quote, label: auditQuoteCopy.title }] : []),
     ...(ai ? [{ id: ids.ai, label: auditAiCopy.fullTitle }] : []),
     { id: ids.cwv, label: auditUi.cwvTitle },
@@ -222,11 +225,30 @@ export function FullReport({
         <Badge tone="pass" dot>
           {badgeLabel}
         </Badge>
-        <h3 id={headingId} ref={headingRef} tabIndex={-1} className="mt-4 font-serif text-display-sm text-ink scroll-mt-28 rounded-sm focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">
+        <h3 id={headingId} ref={headingRef} tabIndex={-1} className="mt-4 font-serif text-display-sm text-ink rounded-sm focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">
           {auditUi.fullReportTitle}
         </h3>
-        <ExportBar result={result} headingId={ids.export} className="mt-6" />
       </div>
+
+      {/* phones and tablets: the same contents as a sticky, horizontally scrolling chip row */}
+      <nav
+        aria-label={auditUi.fullReportTitle}
+        className="sticky top-(--nav-h) z-30 -mx-4 bg-paper/95 px-4 py-2 sm:-mx-6 sm:px-6 lg:hidden"
+      >
+        <ul className="flex gap-2 overflow-x-auto pb-1">
+          {toc.map((t) => (
+            <li key={t.id} className="shrink-0">
+              <a
+                href={`#${t.id}`}
+                className="inline-flex min-h-9 items-center gap-1.5 rounded-pill bg-white px-3.5 text-sm whitespace-nowrap text-ink-2 shadow-[inset_0_0_0_1px_var(--color-line-strong)] hover:text-ink"
+              >
+                {t.label}
+                {typeof t.count === "number" ? <span className="text-xs text-muted tabular-nums">{t.count}</span> : null}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
 
       <nav aria-label={auditUi.fullReportTitle} className="hidden lg:block">
         <ul className="sticky top-28 space-y-0.5 border-l border-line">
@@ -276,6 +298,7 @@ export function FullReport({
                                 issue={issue}
                                 hostname={result.hostname}
                                 headingLevel={6}
+                                collapsible
                                 ticket={toTicketsMarkdown({ ...result, issues: [issue] })}
                               />
                             </li>
@@ -288,6 +311,11 @@ export function FullReport({
               </div>
             );
           })}
+        </div>
+
+        {/* developer hand-off after the issues, not before them (R4 finding 39) */}
+        <div id={ids.export}>
+          <ExportBar result={result} headingId={`${ids.export}-title`} />
         </div>
 
         {result.issues.length ? <QuotePanel headingId={ids.quote} diyHref={`#${ids.issues}`} headingLevel={4} /> : null}

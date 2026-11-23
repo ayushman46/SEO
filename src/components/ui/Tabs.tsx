@@ -88,7 +88,7 @@ export function Tabs({
       role="tablist"
       aria-label={label}
       aria-orientation="horizontal"
-      className="inline-flex max-w-full items-center gap-1 rounded-pill bg-accent-600 p-1 shadow-[inset_0_1px_0_rgb(255_255_255/0.18),0_10px_24px_-14px_rgb(26_111_232/0.9)]"
+      className="inline-flex max-w-full items-center gap-1 rounded-pill bg-paper-2 p-1 shadow-[inset_0_0_0_1px_var(--color-line)]"
     >
       {items.map((item, i) => {
         const selected = item.id === active;
@@ -108,10 +108,10 @@ export function Tabs({
             onKeyDown={(e) => onKeyDown(e, i)}
             className={cx(
               "relative h-9 rounded-pill px-3.5 text-sm font-medium whitespace-nowrap transition-[background-color,color,box-shadow] duration-300 ease-(--ease-paper) sm:h-10 sm:px-5 sm:text-[0.9375rem]",
-              "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white",
+              "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
               selected
-                ? "bg-white text-accent-ink shadow-[0_1px_2px_rgb(17_79_173/0.35),0_4px_10px_-4px_rgb(17_79_173/0.5)]"
-                : "text-white hover:bg-white/[0.14]",
+                ? "bg-white text-ink shadow-paper"
+                : "text-ink-2 hover:text-ink",
             )}
           >
             {item.label}

@@ -8,7 +8,7 @@ export const site = {
   name: "seenhq",
   tagline: "Be seen by people and by the machines they ask.",
   description:
-    "seenhq audits your website for Google and AI answer engines like ChatGPT and Perplexity, then fixes what stops you from being found, cited and chosen.",
+    "seenhq audits your website for Google and AI answer engines like ChatGPT and Perplexity, then fixes what stops them reading and quoting it.",
   contactEmail: "",
   location: "Remote, worldwide",
   nav: [
@@ -72,7 +72,13 @@ export const site = {
 /** Last time the marketing copy was reviewed (ISO date). Used for sitemap lastModified and visible "updated" dates. */
 export const contentUpdated = "2026-11-23";
 
-/** Small line under the engine logo strip ("Checks how you show up in"). */
+/**
+ * Label above the home engine strip (replaces the hard-coded "Checks how you show up in", which
+ * overclaimed: the audit checks readiness, it does not report how you appear in these engines).
+ */
+export const enginesHeading = "We check your site against what these engines need";
+
+/** Small line under the engine strip. */
 export const enginesDisclaimer =
   "Logos are trademarks of their respective owners. seenhq is not affiliated with or endorsed by them.";
 

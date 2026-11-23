@@ -1,37 +1,40 @@
 import Link from "next/link";
-import { home } from "@/content/home";
-import { enginesDisclaimer, site } from "@/content/site";
+import * as homeContent from "@/content/home";
+import * as siteContent from "@/content/site";
 import { services } from "@/content/services";
-import { pricingTiers } from "@/content/pricing";
-import { SectionTear } from "@/components/collage/SectionTear";
+import { PriceText } from "@/components/pages/PriceText";
 import { Accordion } from "@/components/ui/Accordion";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
-import { cx } from "@/components/ui/cx";
 import { EngineStrip } from "@/components/ui/EngineStrip";
 import { Icon } from "@/components/ui/Icon";
-import { PlaceholderText } from "@/components/ui/PlaceholderText";
-import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 
-/* ---------- Proof line + engines ---------- */
+/*
+ * Home sections after the hero (T026). Openers vary on purpose (never more than two
+ * kicker + heading + paragraph stacks in a row): Problem has no kicker, Services is a
+ * heading and a ruled index, FAQ is a heading only. Paper sections on white meet it
+ * with a straight hairline; torn edges are kept for the hero, night sky and footer.
+ */
+
+const { home } = homeContent;
+/** Optional source for the problem statistic (content-seo). */
+const problemSource = (homeContent as { homeProblemSource?: { label: string; href: string } }).homeProblemSource;
+
+/* ---------- Engines ---------- */
+
+/** Content-seo's heading for the strip; falls back while the export is being added. */
+const enginesHeading: string =
+  (siteContent as { enginesHeading?: string }).enginesHeading ?? "We check your site against what these engines need";
 
 export function ProofAndEngines() {
   return (
-    <section aria-label="Where seenhq checks your visibility" className="pt-20 pb-6 sm:pt-28">
+    <section aria-label={enginesHeading} className="pt-16 pb-4 sm:pt-20">
       <Container>
-        <div className="flex items-center gap-4 sm:gap-6">
-          <span aria-hidden className="h-px min-w-6 flex-1 bg-line-strong" />
-          <p className="max-w-xl text-center text-sm leading-relaxed text-balance text-muted sm:text-[0.9375rem]">
-            {home.proofLine}
-          </p>
-          <span aria-hidden className="h-px min-w-6 flex-1 bg-line-strong" />
-        </div>
         <EngineStrip
-          label="Checks how you show up in"
-          engines={site.enginesTracked}
-          disclaimer={enginesDisclaimer}
-          className="mt-14"
+          label={enginesHeading}
+          engines={siteContent.site.enginesTracked}
+          disclaimer={siteContent.enginesDisclaimer}
         />
       </Container>
     </section>
@@ -43,236 +46,121 @@ export function ProofAndEngines() {
 export function Problem() {
   const { problem } = home;
   return (
-    <section aria-labelledby="problem-title" className="relative mt-20 sm:mt-28">
-      <SectionTear color="var(--color-paper)" seed={4} grain />
-      <div className="paper-grain bg-paper py-20 sm:py-28">
-        <Container className="grid gap-14 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-20">
-          <Reveal className="lg:sticky lg:top-28 lg:self-start">
-            <SectionHeading
-              id="problem-title"
-              kicker={problem.kicker}
-              title={problem.title}
-              body={problem.body}
-            />
-          </Reveal>
-          <ul className="grid gap-4 sm:grid-cols-2">
+    <section aria-labelledby="problem-title" className="mt-16 border-t border-line-strong sm:mt-20">
+      <div className="paper-grain bg-paper py-16 sm:py-24">
+        <Container className="grid gap-12 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-20">
+          <SectionHeading
+            id="problem-title"
+            title={problem.title}
+            body={problem.body}
+            size="lg"
+            className="lg:sticky lg:top-28 lg:self-start"
+          >
+            {problemSource ? (
+              <p className="mt-4 text-xs text-muted">
+                Source:{" "}
+                <a
+                  href={problemSource.href}
+                  rel="noopener noreferrer"
+                  className="rounded-sm underline decoration-ink/25 underline-offset-4 hover:text-ink hover:decoration-ink"
+                >
+                  {problemSource.label}
+                </a>
+              </p>
+            ) : null}
+          </SectionHeading>
+          <ol className="border-b border-ink">
             {problem.points.map((point, i) => (
-              <li key={point.title}>
-                <Reveal delay={i * 90} className="h-full">
-                  <div className="h-full rounded-card bg-white p-6 shadow-paper sm:p-7">
-                    <span className="grid size-11 place-items-center rounded-xl bg-paper text-ink shadow-[inset_0_0_0_1px_var(--color-line)]">
-                      <Icon name={point.icon} size={22} />
-                    </span>
-                    <h3 className="mt-6 font-serif text-[1.625rem] leading-[1.1] text-balance text-ink">
-                      {point.title}
-                    </h3>
-                    <p className="mt-3 text-[0.9375rem] leading-relaxed text-pretty text-muted">
-                      {point.body}
-                    </p>
-                  </div>
-                </Reveal>
+              <li
+                key={point.title}
+                className="grid gap-x-6 gap-y-2 border-t border-ink py-6 sm:grid-cols-[2.5rem_minmax(0,0.9fr)_minmax(0,1.1fr)] sm:py-7"
+              >
+                <span aria-hidden className="font-serif text-title leading-none text-muted tabular-nums">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <h3 className="font-serif text-title-lg text-balance text-ink">{point.title}</h3>
+                <p className="max-w-[60ch] text-[0.9375rem] leading-relaxed text-pretty text-muted">{point.body}</p>
               </li>
             ))}
-          </ul>
+          </ol>
         </Container>
       </div>
-      <SectionTear color="var(--color-paper)" seed={8} flip grain />
     </section>
   );
 }
 
-/* ---------- How it works ---------- */
-
-export function HowItWorks() {
-  const { howItWorks } = home;
-  return (
-    <section aria-labelledby="how-title" className="py-24 sm:py-32">
-      <Container>
-        <SectionHeading
-          id="how-title"
-          kicker={howItWorks.kicker}
-          title={howItWorks.title}
-          align="center"
-        />
-        <ol className="mt-16 grid gap-10 md:grid-cols-3 md:gap-8">
-          {howItWorks.steps.map((step, i) => (
-            <li key={step.title}>
-              <Reveal delay={i * 120}>
-                <div className="relative border-t border-ink pt-6">
-                  <span
-                    aria-hidden
-                    className="absolute -top-[5px] left-0 size-2.5 rounded-full bg-accent"
-                  />
-                  {/* decorative numeral via pseudo-element: not read out, not contrast-checked */}
-                  <span
-                    aria-hidden
-                    data-n={String(i + 1).padStart(2, "0")}
-                    className="block font-serif text-[4.5rem] leading-none text-ink/15 tabular-nums before:content-[attr(data-n)]"
-                  />
-                  <h3 className="mt-4 text-xl font-semibold tracking-[-0.01em] text-ink">
-                    <span className="sr-only">Step {i + 1}: </span>
-                    {step.title}
-                  </h3>
-                  <p className="mt-3 max-w-sm text-[0.9875rem] leading-relaxed text-pretty text-muted">
-                    {step.body}
-                  </p>
-                </div>
-              </Reveal>
-            </li>
-          ))}
-        </ol>
-      </Container>
-    </section>
-  );
-}
-
-/* ---------- Services teaser ---------- */
+/* ---------- Services index ---------- */
 
 /** Leading price token: "$49", "From $199", "₹2,999/month", "$29/month". */
 const PRICE_TOKEN = /^(From\s+)?[$₹][\d,]+(?:\.\d+)?(\/month)?/;
 
-/**
- * "$49 as part of the Full audit" -> the amount ("$49") on one unbreakable line,
- * and any qualifier on its own muted line beneath, so long price strings never
- * wrap mid-phrase at any width. Strings without a leading price render as is.
- */
-function PriceLine({ value }: { value: string }) {
-  const m = PRICE_TOKEN.exec(value.trim());
-  const amount = m ? m[0] : value.trim();
-  const qualifier = m ? value.trim().slice(m[0].length).trim() : "";
-  return (
-    <span className="mt-auto block pt-6">
-      <span className="flex flex-col gap-1.5 border-t border-line pt-5">
-        <span
-          className={cx(
-            "text-[1.0625rem] leading-tight font-semibold text-ink tabular-nums",
-            m ? "whitespace-nowrap" : "text-pretty",
-          )}
-        >
-          {amount}
-        </span>
-        {qualifier ? (
-          <span className="text-[0.8125rem] leading-snug text-pretty text-muted">{qualifier}</span>
-        ) : null}
-      </span>
-    </span>
-  );
+function splitPrice(value: string) {
+  const v = value.trim();
+  const m = PRICE_TOKEN.exec(v);
+  // no leading price (e.g. "Included in the Full audit · $39"): a quiet line, not a figure
+  if (!m) return { prefix: "", amount: "", qualifier: v };
+  const prefix = m[1] ? m[1].trim() : "";
+  return { prefix, amount: m[0].slice(m[1]?.length ?? 0), qualifier: v.slice(m[0].length).trim() };
 }
 
+/**
+ * Ruled index of every service (T026, finding 10): number, serif name with the
+ * tagline from sm, price on the right in a fixed tabular column. The whole row
+ * is the link. Any count works: no grid spans, no orphans.
+ */
 export function ServicesTeaser() {
   const { servicesTeaser } = home;
   return (
-    <section aria-labelledby="services-title" className="relative">
-      <SectionTear color="var(--color-paper)" seed={15} grain />
+    <section aria-labelledby="services-title" className="border-t border-line-strong">
       <div className="paper-grain bg-paper py-20 sm:py-28">
         <Container>
-          <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-            <SectionHeading
-              id="services-title"
-              kicker={servicesTeaser.kicker}
-              title={servicesTeaser.title}
-              body={servicesTeaser.body}
-            />
-            <Button
-              href="/services"
-              variant="secondary"
-              icon="arrow-right"
-              className="self-start lg:self-auto"
-            >
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <SectionHeading id="services-title" kicker={servicesTeaser.kicker} title={servicesTeaser.title} />
+            <Button href="/services" variant="secondary" className="self-start lg:self-auto">
               All services
             </Button>
           </div>
-          <ul className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
-            {services.map((service, i) => (
-              <li
-                key={service.slug}
-                className={cx(
-                  i < 3 ? "lg:col-span-2" : "lg:col-span-3",
-                  i === 4 && "sm:col-span-2 lg:col-span-3",
-                )}
-              >
-                <Reveal delay={(i % 3) * 90} className="h-full">
+          <ol className="mt-12 border-b border-line">
+            {services.map((service, i) => {
+              const price = splitPrice(service.priceFrom);
+              return (
+                <li key={service.slug}>
                   <Link
                     href={`/services#${service.slug}`}
-                    className="group flex h-full flex-col rounded-card bg-white p-6 shadow-paper transition-[box-shadow,transform] duration-300 ease-(--ease-paper) hover:-translate-y-0.5 hover:shadow-float sm:p-7"
+                    className="group grid grid-cols-[2rem_minmax(0,1fr)] items-baseline gap-x-4 gap-y-1 border-t border-line py-5 sm:grid-cols-[2.5rem_minmax(0,1fr)_auto] sm:py-6"
                   >
-                    <span className="flex items-center justify-between">
-                      <span className="font-serif text-lg text-muted tabular-nums">
-                        {String(i + 1).padStart(2, "0")}
+                    <span aria-hidden className="font-serif text-title leading-none text-muted tabular-nums">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <span className="min-w-0">
+                      <span className="flex items-baseline gap-2 font-serif text-title-lg text-ink transition-colors group-hover:text-accent-ink">
+                        {service.name}
+                        <Icon
+                          name="arrow-up-right"
+                          size={16}
+                          className="shrink-0 self-center text-muted transition-colors group-hover:text-accent-ink"
+                        />
                       </span>
-                      <span className="grid size-9 place-items-center rounded-full bg-paper text-ink transition-colors group-hover:bg-accent-600 group-hover:text-white">
-                        <Icon name="arrow-up-right" size={18} />
+                      <span className="mt-1 hidden max-w-[60ch] text-[0.9375rem] leading-relaxed text-pretty text-muted sm:block">
+                        {service.tagline}
                       </span>
                     </span>
-                    <span className="mt-8 font-serif text-[2rem] leading-none text-ink">
-                      {service.name}
+                    <span className="col-start-2 flex flex-col sm:col-start-3 sm:items-end sm:text-right">
+                      {price.prefix ? <span className="text-xs tracking-[0.08em] text-muted uppercase">{price.prefix}</span> : null}
+                      {price.amount ? (
+                        <PriceText value={price.amount} className="min-w-[5ch] text-[1.0625rem] font-semibold whitespace-nowrap text-ink" />
+                      ) : null}
+                      {price.qualifier ? (
+                        <span className="max-w-[22ch] text-xs leading-snug text-pretty text-muted">{price.qualifier}</span>
+                      ) : null}
                     </span>
-                    <span className="mt-3 text-[0.9375rem] leading-relaxed text-pretty text-muted">
-                      {service.tagline}
-                    </span>
-                    <PriceLine value={service.priceFrom} />
                   </Link>
-                </Reveal>
-              </li>
-            ))}
-          </ul>
+                </li>
+              );
+            })}
+          </ol>
         </Container>
       </div>
-      <SectionTear color="var(--color-paper)" seed={16} flip grain />
-    </section>
-  );
-}
-
-/* ---------- Pricing teaser ---------- */
-
-export function PricingTeaser() {
-  const { pricingTeaser } = home;
-  return (
-    <section aria-labelledby="pricing-title" className="py-24 sm:py-32">
-      <Container className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-center lg:gap-20">
-        <SectionHeading
-          id="pricing-title"
-          kicker={pricingTeaser.kicker}
-          title={pricingTeaser.title}
-          body={pricingTeaser.body}
-        >
-          <div className="mt-8">
-            <Button href={pricingTeaser.cta.href} icon="arrow-right">
-              {pricingTeaser.cta.label}
-            </Button>
-          </div>
-        </SectionHeading>
-        <Reveal>
-          <ul className="overflow-hidden rounded-panel bg-white shadow-[inset_0_0_0_1px_var(--color-line)]">
-            {pricingTiers.map((tier) => (
-              <li
-                key={tier.name}
-                className={cx(
-                  "relative flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-b border-line px-6 py-5 last:border-b-0 sm:px-8 sm:py-6",
-                  tier.highlighted && "bg-accent-soft/50",
-                )}
-              >
-                {tier.highlighted ? (
-                  <span aria-hidden className="absolute inset-y-0 left-0 w-1 bg-accent" />
-                ) : null}
-                <div className="min-w-0">
-                  <h3 className="font-serif text-[1.75rem] leading-none text-ink">{tier.name}</h3>
-                  <p className="mt-2 max-w-xs text-sm leading-relaxed text-pretty text-muted">
-                    {tier.description}
-                  </p>
-                </div>
-                <p className="shrink-0 text-right">
-                  <PlaceholderText
-                    value={tier.price}
-                    className="font-serif text-[2rem] leading-none text-ink"
-                  />
-                  <span className="ml-1.5 text-sm text-muted">{tier.cadence}</span>
-                </p>
-              </li>
-            ))}
-          </ul>
-        </Reveal>
-      </Container>
     </section>
   );
 }
@@ -281,15 +169,14 @@ export function PricingTeaser() {
 
 export function Faq() {
   return (
-    <section aria-labelledby="faq-title" className="py-24 sm:py-32">
-      <Container className="grid gap-12 lg:grid-cols-[minmax(0,0.75fr)_minmax(0,1.25fr)] lg:gap-20">
+    <section aria-labelledby="faq-title" className="py-14 sm:py-20">
+      <Container className="grid gap-10 lg:grid-cols-[minmax(0,0.75fr)_minmax(0,1.25fr)] lg:gap-20">
         <SectionHeading
           id="faq-title"
-          kicker="FAQ"
           title="Questions, answered plainly"
           className="lg:sticky lg:top-28 lg:self-start"
         />
-        <Accordion items={home.faq.map((f) => ({ title: f.q, content: <p>{f.a}</p> }))} />
+        <Accordion visible={6} items={home.faq.map((f) => ({ title: f.q, content: <p>{f.a}</p> }))} />
       </Container>
     </section>
   );

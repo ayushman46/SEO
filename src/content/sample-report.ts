@@ -21,19 +21,19 @@ export const sampleReportCopy = {
   /** Start of the "which site, which date" line; the page appends the run date in a <time>. */
   ranFor: (hostname: string) => `Audit of ${hostname}, a fictional business, run on`,
   disclaimer:
-    "Illustrative sample for a fictional business. Scores and issues are computed by the same engine and wording as a real report; the AI reading shown here is an example.",
+    "Illustrative sample for a fictional business. Scores and issues come from the real engine; the AI reading is an example.",
   cta: { label: "Run this on your own site", href: "/audit" } satisfies Cta,
   methodologyCta: { label: "How we score", href: "/methodology" } satisfies Cta,
   closing: {
     title: "Run this on your own site",
-    body: "The audit is free and takes under a minute. You see your scores and top issues straight away; the full report like this one needs only an email.",
+    body: "Free, and it takes about a minute. Scores and top issues show straight away; the full report needs only an email.",
   },
 };
 
 /** Short link labels used near the audit forms and the email gate. */
 export const sampleReportLinks = {
   hero: "See a sample report",
-  gate: "Not sure? See a full sample report first",
+  gate: "See a full sample report first",
   href: "/sample-report",
 };
 

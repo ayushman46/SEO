@@ -3,41 +3,70 @@ import { cx } from "./cx";
 
 export type AccordionItem = { id?: string; title: ReactNode; content: ReactNode };
 
+function Row({ item, name, H }: { item: AccordionItem; name?: string; H: "h2" | "h3" | "h4" }) {
+  return (
+    <details name={name} className="group border-b border-line">
+      <summary className="flex cursor-pointer items-start justify-between gap-6 rounded-sm py-5 text-left transition-colors hover:text-accent-ink">
+        <H className="text-[1.0625rem] leading-snug font-medium text-pretty">{item.title}</H>
+        <span aria-hidden className="relative mt-1.5 grid size-3 shrink-0 place-items-center text-muted">
+          <span className="absolute h-px w-3 bg-current" />
+          <span className="absolute h-3 w-px bg-current transition-transform duration-300 ease-(--ease-paper) group-open:scale-y-0" />
+        </span>
+      </summary>
+      <div className="max-w-[66ch] pr-2 pb-6 text-[0.9375rem] leading-relaxed text-pretty text-muted sm:pr-12">
+        {item.content}
+      </div>
+    </details>
+  );
+}
+
 /**
  * FAQ accordion on native <details>/<summary>: keyboard and screen-reader
  * support for free, works without JavaScript. Optional `name` makes it exclusive.
+ * T026: with `visible`, only the first N show; the rest sit in one outer
+ * <details> ("More questions"). Every answer stays in the HTML (and the JSON-LD).
  */
 export function Accordion({
   items,
   name,
   headingLevel = 3,
+  visible,
+  moreLabel = "More questions",
   className,
 }: {
   items: AccordionItem[];
   name?: string;
   headingLevel?: 2 | 3 | 4;
+  /** show this many, fold the rest */
+  visible?: number;
+  moreLabel?: string;
   className?: string;
 }) {
   const H = `h${headingLevel}` as "h2" | "h3" | "h4";
+  const cut = visible && items.length > visible + 1 ? visible : items.length;
+  const shown = items.slice(0, cut);
+  const rest = items.slice(cut);
   return (
     <div className={cx("border-t border-line", className)}>
-      {items.map((item, i) => (
-        <details key={item.id ?? i} name={name} className="group border-b border-line">
-          <summary className="flex cursor-pointer items-start justify-between gap-6 rounded-sm py-6 text-left transition-colors hover:text-accent-ink">
-            <H className="text-[1.0625rem] leading-snug font-medium text-pretty sm:text-lg">{item.title}</H>
-            <span
-              aria-hidden
-              className="relative mt-0.5 grid size-7 shrink-0 place-items-center rounded-full shadow-[inset_0_0_0_1px_var(--color-line-strong)] transition-colors duration-200 group-open:bg-ink group-open:text-white"
-            >
-              <span className="absolute h-px w-3 bg-current" />
-              <span className="absolute h-3 w-px bg-current transition-transform duration-300 ease-(--ease-paper) group-open:scale-y-0" />
+      {shown.map((item, i) => (
+        <Row key={item.id ?? i} item={item} name={name} H={H} />
+      ))}
+      {rest.length ? (
+        <details className="group/more">
+          <summary className="inline-flex cursor-pointer items-center gap-2 rounded-sm py-5 text-[0.9375rem] font-medium text-ink-2 hover:text-ink">
+            {moreLabel}
+            <span className="text-muted tabular-nums">({rest.length})</span>
+            <span aria-hidden className="text-muted transition-transform duration-200 group-open/more:rotate-90">
+              ›
             </span>
           </summary>
-          <div className="max-w-3xl pr-2 pb-7 text-[0.9875rem] leading-relaxed text-pretty text-muted sm:pr-12">
-            {item.content}
+          <div className="border-t border-line">
+            {rest.map((item, i) => (
+              <Row key={item.id ?? `more-${i}`} item={item} name={name} H={H} />
+            ))}
           </div>
         </details>
-      ))}
+      ) : null}
     </div>
   );
 }

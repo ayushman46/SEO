@@ -32,18 +32,18 @@ describe("buildQuote", () => {
   it("quotes only the AI crawler unblock when that is the only serious problem", () => {
     const q = buildQuote({ issues: [issue("geo.ai-crawlers:search-blocked")], pagesScanned: 6, currency: "USD" });
     expect(q.lines.map((l) => l.key)).toEqual(["ai-crawler-unblock"]);
-    expect(q.total).toBe(149);
+    expect(q.total).toBe(49);
     expect(q.fixedTotal).toBe(true);
-    expect(q.totalText).toBe("$149");
+    expect(q.totalText).toBe("$49");
     expect(q.confirmNote).toBeNull();
     expect(q.reviewReasons).toEqual([]);
     expect(q.taxNote).toBe("excludes-applicable-taxes");
     expect(q.bundle).toBeNull();
-    expect(q.summary).toContain("AI crawler unblock ($149)");
-    expect(q.summary).toContain("Total $149, fixed, excluding applicable taxes.");
+    expect(q.summary).toContain("AI crawler unblock ($49)");
+    expect(q.summary).toContain("Total $49, fixed, excluding applicable taxes.");
   });
 
-  it("folds robots.txt crawler blocks into the fix sprint instead of adding $149", () => {
+  it("folds robots.txt crawler blocks into the fix sprint instead of adding $49", () => {
     const q = buildQuote({
       issues: [issue("geo.ai-crawlers:search-blocked"), issue("seo.sitemap:missing")],
       pagesScanned: 6,
@@ -51,8 +51,9 @@ describe("buildQuote", () => {
     });
     expect(q.lines.map((l) => l.key)).toEqual(["fix-sprint"]);
     expect(q.lines[0].covers.map((c) => c.id)).toEqual(["seo.sitemap:missing", "geo.ai-crawlers:search-blocked"]);
-    expect(q.bundle).toMatchObject({ into: "fix-sprint", absorbed: ["ai-crawler-unblock"], avoidedAmount: 149 });
-    expect(q.total).toBe(199);
+    expect(q.bundle).toMatchObject({ into: "fix-sprint", absorbed: ["ai-crawler-unblock"], avoidedAmount: 49 });
+    expect(q.total).toBe(149);
+    expect(q.fixedTotal).toBe(true);
   });
 
   it("keeps a separate unblock when the block is at server/CDN level (probe)", () => {
@@ -66,15 +67,23 @@ describe("buildQuote", () => {
     });
     expect(q.lines.map((l) => l.key)).toEqual(["ai-crawler-unblock", "fix-sprint"]);
     expect(q.bundle).toBeNull();
-    expect(q.total).toBe(348);
+    expect(q.total).toBe(198);
+  });
+
+  it("quotes the Fix sprint at its fixed price within the scope cap", () => {
+    const q = buildQuote({ issues: [issue("seo.sitemap:missing")], pagesScanned: 6, currency: "USD" });
+    expect(q.lines[0]).toMatchObject({ key: "fix-sprint", price: 149, priceKind: "fixed", priceText: "$149" });
+    expect(q.fixedTotal).toBe(true);
+    expect(q.totalText).toBe("$149");
+    expect(QUOTE_SCOPE_CAP.maxPaidIssues).toBe(8);
   });
 
   it("never shows a 'from' price as fixed", () => {
-    const q = buildQuote({ issues: [issue("seo.sitemap:missing")], pagesScanned: 6, currency: "USD" });
-    expect(q.lines[0]).toMatchObject({ key: "fix-sprint", price: 199, priceKind: "from", priceText: "From $199" });
+    const q = buildQuote({ issues: [issue("geo.faq:missing")], pagesScanned: 6, currency: "USD" });
+    expect(q.lines[0]).toMatchObject({ key: "content-entity", price: 99, priceKind: "from", priceText: "From $99" });
     expect(q.fixedTotal).toBe(false);
     expect(q.reviewReasons).toContain("from-price");
-    expect(q.totalText).toBe("From $199");
+    expect(q.totalText).toBe("From $99");
     expect(q.confirmNote).toBe("person-confirms-within-1-business-day");
     expect(q.summary).toContain("a person confirms the final price within 1 business day");
   });
@@ -127,29 +136,30 @@ describe("buildQuote", () => {
     });
     expect(q.lines.map((l) => l.key)).toEqual(["ai-crawler-unblock", "content-entity"]);
     expect(q.diyIssueIds).toEqual(["seo.title:missing"]);
-    expect(q.total).toBe(298);
+    expect(q.total).toBe(148);
     expect(q.fixedTotal).toBe(false);
   });
 
-  it("uses rupee prices and marks Content & entity as price-on-request in INR", () => {
+  it("uses rupee prices, including the Content & entity starting price", () => {
     const q = buildQuote({
       issues: [issue("geo.ai-crawlers:search-blocked"), issue("geo.faq:missing")],
       pagesScanned: 6,
       currency: "INR",
     });
     expect(q.lines.map((l) => [l.key, l.price, l.priceKind, l.priceText])).toEqual([
-      ["ai-crawler-unblock", 9999, "fixed", "₹9,999"],
-      ["content-entity", null, "on-request", "Price confirmed by email"],
+      ["ai-crawler-unblock", 2999, "fixed", "₹2,999"],
+      ["content-entity", 6999, "from", "From ₹6,999"],
     ]);
-    expect(q.total).toBe(9999);
-    expect(q.reviewReasons).toEqual(["price-on-request"]);
-    expect(q.totalText).toBe("From ₹9,999");
+    expect(q.total).toBe(9998);
+    expect(q.reviewReasons).toEqual(["from-price"]);
+    expect(q.totalText).toBe("From ₹9,998");
   });
 
-  it("says 'price by email' when nothing has a published price", () => {
+  it("every catalog item has a rupee price, so no INR line is 'price by email'", () => {
+    expect(CATALOG.every((c) => c.inr !== null)).toBe(true);
     const q = buildQuote({ issues: [issue("geo.faq:missing")], pagesScanned: 6, currency: "INR" });
-    expect(q.totalText).toBe("Price confirmed by email");
-    expect(q.summary).toContain("A person confirms the price by email within 1 business day");
+    expect(q.totalText).toBe("From ₹6,999");
+    expect(q.summary).toContain("a person confirms the final price within 1 business day");
   });
 
   it("is not fixed above the scope cap or for developer-level work", () => {
@@ -177,7 +187,7 @@ describe("buildQuote", () => {
     const issues = Object.keys(ISSUE_CATALOG).map((k) => issue(k as IssueKey));
     const q = buildQuote({ issues, pagesScanned: 6, currency: "USD" });
     expect(q.lines.some((l) => l.key === "monitoring" || l.key === "full-audit")).toBe(false);
-    expect(q.alternatives.map((a) => [a.key, a.price, a.priceKind])).toEqual([["full-audit", 49, "fixed"]]);
+    expect(q.alternatives.map((a) => [a.key, a.price, a.priceKind])).toEqual([["full-audit", 39, "fixed"]]);
     expect(q.total).toBe(q.lines.reduce((s, l) => s + (l.price ?? 0), 0));
   });
 
@@ -201,7 +211,7 @@ describe("buildQuote", () => {
     expect(a).toEqual(b);
     expect(a.coveredIssueIds).toEqual(["seo.sitemap:missing"]);
     expect(a.summary).toBe(
-      "We found 1 issue. We suggest Technical fix sprint (from $199). Total from $199, excluding applicable taxes; a person confirms the final price within 1 business day, before you pay anything.",
+      "We found 1 issue. We suggest Technical fix sprint ($149). Total $149, fixed, excluding applicable taxes.",
     );
   });
 
@@ -220,10 +230,10 @@ describe("issueFixInfo", () => {
       diy: true,
       serviceSlug: "technical-fixes",
       serviceLabel: "Technical fix sprint",
-      priceText: "From $199",
+      priceText: "$149",
     });
-    expect(issueFixInfo({ id: "geo.ai-crawlers:search-blocked" }, "INR").priceText).toBe("₹9,999");
-    expect(issueFixInfo({ id: "geo.faq:missing" }, "INR").priceText).toBe("Price confirmed by email");
+    expect(issueFixInfo({ id: "geo.ai-crawlers:search-blocked" }, "INR").priceText).toBe("₹2,999");
+    expect(issueFixInfo({ id: "geo.faq:missing" }, "INR").priceText).toBe("From ₹6,999");
   });
 });
 
@@ -251,7 +261,7 @@ describe("order hand-off round trip", () => {
   it("a fixed quote stays fixed", () => {
     const q = buildQuote({ issues: [issue("geo.ai-crawlers:search-blocked")], pagesScanned: 6, currency: "USD" });
     const v = verifyOrder({ currency: "USD", items: toOrderItems(q), submittedTotal: q.total, submittedFixed: q.fixedTotal });
-    expect(v).toMatchObject({ valid: true, fixed: true, catalogTotal: 149 });
+    expect(v).toMatchObject({ valid: true, fixed: true, catalogTotal: 49 });
   });
 });
 
@@ -260,9 +270,9 @@ describe("R3 regressions: verifyOrder", () => {
     const v = verifyOrder({
       currency: "USD",
       items: [
-        { serviceSlug: "ai-crawler-unblock", label: "Full site rebuild + 12 months retainer (agreed by phone)", price: 149, from: false },
+        { serviceSlug: "ai-crawler-unblock", label: "Full site rebuild + 12 months retainer (agreed by phone)", price: 49, from: false },
       ],
-      submittedTotal: 149,
+      submittedTotal: 49,
       submittedFixed: true,
     });
     expect(v.valid).toBe(false);
@@ -282,19 +292,19 @@ describe("R3 regressions: verifyOrder", () => {
   });
 
   it("L4: duplicate services are flagged and never valid or fixed", () => {
-    const same = { serviceSlug: "ai-crawler-unblock", label: "AI crawler unblock", price: 149, from: false };
-    const v = verifyOrder({ currency: "USD", items: Array(12).fill(same), submittedTotal: 1788, submittedFixed: true });
+    const same = { serviceSlug: "ai-crawler-unblock", label: "AI crawler unblock", price: 49, from: false };
+    const v = verifyOrder({ currency: "USD", items: Array(12).fill(same), submittedTotal: 588, submittedFixed: true });
     expect(v.valid).toBe(false);
     expect(v.fixed).toBe(false);
     expect(v.items[0].problem).toBeNull();
     expect(v.items.slice(1).every((i) => i.problem === "duplicate")).toBe(true);
-    expect(v.catalogTotal).toBe(149);
+    expect(v.catalogTotal).toBe(49);
     // aliases count as the same service
-    const full = { label: "Full audit (SEO + GEO, reviewed by a person)", price: 49, from: false };
+    const full = { label: "Full audit (SEO + GEO, reviewed by a person)", price: 39, from: false };
     const w = verifyOrder({
       currency: "USD",
       items: [{ serviceSlug: "seo-audit", ...full }, { serviceSlug: "geo-audit", ...full }],
-      submittedTotal: 98,
+      submittedTotal: 78,
       submittedFixed: true,
     });
     expect(w.items[1].problem).toBe("duplicate");
