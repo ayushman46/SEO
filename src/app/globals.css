@@ -190,10 +190,51 @@
   }
 }
 
-/* Fix tray (audit/quote/FixTray): while it is shown, sticky panels (the email gate)
-   size themselves above it instead of sliding under it (T026). */
+/* Night sky (home/NightSky): no stars behind the copy column (R5 #8). Below lg the copy
+   spans the width, so stars keep to the bands above and below it (the section padding);
+   from lg they keep out of the max-w-2xl column (left margin and right side only). The mask sits on a static
+   wrapper; only the children's opacity animates. */
+.night-stars {
+  --night-pad: 7rem;
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0,
+    #000 calc(var(--night-pad) - 2rem),
+    transparent var(--night-pad),
+    transparent calc(100% - var(--night-pad)),
+    #000 calc(100% - var(--night-pad) + 2rem)
+  );
+}
+@media (min-width: 40rem) {
+  .night-stars {
+    --night-pad: 10rem;
+  }
+}
+@media (min-width: 64rem) {
+  .night-stars {
+    /* stars in the side margin left of the container, none over the copy, then the right side */
+    mask-image: linear-gradient(
+      to right,
+      #000 0,
+      #000 calc(50% - 42rem),
+      transparent calc(50% - 38rem),
+      transparent max(calc(50% + 6.25rem), 45rem),
+      #000 max(calc(50% + 11rem), 50rem)
+    );
+  }
+}
+
+/* Fix tray (audit/quote/FixTray). While it is shown: sticky panels (the email gate) size
+   themselves above it (T026); focus and anchor scrolling keep targets clear of it, and the
+   page end can scroll out from under it (R5 #3, WCAG 2.2 SC 2.4.11). FixTray writes the
+   measured height inline on <html>; 5.25rem is only the pre-measure fallback. The body
+   padding sits behind the (white) tray when scrolled to the end, so it is never seen. */
 html:has([data-fix-tray]) {
   --fix-tray-h: 5.25rem;
+  scroll-padding-bottom: calc(var(--fix-tray-h) + 0.75rem);
+}
+html:has([data-fix-tray]) body {
+  padding-bottom: var(--fix-tray-h);
 }
 
 /* Mobile menu sheet (native <dialog>). Lock page scroll while open. */

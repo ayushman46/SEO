@@ -67,7 +67,8 @@ export function Nav() {
               {contact.label}
             </Link>
           ) : null}
-          <Button href={audit.href} size="md">
+          {/* a little narrower below 360 px so the three pills fit a 320 px screen */}
+          <Button href={audit.href} size="md" className="max-[359px]:px-4">
             {audit.label}
           </Button>
           {/* the menu trigger sits where the sheet's close button appears (top right) */}

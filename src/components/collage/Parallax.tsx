@@ -16,7 +16,8 @@ import { onScrollFrame } from "@/components/scroll/loop";
  * once the user actually scrolls, so the layer is composited while it moves.
  */
 
-type Layer = { outer: HTMLElement; inner: HTMLElement; speed: number; visible: boolean };
+/** `fromTop`: offset is measured from the top of the page (0 at scrollY 0), for layers in the first screen whose at-rest position matters. */
+type Layer = { outer: HTMLElement; inner: HTMLElement; speed: number; visible: boolean; fromTop: boolean };
 
 const layers = new Map<HTMLElement, Layer>();
 let io: IntersectionObserver | null = null;
@@ -32,6 +33,10 @@ function read() {
   moves = [];
   for (const l of layers.values()) {
     if (!l.visible) continue;
+    if (l.fromTop) {
+      moves.push([l.inner, window.scrollY * l.speed]);
+      continue;
+    }
     const rect = l.outer.getBoundingClientRect();
     moves.push([l.inner, -(rect.top + rect.height / 2 - vh / 2) * l.speed]);
   }
@@ -94,16 +99,20 @@ function unregister(outer: HTMLElement) {
 /**
  * `speed` is the fraction of scroll distance the layer drifts (0.08 = subtle;
  * negative = opposite). Measures the static outer box and moves only the inner
- * layer, so there is no feedback loop.
+ * layer, so there is no feedback loop. `fromTop` makes the offset 0 at the top of the
+ * page (scrollY x speed) instead of 0 at the viewport centre, so a first-screen layer
+ * rests exactly where its CSS puts it (PageHero fragments clear the nav, R5 #5).
  */
 export function Parallax({
   speed = 0.08,
+  fromTop = false,
   className,
   innerClassName,
   style,
   children,
 }: {
   speed?: number;
+  fromTop?: boolean;
   className?: string;
   innerClassName?: string;
   style?: CSSProperties;
@@ -116,9 +125,9 @@ export function Parallax({
     const outer = outerRef.current;
     const inner = innerRef.current;
     if (!outer || !inner || typeof IntersectionObserver === "undefined") return;
-    register({ outer, inner, speed, visible: false });
+    register({ outer, inner, speed, visible: false, fromTop });
     return () => unregister(outer);
-  }, [speed]);
+  }, [speed, fromTop]);
 
   return (
     <div ref={outerRef} className={className} style={style}>

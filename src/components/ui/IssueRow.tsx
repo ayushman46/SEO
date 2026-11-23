@@ -56,13 +56,14 @@ export function IssueRow({
       </Badge>
       <span
         className={cx(
-          "min-w-0 flex-1 text-sm leading-snug font-medium",
+          // a basis so on narrow cards the meta group wraps below the title instead of squeezing it (R5 #6)
+          "min-w-0 flex-1 basis-[11rem] text-sm leading-snug font-medium",
           locked ? "text-muted" : "text-ink",
         )}
       >
         {locked ? (
-          <span className="inline-flex items-center gap-1.5">
-            <Icon name="lock" size={14} className="shrink-0" />
+          <span className="inline-flex items-baseline gap-1.5">
+            <Icon name="lock" size={14} className="shrink-0 translate-y-0.5" />
             <span className="sr-only">Locked: </span>
             {issue.title}
           </span>

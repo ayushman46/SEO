@@ -420,6 +420,8 @@ export function ContactForm({ honeypotName }: { honeypotName: string }) {
               error={err("website")}
             >
               <Input
+                // remount once the stored quote is read after hydration, so the audited site prefills (R5 #15)
+                key={stored ? "quote" : "plain"}
                 id={id("website")}
                 name="website"
                 type="text"
@@ -429,7 +431,7 @@ export function ContactForm({ honeypotName }: { honeypotName: string }) {
                 spellCheck={false}
                 maxLength={2048}
                 placeholder={F.website.placeholder}
-                defaultValue={values.website}
+                defaultValue={values.website ?? stored?.audit_url}
                 invalid={Boolean(err("website"))}
                 aria-describedby={describedBy(id("website"), {
                   help: F.website.help,

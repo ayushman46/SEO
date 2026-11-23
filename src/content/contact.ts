@@ -72,8 +72,6 @@ export const contactForm = {
     rateLimited: "You have sent several messages in a short time. Please wait a while and try again.",
     fieldsInvalid: "Please check the highlighted fields.",
   },
-  /** @deprecated R5 edit 24: render nothing. Empty until frontend removes the line from the contact page. */
-  directEmailLabel: "",
 } as const;
 
 /** "What happens next" panel beside the contact form (added by frontend-designer for T006; content-seo may refine). */

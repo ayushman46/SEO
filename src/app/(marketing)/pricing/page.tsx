@@ -15,6 +15,7 @@ import {
   pricingOrderSteps,
   pricingPage,
   pricingRateCardHeader,
+  pricingServicesLink,
   pricingTaxNote,
   pricingTiers,
   pricingTiersInr,
@@ -43,7 +44,7 @@ function RateSheet({ tiers, idSuffix }: { tiers: readonly PricingTier[]; idSuffi
       {tiers.map((tier) => (
         <li
           key={tier.name}
-          className="min-w-0 border-t border-line-strong first:border-t-0 md:odd:border-r md:nth-2:border-t-0 xl:border-t-0 xl:border-r xl:last:border-r-0"
+          className="min-w-0 border-t border-line-strong first:border-t-0 md:row-span-5 md:grid md:grid-rows-subgrid md:odd:border-r md:nth-2:border-t-0 xl:border-t-0 xl:border-r xl:last:border-r-0"
         >
           <PricingCard tier={tier} highlightLabel={pricingHighlightLabel} idSuffix={idSuffix} />
         </li>
@@ -136,8 +137,8 @@ export default function PricingPage() {
           />
           <div className="mt-8 flex flex-col gap-6 md:flex-row md:items-center md:justify-end">
             <div className="flex shrink-0 flex-col gap-4 sm:flex-row sm:items-center">
-              <Button href="/services" variant="link">
-                Every service in detail
+              <Button href={pricingServicesLink.href} variant="link">
+                {pricingServicesLink.label}
               </Button>
               <Button href={pricingClosing.secondaryCta.href} size="lg" icon="arrow-right">
                 {pricingClosing.secondaryCta.label}

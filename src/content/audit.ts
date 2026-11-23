@@ -11,14 +11,10 @@ export const auditPage = {
     "We read your homepage and up to five more pages, score them for Google, AI answer engines and mobile speed, and rank what to fix first. About a minute. No email needed for your scores and top three issues.",
 } satisfies PageCopy;
 
-export const auditForm = {
-  label: "Website address",
-  placeholder: "example.com",
-  help: "We only read public pages, the same way a search engine does.",
-  submitLabel: "Run free audit",
-  submittingLabel: "Auditing…",
-  invalidInput: "That doesn't look like a website address. Try something like example.com.",
-} as const;
+// The URL form copy lives in its own module so client islands (the home hero form) do not
+// bundle the whole report copy (R5 #16). Re-exported so existing imports keep working.
+import { auditForm } from "./audit-form";
+export { auditForm };
 
 /** Shown in order while the audit runs. */
 export const auditProgressSteps = [

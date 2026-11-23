@@ -45,7 +45,7 @@ export function ClosingCta({
     return (
       <section aria-labelledby={id} className="pt-16 pb-20 sm:pt-20 sm:pb-28">
         <Container>
-          <div className="flex flex-col gap-8 border-t border-ink pt-10 md:flex-row md:items-end md:justify-between md:gap-12">
+          <div className="flex flex-col gap-8 border-t border-ink pt-10 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
             <div className="max-w-2xl">
               <h2 id={id} className="font-serif text-display-md text-balance text-ink">
                 {title}

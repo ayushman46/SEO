@@ -41,6 +41,8 @@ export function InPageNav({
         for (const e of entries) visible.set(e.target.id, e.isIntersecting);
         const first = items.find((i) => visible.get(i.id));
         if (first) setActive(first.id);
+        // back above the first section (e.g. Home key or a jump to the top): nothing is current
+        else if (els[0].getBoundingClientRect().top > navH + rem) setActive(null);
       },
       // a band in the upper part of the viewport, below the floating nav
       { rootMargin: `-${Math.round(navH + rem)}px 0px -55% 0px` },

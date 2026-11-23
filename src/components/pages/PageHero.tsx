@@ -21,7 +21,10 @@ type Motif = {
   shape: "rect" | "ellipse";
   position?: string;
   scale?: string;
+  /** width / height of the frame, used to cap the width so the frame fits the strip below the nav */
+  ratio: number;
   side: "left" | "right";
+  /** CSS width expression */
   width: string;
   rotate: number;
 };
@@ -31,52 +34,58 @@ const MOTIFS: Record<Exclude<HeroMotif, "none">, Motif> = {
   eye: {
     src: "/images/eye.webp",
     aspect: "aspect-[2.15/1]",
+    ratio: 2.15,
     shape: "ellipse",
     position: "object-[50%_42%]",
     scale: "scale-[1.08]",
     side: "right",
-    width: "w-[clamp(8.5rem,26vw,19rem)]",
+    width: "clamp(8.5rem,26vw,19rem)",
     rotate: 0,
   },
   // sample report: one eye, close, on a rectangular scrap
   "eye-single": {
     src: "/images/eye.webp",
     aspect: "aspect-[4/3]",
+    ratio: 4 / 3,
     shape: "rect",
-    position: "object-[50%_42%]",
-    // transform scale pivots on the box centre (the nose bridge); pivot on the left eye instead
-    scale: "origin-[29%_47%] scale-[2.2]",
+    // cover crop from the left edge, then scale about the left eye (about 44% / 43% of the box),
+    // so the scrap shows the whole eye and lid, not the bare cheek and nose bridge
+    position: "object-[0%_42%]",
+    scale: "origin-[44%_43%] scale-[2.2]",
     side: "right",
-    width: "w-[clamp(5.5rem,13vw,10rem)]",
+    width: "clamp(5.5rem,13vw,10rem)",
     rotate: -3,
   },
   // services: the marble youth
   marble: {
     src: "/images/marble-youth.webp",
     aspect: "aspect-[760/923]",
+    ratio: 760 / 923,
     shape: "rect",
     side: "right",
-    width: "w-[clamp(4.75rem,10vw,8.5rem)]",
+    width: "clamp(4.75rem,10vw,8.5rem)",
     rotate: -5,
   },
   // contact: Michelangelo's near-touching hands
   hands: {
     src: "/images/hands.webp",
     aspect: "aspect-[720/460]",
+    ratio: 720 / 460,
     shape: "rect",
     side: "left",
-    width: "w-[clamp(7.5rem,20vw,15rem)]",
+    width: "clamp(7.5rem,20vw,15rem)",
     rotate: 4,
   },
   // pricing: only the gap between the fingers
   "hands-gap": {
     src: "/images/hands.webp",
     aspect: "aspect-[3/2]",
+    ratio: 3 / 2,
     shape: "rect",
     position: "object-[50%_50%]",
     scale: "origin-[52%_52%] scale-[1.8]",
     side: "left",
-    width: "w-[clamp(6rem,15vw,11rem)]",
+    width: "clamp(6rem,15vw,11rem)",
     rotate: -3,
   },
 };
@@ -120,7 +129,7 @@ export function PageHero({
         <div
           className={cx(
             "relative isolate -mt-(--nav-h) overflow-clip",
-            compact ? "h-[clamp(9.5rem,20svh,12rem)]" : "h-[clamp(12.5rem,30svh,18rem)]",
+            compact ? "h-[calc(var(--nav-h)+clamp(5rem,12svh,7.5rem))]" : "h-[calc(var(--nav-h)+clamp(7.5rem,20svh,12rem))]",
           )}
         >
           <div aria-hidden className="absolute inset-0" style={{ clipPath: bottomTear }}>
@@ -139,29 +148,34 @@ export function PageHero({
             <div className="absolute inset-x-0 top-0 h-28 bg-linear-to-b from-[#0b2a5c]/25 to-transparent" />
           </div>
 
-          <Parallax
-            speed={0.08}
-            className={cx(
-              "absolute",
-              // compact strips are short: keep the fragment small and low so it clears the floating nav
-              compact ? "bottom-[16%] w-[clamp(4.5rem,10vw,8rem)]" : cx("bottom-[16%]", m.width),
-              m.side === "right" ? "right-[5%] sm:right-[8%] lg:right-[10%]" : "left-[5%] sm:left-[8%] lg:left-[10%]",
-            )}
-          >
-            <div aria-hidden>
-              <TornFrame
-                seed={seed + 3}
-                shape={m.shape}
-                amp={m.shape === "ellipse" ? 3.4 : undefined}
-                rimWidth={m.shape === "ellipse" ? 2.6 : undefined}
-                rotate={m.rotate}
-                shadow="float"
-                className={m.aspect}
-              >
-                <Image src={m.src} alt="" fill sizes="(min-width: 1024px) 304px, 26vw" className={cx("object-cover", m.position, m.scale)} />
-              </TornFrame>
-            </div>
-          </Parallax>
+          {/* The fragment lives in the band below the floating nav (R5 #5): its width is capped by
+              the band height (container query units) so a tall motif never reaches up into the
+              pills, and its parallax is 0 at the top of the page so it rests where it is placed. */}
+          <div className="absolute inset-x-0 top-[calc(var(--nav-h)+0.25rem)] bottom-4 [container-type:size]">
+            <Parallax
+              speed={0.08}
+              fromTop
+              className={cx(
+                "absolute top-0",
+                m.side === "right" ? "right-[5%] sm:right-[8%] lg:right-[10%]" : "left-[5%] sm:left-[8%] lg:left-[10%]",
+              )}
+              style={{ width: `min(${compact ? "clamp(4.5rem,10vw,8rem)" : m.width}, calc(100cqh * ${m.ratio} * 0.88))` }}
+            >
+              <div aria-hidden>
+                <TornFrame
+                  seed={seed + 3}
+                  shape={m.shape}
+                  amp={m.shape === "ellipse" ? 3.4 : undefined}
+                  rimWidth={m.shape === "ellipse" ? 2.6 : undefined}
+                  rotate={m.rotate}
+                  shadow="float"
+                  className={m.aspect}
+                >
+                  <Image src={m.src} alt="" fill sizes="(min-width: 1024px) 304px, 26vw" className={cx("object-cover", m.position, m.scale)} />
+                </TornFrame>
+              </div>
+            </Parallax>
+          </div>
         </div>
       ) : null}
 
@@ -172,7 +186,7 @@ export function PageHero({
         )}
       >
         <div className={cx(!m && "border-b border-line pb-10 sm:pb-14")}>
-          <p className="mb-4 flex max-w-4xl flex-wrap items-baseline justify-between gap-x-6 gap-y-1 text-kicker font-semibold text-muted uppercase">
+          <p className="mb-4 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 text-kicker font-semibold text-muted uppercase">
             <span className="inline-flex items-center gap-2.5">
               <span aria-hidden className="h-px w-6 bg-ink/30" />
               {kicker}

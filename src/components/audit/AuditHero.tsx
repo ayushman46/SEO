@@ -71,7 +71,7 @@ export function AuditHeroNotes() {
         <span>
           {u.label} <time dateTime={u.iso}>{u.display}</time>
         </span>
-        <span aria-hidden className="text-line-strong">
+        <span aria-hidden className="text-line-strong max-sm:hidden">
           ·
         </span>
         <Link

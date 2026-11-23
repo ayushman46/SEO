@@ -29,3 +29,22 @@ export function PriceText({ value, tone = "light", className }: { value: string;
     </span>
   );
 }
+
+/**
+ * A quiet price line such as "Included in the Full audit · $39": the trailing "· $39" never
+ * wraps away from the last word onto a line of its own (R5 #11).
+ */
+export function QualifiedPriceText({ value, className }: { value: string; className?: string }) {
+  const at = value.lastIndexOf(" · ");
+  if (at < 0) return <PriceText value={value} className={className} />;
+  const head = value.slice(0, at);
+  const lastSpace = head.lastIndexOf(" ");
+  return (
+    <span className={className}>
+      <PriceText value={head.slice(0, lastSpace + 1)} />
+      <span className="whitespace-nowrap">
+        <PriceText value={head.slice(lastSpace + 1)} /> · <PriceText value={value.slice(at + 3)} />
+      </span>
+    </span>
+  );
+}

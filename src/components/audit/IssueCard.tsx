@@ -104,8 +104,16 @@ export function IssueCard({
   return (
     <article id={issueAnchor(issue.id)} className={cx("rounded-card bg-white shadow-paper ring-1 ring-ink/[0.04]", className)}>
       <details open={open} className="group/issue">
-        <summary className="block cursor-pointer rounded-card p-5 sm:p-7 [&::-webkit-details-marker]:hidden">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+        <summary className="flex cursor-pointer flex-col rounded-card p-5 sm:p-7 [&::-webkit-details-marker]:hidden">
+          {/* title first in DOM so the summary's accessible name starts with it; the chip row
+              is moved above it visually (R5 #14) */}
+          <div className="mt-3 flex items-start justify-between gap-4">
+            <H className="font-serif text-title-lg text-balance text-ink">{issue.title}</H>
+            <span aria-hidden className="mt-2 shrink-0 text-muted transition-transform duration-200 group-open/issue:rotate-90">
+              ›
+            </span>
+          </div>
+          <div className="order-first flex flex-wrap items-center gap-x-3 gap-y-2">
             <Badge tone={issue.severity} dot>
               {auditResultCopy.severityLabels[issue.severity]}
             </Badge>
@@ -118,12 +126,6 @@ export function IssueCard({
                 {auditUi.impact(issue.impact < 1 ? issue.impact : Math.round(issue.impact))}
               </span>
             ) : null}
-          </div>
-          <div className="mt-3 flex items-start justify-between gap-4">
-            <H className="font-serif text-title-lg text-balance text-ink">{issue.title}</H>
-            <span aria-hidden className="mt-2 shrink-0 text-muted transition-transform duration-200 group-open/issue:rotate-90">
-              ›
-            </span>
           </div>
         </summary>
         <div className="px-5 pb-5 sm:px-7 sm:pb-7">

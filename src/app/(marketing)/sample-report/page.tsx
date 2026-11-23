@@ -96,7 +96,7 @@ export default function SampleReportPage() {
               sample
             >
               <div className="mt-16 sm:mt-20">
-                <FullReport result={r} headingId="sample-full" badgeLabel={copy.label} />
+                <FullReport result={r} headingId="sample-full" badgeLabel={copy.label} badgeTone="accent" />
               </div>
               <FixTray id="sample-fixlist" />
             </QuoteProvider>

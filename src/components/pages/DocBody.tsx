@@ -32,7 +32,7 @@ function ItemList({ items }: { items: DocItem[] }) {
         <div
           key={item.id ?? i}
           id={item.id ? `item-${item.id.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}` : undefined}
-          className="grid gap-1.5 border-b border-line py-4 sm:grid-cols-[minmax(0,12rem)_minmax(0,1fr)] sm:gap-8"
+          className="grid gap-1.5 border-b border-line py-4 last:border-b-0 sm:grid-cols-[minmax(0,12rem)_minmax(0,1fr)] sm:gap-8"
         >
           <dt className="text-[0.9375rem] font-semibold text-ink">{item.label}</dt>
           <dd className="text-[0.9375rem] leading-relaxed text-pretty text-ink-2">

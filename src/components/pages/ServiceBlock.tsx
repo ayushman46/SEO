@@ -3,7 +3,7 @@ import { serviceCardCta } from "@/content/services";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { PlaceholderText } from "@/components/ui/PlaceholderText";
-import { PriceText } from "./PriceText";
+import { PriceText, QualifiedPriceText } from "./PriceText";
 
 /**
  * One service on /services (T026): no card chrome and no icon tile; a ruled block
@@ -35,7 +35,7 @@ export function ServiceBlock({ service, index }: { service: Service; index: numb
             <PriceText value={service.priceFrom} className="mt-1 block font-serif text-title-lg text-ink" />
           ) : (
             // e.g. "Included in the Full audit · $39": a quiet line, not the large figure
-            <PriceText value={service.priceFrom} className="mt-1 block text-[0.9375rem] font-medium text-ink-2" />
+            <QualifiedPriceText value={service.priceFrom} className="mt-1 block text-[0.9375rem] font-medium text-ink-2" />
           )}
         </p>
         <div className="mt-6">

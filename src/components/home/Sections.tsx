@@ -2,7 +2,7 @@ import Link from "next/link";
 import * as homeContent from "@/content/home";
 import * as siteContent from "@/content/site";
 import { services } from "@/content/services";
-import { PriceText } from "@/components/pages/PriceText";
+import { PriceText, QualifiedPriceText } from "@/components/pages/PriceText";
 import { Accordion } from "@/components/ui/Accordion";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
@@ -156,7 +156,7 @@ export function ServicesTeaser() {
                         <PriceText value={price.amount} className="min-w-[5ch] text-[1.0625rem] font-semibold whitespace-nowrap text-ink" />
                       ) : null}
                       {price.qualifier ? (
-                        <span className="max-w-[22ch] text-xs leading-snug text-pretty text-muted">{price.qualifier}</span>
+                        <QualifiedPriceText value={price.qualifier} className="max-w-[28ch] text-xs leading-snug text-pretty text-muted" />
                       ) : null}
                     </span>
                   </Link>

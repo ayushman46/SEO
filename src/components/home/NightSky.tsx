@@ -90,7 +90,10 @@ export function NightSky() {
               "radial-gradient(120% 80% at 80% 0%, var(--color-night-3) 0%, transparent 55%), radial-gradient(90% 70% at 0% 100%, #101c3f 0%, transparent 60%), linear-gradient(180deg, var(--color-night) 0%, var(--color-night-2) 100%)",
           }}
         />
-        <Stars />
+        {/* the star layer is masked out behind the copy column so no star reads as punctuation (R5 #8) */}
+        <div aria-hidden className="night-stars absolute inset-0">
+          <Stars />
+        </div>
 
         {/* moon and a marble witness, pinned to the night */}
         <Parallax

@@ -22,7 +22,7 @@ const ratingTone: Record<Rating, string> = {
 
 function SubHeading({ id, children, count }: { id: string; children: ReactNode; count?: number }) {
   return (
-    <h4 id={id} className="font-serif text-display-sm text-balance text-ink">
+    <h4 id={id} className="scroll-mt-14 font-serif text-display-sm text-balance text-ink lg:scroll-mt-0">
       {children}
       {typeof count === "number" ? (
         <span className="ml-3 font-sans text-sm font-medium whitespace-nowrap text-muted tabular-nums">{count}</span>
@@ -188,12 +188,15 @@ export function FullReport({
   headingRef,
   headingId,
   badgeLabel = auditUi.fullReportUnlocked,
+  badgeTone = "pass",
 }: {
   result: AuditResult;
   headingRef?: Ref<HTMLHeadingElement>;
   headingId: string;
   /** status line above the title; /sample-report passes its own */
   badgeLabel?: string;
+  /** "accent" on /sample-report, matching the "Sample report" badge on its front page (R5 #17) */
+  badgeTone?: "pass" | "accent";
 }) {
   const groups = groupIssues(result.issues);
   const ids = {
@@ -222,7 +225,7 @@ export function FullReport({
   return (
     <section aria-labelledby={headingId} className="grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[12rem_minmax(0,1fr)] lg:gap-14 xl:grid-cols-[14rem_minmax(0,1fr)]">
       <div className="lg:col-span-2">
-        <Badge tone="pass" dot>
+        <Badge tone={badgeTone} dot={badgeTone === "pass"}>
           {badgeLabel}
         </Badge>
         <h3 id={headingId} ref={headingRef} tabIndex={-1} className="mt-4 font-serif text-display-sm text-ink rounded-sm focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">
@@ -276,7 +279,7 @@ export function FullReport({
             const gid = `${ids.issues}-${g.category}`;
             return (
               <div key={g.category} role="group" aria-labelledby={gid}>
-                <h5 id={gid} className="border-b border-ink pb-3 text-kicker font-semibold text-ink uppercase">
+                <h5 id={gid} className="scroll-mt-14 border-b border-ink pb-3 text-kicker font-semibold text-ink uppercase lg:scroll-mt-0">
                   {auditUi.categoryIssues(auditResultCopy.categoryLabels[g.category], g.count)}
                 </h5>
                 {g.count === 0 ? (
@@ -314,7 +317,7 @@ export function FullReport({
         </div>
 
         {/* developer hand-off after the issues, not before them (R4 finding 39) */}
-        <div id={ids.export}>
+        <div id={ids.export} className="scroll-mt-14 lg:scroll-mt-0">
           <ExportBar result={result} headingId={`${ids.export}-title`} />
         </div>
 
