@@ -9,7 +9,7 @@ export interface QuoteState {
   setCurrency: (c: QuoteCurrency) => void;
   /** the default quote for this audit (every non-DIY issue above low severity) */
   quote: Quote;
-  /** issue ids the owner picked with "Have us fix this", in the order picked */
+  /** issue ids the owner picked with "Add to my fix list", in the order picked */
   selected: string[];
   isSelected: (id: string) => boolean;
   toggle: (id: string) => void;

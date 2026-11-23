@@ -13,6 +13,7 @@ import {
   CATALOG,
   catalogItem,
   formatPrice,
+  largerJobPriceIn,
   MAX_ORDER_ITEMS,
   priceIn,
   QUOTE_SCOPE_CAP,
@@ -56,7 +57,7 @@ export interface QuoteLine {
   /** catalog amount in the quote currency; null when priceKind is "on-request" */
   price: number | null;
   priceKind: QuoteLinePriceKind;
-  /** ready to render: "$149", "From $199", "Price confirmed by email" */
+  /** ready to render: "$149", "From $249", "Price confirmed by email" */
   priceText: string;
   unit: "site" | "location";
   /** one plain sentence about scope, or null */
@@ -83,6 +84,7 @@ export interface QuoteBundle {
 }
 
 export type QuoteTaxNoteKey = "excludes-applicable-taxes";
+/** Stable key (kept for compatibility); the wording is QUOTE_TEXT.confirm ("within two working days"). */
 export type QuoteConfirmNoteKey = "person-confirms-within-1-business-day";
 
 export interface Quote {
@@ -97,7 +99,7 @@ export interface Quote {
   total: number;
   /** "$348", "From $348", or "Price confirmed by email" */
   totalText: string;
-  /** false → the UI must say a person confirms the price within 1 business day */
+  /** false → the UI must say a person confirms the price within two working days (QUOTE_TEXT.confirm) */
   fixedTotal: boolean;
   /** empty when fixedTotal is true */
   reviewReasons: QuoteReviewReason[];
@@ -118,13 +120,13 @@ export interface Quote {
 /** Default English copy for the keys above. content-seo may override in the UI. */
 export const QUOTE_TEXT = {
   tax: "Prices exclude applicable taxes.",
-  confirm: "A person confirms the final price within 1 business day, before you pay anything.",
+  confirm: "A person confirms the final price within two working days, before you pay anything.",
   onRequest: "Price confirmed by email",
   review: {
     "from-price": "Some prices are starting prices; the final price depends on the work involved.",
     "price-on-request": "One service has no published price in this currency yet.",
     "pages-over-cap": `The quote covers the ${QUOTE_SCOPE_CAP.maxPagesScanned} pages the free audit reads; a larger site needs a person to look.`,
-    "issues-over-cap": `More than ${QUOTE_SCOPE_CAP.maxPaidIssues} fixes is a larger job than the fixed-price Fix sprint covers, so a person quotes it.`,
+    "issues-over-cap": `More than ${QUOTE_SCOPE_CAP.maxPaidIssues} fixes is a larger job than one Fix sprint covers, so the Fix sprint shows its larger-job starting price and a person quotes it.`,
     "involved-work": "At least one fix needs a developer, so a person scopes it first.",
   } satisfies Record<QuoteReviewReason, string>,
 } as const;
@@ -227,7 +229,7 @@ export function buildQuote(input: QuoteInput): Quote {
     else groups.set(key, [r]);
   }
 
-  // Bundle: the fix sprint already sets robots.txt up correctly, so robots.txt-level AI crawler
+  // Bundle: the Fix sprint already sets robots.txt up correctly, so robots.txt-level AI crawler
   // blocks need no separate unblock job. Server, CDN or firewall blocks (the probe) still do.
   let bundle: QuoteBundle | null = null;
   const sprint = groups.get("fix-sprint");
@@ -240,7 +242,7 @@ export function buildQuote(input: QuoteInput): Quote {
       into: "fix-sprint",
       absorbed: ["ai-crawler-unblock"],
       reason:
-        "The fix sprint already includes setting up robots.txt, so the AI crawler rules are fixed there instead of as a separate AI crawler unblock.",
+        "The Fix sprint already includes setting up robots.txt, so the AI crawler rules are fixed there instead of as a separate AI crawler unblock.",
       avoidedAmount: absorbedPrice?.amount ?? 0,
     };
   }
@@ -262,14 +264,27 @@ export function buildQuote(input: QuoteInput): Quote {
   lines.splice(MAX_ORDER_ITEMS);
 
   const coveredIssueIds = lines.flatMap((l) => l.covers.map((c) => c.id));
+  const issuesOverCap = coveredIssueIds.length > QUOTE_SCOPE_CAP.maxPaidIssues;
 
   const reviewReasons: QuoteReviewReason[] = [];
   if (lines.length > 0) {
+    // Catalog "from" prices only; the larger-job price below is explained by "issues-over-cap".
     if (lines.some((l) => l.priceKind === "from")) reviewReasons.push("from-price");
     if (lines.some((l) => l.priceKind === "on-request")) reviewReasons.push("price-on-request");
     if (pagesScanned > QUOTE_SCOPE_CAP.maxPagesScanned) reviewReasons.push("pages-over-cap");
-    if (coveredIssueIds.length > QUOTE_SCOPE_CAP.maxPaidIssues) reviewReasons.push("issues-over-cap");
+    if (issuesOverCap) reviewReasons.push("issues-over-cap");
     if (paidIssues.some((r) => r.issue.effort === "involved")) reviewReasons.push("involved-work");
+  }
+
+  // Above the cap the job is larger than one Fix sprint: its line shows the published larger-job
+  // starting price (catalog fix-sprint.largerJob), never the fixed sprint price.
+  if (issuesOverCap) {
+    for (let i = 0; i < lines.length; i++) {
+      const item = catalogItem(lines[i].key);
+      const larger = largerJobPriceIn(item, currency);
+      if (!larger) continue;
+      lines[i] = { ...lines[i], price: larger.amount, priceKind: "from", priceText: priceTextFor("from", larger.amount, currency) };
+    }
   }
   const fixedTotal = reviewReasons.length === 0;
   const total = lines.reduce((sum, l) => sum + (l.price ?? 0), 0);
@@ -362,12 +377,12 @@ function buildSummary(s: {
   if (s.bundle) out.push(s.bundle.reason);
 
   if (s.allOnRequest) {
-    out.push("A person confirms the price by email within 1 business day, before you pay anything.");
+    out.push("A person confirms the price by email within two working days, before you pay anything.");
   } else if (s.fixedTotal) {
     out.push(`Total ${s.totalText}, fixed, excluding applicable taxes.`);
   } else {
     out.push(
-      `Total ${s.totalText.charAt(0).toLowerCase()}${s.totalText.slice(1)}, excluding applicable taxes; a person confirms the final price within 1 business day, before you pay anything.`,
+      `Total ${s.totalText.charAt(0).toLowerCase()}${s.totalText.slice(1)}, excluding applicable taxes; a person confirms the final price within two working days, before you pay anything.`,
     );
   }
   return out.join(" ");
@@ -384,7 +399,7 @@ export interface IssueFixInfo {
   /** the service a "have us fix this" click adds */
   serviceSlug: ServiceSlug;
   serviceLabel: string;
-  /** e.g. "From $199" or "$149"; the price of the whole service, not of this one issue */
+  /** e.g. "From $99" or "$149"; the price of the whole service, not of this one issue */
   priceText: string;
 }
 

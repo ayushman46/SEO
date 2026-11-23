@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import type { AuditIssue } from "@/lib/audit/types";
 import { ISSUE_CATALOG, type IssueKey } from "@/lib/audit/issues";
-import { CATALOG, QUOTE_SCOPE_CAP } from "@/lib/quote/catalog";
-import { buildQuote, issueFixInfo, toOrderFields, toOrderItems, type QuoteIssueInput } from "@/lib/quote/quote";
+import { CATALOG, catalogItem, QUOTE_SCOPE_CAP } from "@/lib/quote/catalog";
+import { QUOTE_TEXT, buildQuote, issueFixInfo, toOrderFields, toOrderItems, type QuoteIssueInput } from "@/lib/quote/quote";
 import { verifyOrder } from "@/lib/quote/verify";
 
 function issue(key: IssueKey, over: Partial<AuditIssue> = {}): AuditIssue {
@@ -85,7 +85,12 @@ describe("buildQuote", () => {
     expect(q.reviewReasons).toContain("from-price");
     expect(q.totalText).toBe("From $99");
     expect(q.confirmNote).toBe("person-confirms-within-1-business-day");
-    expect(q.summary).toContain("a person confirms the final price within 1 business day");
+    expect(q.summary).toContain("a person confirms the final price within two working days");
+  });
+
+  it("states the reply time in the one agreed wording (R5 ruling 5)", () => {
+    expect(QUOTE_TEXT.confirm).toBe("A person confirms the final price within two working days, before you pay anything.");
+    expect(JSON.stringify(QUOTE_TEXT)).not.toMatch(/business day/);
   });
 
   it("lists DIY items and never prices them by default", () => {
@@ -159,7 +164,7 @@ describe("buildQuote", () => {
     expect(CATALOG.every((c) => c.inr !== null)).toBe(true);
     const q = buildQuote({ issues: [issue("geo.faq:missing")], pagesScanned: 6, currency: "INR" });
     expect(q.totalText).toBe("From ₹6,999");
-    expect(q.summary).toContain("a person confirms the final price within 1 business day");
+    expect(q.summary).toContain("a person confirms the final price within two working days");
   });
 
   it("is not fixed above the scope cap or for developer-level work", () => {
@@ -173,7 +178,10 @@ describe("buildQuote", () => {
       severity: "high",
       title: `Probe ${i}`,
     }));
-    expect(buildQuote({ issues: many, pagesScanned: 6, currency: "USD" }).reviewReasons).toEqual(["issues-over-cap"]);
+    const overCap = buildQuote({ issues: many, pagesScanned: 6, currency: "USD" });
+    expect(overCap.reviewReasons).toEqual(["issues-over-cap"]);
+    // No Fix sprint line here (probe blocks go to the AI crawler unblock), so nothing is repriced.
+    expect(overCap.lines.map((l) => [l.key, l.priceText])).toEqual([["ai-crawler-unblock", "$49"]]);
     const involved = buildQuote({
       issues: [{ id: "geo.ai-crawler-probe:waf", checkId: "geo.ai-crawler-probe", severity: "high", title: "WAF", effort: "involved" }],
       pagesScanned: 6,
@@ -195,12 +203,46 @@ describe("buildQuote", () => {
     const issues = Object.keys(ISSUE_CATALOG).map((k) => issue(k as IssueKey));
     for (const currency of ["USD", "INR"] as const) {
       const q = buildQuote({ issues, pagesScanned: 6, currency, selectedIssueIds: issues.map((i) => i.id) });
+      expect(q.reviewReasons).toContain("issues-over-cap");
       for (const l of [...q.lines, ...q.alternatives]) {
         const item = CATALOG.find((c) => c.key === l.key)!;
-        const p = currency === "USD" ? item.usd : item.inr;
+        // Above the cap, an item with a larger-job price is quoted at that price.
+        const larger = item.largerJob ? (currency === "USD" ? item.largerJob.usd : item.largerJob.inr) : null;
+        const p = q.alternatives.includes(l) || !larger ? (currency === "USD" ? item.usd : item.inr) : larger;
         expect(l.price).toBe(p === null ? null : p.amount);
         expect(l.priceKind).toBe(p === null ? "on-request" : p.kind);
       }
+    }
+  });
+
+  it("prices a Fix sprint above the 8-fix cap at the larger-job starting price (R5 B1, ruling 6)", () => {
+    const sprintIssues = Object.keys(ISSUE_CATALOG)
+      .map((k) => issue(k as IssueKey))
+      .filter((i) => issueFixInfo(i, "USD").serviceSlug === "technical-fixes" && i.effort !== "involved");
+    expect(sprintIssues.length).toBeGreaterThan(QUOTE_SCOPE_CAP.maxPaidIssues);
+    const ids = sprintIssues.map((i) => i.id);
+
+    const within = buildQuote({ issues: sprintIssues, pagesScanned: 6, currency: "USD", selectedIssueIds: ids.slice(0, 8) });
+    expect(within.lines.find((l) => l.key === "fix-sprint")).toMatchObject({ price: 149, priceKind: "fixed", priceText: "$149" });
+
+    const usd = buildQuote({ issues: sprintIssues, pagesScanned: 6, currency: "USD", selectedIssueIds: ids.slice(0, 9) });
+    expect(usd.lines.map((l) => l.key)).toEqual(["fix-sprint"]);
+    expect(usd.lines[0]).toMatchObject({ price: 249, priceKind: "from", priceText: "From $249" });
+    expect(usd.reviewReasons).toEqual(["issues-over-cap"]);
+    expect(usd.fixedTotal).toBe(false);
+    expect(usd.total).toBe(249);
+    expect(usd.totalText).toBe("From $249");
+    expect(usd.summary).toContain("Fix sprint (from $249)");
+    expect(usd.summary).not.toContain("$149");
+
+    const inr = buildQuote({ issues: sprintIssues, pagesScanned: 6, currency: "INR", selectedIssueIds: ids.slice(0, 9) });
+    expect(inr.lines[0]).toMatchObject({ price: 17999, priceKind: "from", priceText: "From ₹17,999" });
+    expect(catalogItem("fix-sprint").largerJob).toEqual({ usd: { amount: 249, kind: "from" }, inr: { amount: 17999, kind: "from" } });
+
+    // The order hand-off of an over-cap quote still verifies against the catalog, and is never fixed.
+    for (const q of [usd, inr]) {
+      const v = verifyOrder({ currency: q.currency, items: toOrderItems(q), submittedTotal: q.total, submittedFixed: q.fixedTotal });
+      expect(v).toMatchObject({ valid: true, fixed: false, catalogTotal: q.total });
     }
   });
 
@@ -211,7 +253,7 @@ describe("buildQuote", () => {
     expect(a).toEqual(b);
     expect(a.coveredIssueIds).toEqual(["seo.sitemap:missing"]);
     expect(a.summary).toBe(
-      "We found 1 issue. We suggest Technical fix sprint ($149). Total $149, fixed, excluding applicable taxes.",
+      "We found 1 issue. We suggest Fix sprint ($149). Total $149, fixed, excluding applicable taxes.",
     );
   });
 
@@ -229,7 +271,7 @@ describe("issueFixInfo", () => {
       fixer: "diy",
       diy: true,
       serviceSlug: "technical-fixes",
-      serviceLabel: "Technical fix sprint",
+      serviceLabel: "Fix sprint",
       priceText: "$149",
     });
     expect(issueFixInfo({ id: "geo.ai-crawlers:search-blocked" }, "INR").priceText).toBe("₹2,999");
@@ -289,6 +331,17 @@ describe("R3 regressions: verifyOrder", () => {
     const q = buildQuote({ issues: [issue("geo.ai-crawlers:search-blocked")], pagesScanned: 6, currency: "USD" });
     const v = verifyOrder({ currency: "USD", items: toOrderItems(q), submittedTotal: q.total, submittedFixed: true });
     expect(v.items[0]).toMatchObject({ label: "AI crawler unblock", submittedLabel: null, problem: null });
+  });
+
+  it("the larger-job price only verifies as a 'from' price, never as fixed", () => {
+    const sprint = { serviceSlug: "technical-fixes", label: "Fix sprint" };
+    const asFixed = verifyOrder({ currency: "USD", items: [{ ...sprint, price: 249, from: false }], submittedTotal: 249, submittedFixed: true });
+    expect(asFixed.valid).toBe(false);
+    expect(asFixed.items[0].problem).toBe("price-mismatch");
+    const asFrom = verifyOrder({ currency: "USD", items: [{ ...sprint, price: 249, from: true }], submittedTotal: 249, submittedFixed: true });
+    expect(asFrom).toMatchObject({ valid: true, fixed: false });
+    const wrongCurrency = verifyOrder({ currency: "INR", items: [{ ...sprint, price: 249, from: true }], submittedTotal: 249, submittedFixed: false });
+    expect(wrongCurrency.valid).toBe(false);
   });
 
   it("L4: duplicate services are flagged and never valid or fixed", () => {

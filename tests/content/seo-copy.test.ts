@@ -1,7 +1,7 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { site } from "@/content/site";
+import { offerLines, site } from "@/content/site";
 import { home, homeMeta, sampleReportMeta } from "@/content/home";
 import { services, servicesClosing, servicesPage } from "@/content/services";
 import {
@@ -21,9 +21,14 @@ import {
   pricingNoteInr,
   pricingTiersInr,
   pricingTaxNote,
+  pricingExtrasUsd,
+  pricingExtrasHeading,
+  pricingOrderSteps,
+  pricingRateCardHeader,
 } from "@/content/pricing";
 import { aboutClosing, aboutPage, aboutSections } from "@/content/about";
-import { contactForm, contactNextSteps, contactPage, contactServiceOptions } from "@/content/contact";
+import { contactForm, contactNextSteps, contactPage, contactQuoteCopy, contactServiceOptions } from "@/content/contact";
+import { QUOTE_TEXT } from "@/lib/quote/quote";
 import {
   auditAiCopy,
   auditEmailGate,
@@ -98,6 +103,12 @@ const allCopy = JSON.stringify({
   pricingIndiaHeading,
   pricingIndiaComparison,
   pricingNoteInr,
+  pricingExtrasUsd,
+  pricingExtrasHeading,
+  pricingOrderSteps,
+  pricingRateCardHeader,
+  offerLines,
+  contactQuoteCopy,
   currencyLabels,
   aboutPage,
   aboutSections,
@@ -215,17 +226,73 @@ describe("content rules", () => {
     }
   });
 
-  it("AI-facing services state their limits plainly", () => {
+  it("services state the shared limit once at page level and only unique limits per card (R5 ruling 4)", () => {
     const text = (slug: string) => {
       const s = services.find((x) => x.slug === slug)!;
       return `${s.description} ${s.deliverables.join(" ")}`;
     };
-    expect(text("ai-fact-check")).toMatch(/cannot control what an AI says/);
-    expect(text("ai-fact-check")).toMatch(/vary/);
+    expect(servicesPage.intro).toMatch(/We cannot control what Google or an AI shows, so no service promises a ranking or a citation\./);
+    expect(servicesPage.title).not.toMatch(/cited|rank|found/i);
+    const cards = services.map((s) => text(s.slug)).join(" ");
+    expect(cards).not.toMatch(/cannot control what an AI says|does not mean being cited|does not mean any AI assistant will recommend/);
+    expect(text("ai-fact-check")).toMatch(/answers vary between runs/);
     expect(text("local-ai-setup")).toMatch(/only for an existing US listing/);
-    expect(text("local-ai-setup")).toMatch(/does not mean any AI assistant will recommend you/);
-    expect(text("ai-crawler-unblock")).toMatch(/host's decision/);
-    expect(text("ai-crawler-unblock")).toMatch(/does not mean being cited/);
+    expect(text("ai-crawler-unblock")).toMatch(/simulated from our own servers/);
+    expect(text("ai-crawler-unblock")).toMatch(/a host can refuse to lift a block/);
+  });
+
+  it("states the offer on the home first screen and above the services index (R5 ruling 2)", () => {
+    const sub = home.hero.subtitle;
+    expect(sub.trim().split(/\s+/).length).toBeLessThanOrEqual(40);
+    expect(sub).toMatch(/free audit in about a minute/);
+    expect(sub).toMatch(/from \$149/);
+    expect(sub).toMatch(/no contract/);
+    expect(sub).toMatch(/before\/after proof/);
+    expect(home.hero.title).toBe("Be seen by people and by the machines they ask.");
+    expect(home.servicesTeaser.body).toBe(`${offerLines.noContract} ${offerLines.proof}`);
+    expect(offerLines.noContract).toBe("Fixed prices. No contract, no minimum term, no exit fee.");
+    expect([...pricingRateCardHeader.lines]).toEqual([offerLines.noContract, offerLines.proof]);
+    // Orphaned home copy is gone (R5 B9, ruling 10).
+    expect(home).not.toHaveProperty("proofLine");
+    expect(home).not.toHaveProperty("pricingTeaser");
+    expect(home.hero).not.toHaveProperty("eyebrow");
+    for (const t of home.tabs) expect(t).not.toHaveProperty("body");
+  });
+
+  it("pricing leads with a number, keeps the intro short and the market line once (R5 ruling 3)", () => {
+    expect(pricingPage.title).toMatch(/^\D{0,20}\$\d/);
+    expect(pricingPage.intro.split(/(?<=[.!?])\s+/).length).toBeLessThanOrEqual(2);
+    expect(pricingPage.intro).not.toMatch(/priced below/);
+    expect(pricingPage.metaTitle).not.toMatch(/pay as you go/i);
+    const market = /priced below typical freelancer and agency rates/g;
+    expect(allCopy.match(market)?.length).toBe(1);
+    expect(pricingNote).toMatch(/Our Full audit and Fix sprint are priced below/);
+    expect(pricingExtrasHeading).toBe("Other services");
+    expect(pricingExtrasUsd).toHaveLength(4);
+  });
+
+  it("one product name and one reply time everywhere (R5 B3, B10)", () => {
+    const quoteText = JSON.stringify(QUOTE_TEXT);
+    expect(allCopy).not.toMatch(/Technical fix/i);
+    expect(allCopy + quoteText).not.toMatch(/business day/i);
+    expect(allCopy).not.toMatch(/Fixed prices stay fixed/);
+    expect(allCopy).not.toMatch(/\bfix sprints?\b/); // always "Fix sprint"
+    expect(site.footerGroups.flatMap((g) => g.links).find((l) => l.href === "/services#technical-fixes")!.label).toBe("Fix sprint");
+    expect(contactServiceOptions.find((o) => o.value === "technical-fixes")!.label).toBe("Fix sprint");
+    expect(contactPage.intro).toContain("We reply within two working days");
+    expect(aboutClosing.body).toContain("We reply within two working days");
+    expect(contactQuoteCopy.nextSteps.steps[0].body).toContain("within two working days");
+    expect(pricingOrderSteps.steps[1].body).toContain("within two working days");
+  });
+
+  it("methodology says the same as the privacy policy about storage (R5 B4, ruling 7)", () => {
+    const removal = methodologySections.find((x) => x.id === "data-removal")!.body.join(" ");
+    const privacyText = privacy.sections.flatMap((x) => x.body).join(" ");
+    expect(privacyText).toContain("As of 23 November 2026 we do not run a database.");
+    expect(removal).toContain("As of 23 November 2026 we do not run a database.");
+    expect(removal).toMatch(/If we add a database, we will update the privacy policy first/);
+    expect(removal).toMatch(/up to 24 months/);
+    expect(removal).toMatch(/send a request through the contact form/);
   });
 
   it("never claims exclusivity, guarantees or results", () => {
@@ -284,13 +351,15 @@ describe("content rules", () => {
   });
 
   it("pricing states taxes once per currency view and the written quote once, with no GST claim", () => {
-    const tax = /Prices are per site and exclude applicable taxes\./g;
+    const tax = /Prices exclude applicable taxes\./g;
     // The hero intro is shared by both views; each currency panel adds its own copy.
     const usdView = [pricingPage.intro, pricingNote, pricingTaxNote].join(" ");
     const inrView = [pricingPage.intro, pricingIndiaHeading.intro, ...pricingIndiaNotes, pricingNoteInr].join(" ");
     expect(usdView.match(tax)?.length).toBe(1);
     expect(inrView.match(tax)?.length).toBe(1);
-    expect(pricingPage.intro).toContain("We confirm scope and a fixed quote in writing before any paid work starts.");
+    const written = /fixed quote in writing/g;
+    expect(JSON.stringify(pricingOrderSteps).match(written)?.length).toBe(1);
+    expect([pricingPage.intro, pricingNote, pricingTaxNote].join(" ")).not.toMatch(written);
     expect(allCopy).not.toMatch(/\bGST\b/);
   });
 

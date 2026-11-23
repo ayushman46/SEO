@@ -9,7 +9,7 @@ function slugify(s: string) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
-/** "From $199" -> prefix "From", figure "$199"; "₹9,999 per location" -> figure "₹9,999", suffix "per location". */
+/** "From $99" -> prefix "From", figure "$99"; "₹3,999 per location" -> figure "₹3,999", suffix "per location". */
 export function splitPriceParts(price: string) {
   const m = /^(From\s+)?([$₹][\d,]+(?:\.\d+)?)(.*)$/.exec(price.trim());
   if (!m) return { prefix: "", figure: price.trim(), suffix: "" };

@@ -57,7 +57,7 @@ function QuoteCell({ quote, auditId, auditUrl }: { quote: StoredQuote | null; au
         {money(quote.catalogTotal)} {currency}
       </span>
       <span className="block text-xs">
-        {quote.fixed ? "Fixed" : "Not fixed: confirm in 1 business day"} ·{" "}
+        {quote.fixed ? "Fixed" : "Not fixed: confirm within two working days"} ·{" "}
         {quote.valid ? "matches catalog" : `MISMATCH (client said ${money(quote.submittedTotal)})`}
       </span>
       <ul className="mt-1 list-disc pl-4 text-xs">

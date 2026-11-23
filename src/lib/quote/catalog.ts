@@ -33,6 +33,15 @@ export interface CatalogPrice {
   kind: CatalogPriceKind;
 }
 
+/**
+ * Starting price of a job larger than the item's published scope (the Fix sprint above
+ * QUOTE_SCOPE_CAP.maxPaidIssues fixes). Always a "from" price: a person confirms the final number.
+ */
+export interface CatalogLargerJob {
+  usd: CatalogPrice & { kind: "from" };
+  inr: (CatalogPrice & { kind: "from" }) | null;
+}
+
 export interface CatalogItem {
   /** stable catalog key */
   key: CatalogKey;
@@ -52,6 +61,8 @@ export interface CatalogItem {
    * never pre-selected; see docs/CONVERSION_RESEARCH.md change 1).
    */
   quotable: boolean;
+  /** set only where a published "larger job" starting price exists (the Fix sprint) */
+  largerJob?: CatalogLargerJob;
 }
 
 export type CatalogKey =
@@ -79,11 +90,13 @@ export const CATALOG: readonly CatalogItem[] = [
     key: "fix-sprint",
     serviceSlug: "technical-fixes",
     alsoMatches: [],
-    label: "Technical fix sprint",
+    label: "Fix sprint",
     usd: { amount: 149, kind: "fixed" },
     inr: { amount: 9999, kind: "fixed" },
     unit: "site",
     quotable: true,
+    // More than QUOTE_SCOPE_CAP.maxPaidIssues fixes: the published starting price of a larger job.
+    largerJob: { usd: { amount: 249, kind: "from" }, inr: { amount: 17999, kind: "from" } },
   },
   {
     key: "content-entity",
@@ -139,9 +152,10 @@ export const CATALOG: readonly CatalogItem[] = [
 
 /**
  * Written scope of an instant quote. Above either cap the quote still lists prices but is not
- * fixed: a person confirms it within 1 business day.
+ * fixed: a person confirms it within two working days.
  * - maxPagesScanned: the free audit reads the homepage plus up to five pages.
- * - maxPaidIssues: the fixed-price Fix sprint covers up to 8 fixes; above that a person quotes the larger job.
+ * - maxPaidIssues: the fixed-price Fix sprint covers up to 8 fixes; above that the Fix sprint line
+ *   shows its larger-job starting price (CatalogItem.largerJob) and a person quotes the job.
  */
 export const QUOTE_SCOPE_CAP = { maxPagesScanned: 6, maxPaidIssues: 8 } as const;
 
@@ -164,6 +178,12 @@ export function priceIn(item: CatalogItem, currency: QuoteCurrency): CatalogPric
   return currency === "USD" ? item.usd : item.inr;
 }
 
+/** The larger-job starting price in a currency, or null when the item has none. */
+export function largerJobPriceIn(item: CatalogItem, currency: QuoteCurrency): CatalogPrice | null {
+  if (!item.largerJob) return null;
+  return currency === "USD" ? item.largerJob.usd : item.largerJob.inr;
+}
+
 function groupDigits(n: number, currency: QuoteCurrency): string {
   const s = String(Math.trunc(Math.abs(n)));
   if (currency === "USD") return s.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -174,7 +194,7 @@ function groupDigits(n: number, currency: QuoteCurrency): string {
   return `${head.replace(/\B(?=(\d{2})+(?!\d))/g, ",")},${tail}`;
 }
 
-/** Deterministic, locale-independent price text: "$1,199", "₹14,999", "₹1,00,000". */
+/** Deterministic, locale-independent price text: "$1,199", "₹17,999", "₹1,00,000". */
 export function formatPrice(amount: number, currency: QuoteCurrency): string {
   const sign = amount < 0 ? "-" : "";
   return `${sign}${currency === "USD" ? "$" : "₹"}${groupDigits(amount, currency)}`;

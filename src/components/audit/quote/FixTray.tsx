@@ -43,6 +43,9 @@ export function FixTray({ id }: { id: string }) {
               {QUOTE_TEXT.tax}
               {sq.confirmNote ? <span className="hidden sm:inline"> {QUOTE_TEXT.confirm}</span> : null}
             </p>
+            <p className="truncate text-xs text-ink-2">
+              <PriceText value={auditQuoteCopy.fixListExplainer(q.currency)} />
+            </p>
           </div>
           <div className="flex shrink-0 items-center gap-3 sm:gap-4">
             <button

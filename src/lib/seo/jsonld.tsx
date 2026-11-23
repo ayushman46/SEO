@@ -104,7 +104,7 @@ export function serviceLd(service: Service): JsonLdNode {
 }
 
 /**
- * Parses a US dollar display price ("$49", "From $199") into a number.
+ * Parses a US dollar display price ("$49", "From $99") into a number.
  * Returns null for placeholder-marked, non-USD (e.g. "₹3,999") or unparseable prices.
  */
 export function publishableUsdPrice(price: string): number | null {

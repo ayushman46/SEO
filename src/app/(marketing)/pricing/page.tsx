@@ -1,7 +1,10 @@
 import {
   currencyLabels,
   pricingClosing,
+  pricingExtrasHeading,
+  pricingExtrasUsd,
   pricingFaq,
+  pricingFaqHeading,
   pricingHighlightLabel,
   pricingIndiaComparison,
   pricingIndiaExtras,
@@ -11,6 +14,7 @@ import {
   pricingNoteInr,
   pricingOrderSteps,
   pricingPage,
+  pricingRateCardHeader,
   pricingTaxNote,
   pricingTiers,
   pricingTiersInr,
@@ -19,7 +23,7 @@ import { JsonLd, faqLd, innerPageLd, lastUpdated, offerCatalogLd, pageMetadata }
 import { SectionTear } from "@/components/collage/SectionTear";
 import { ClosingCta } from "@/components/pages/ClosingCta";
 import { CurrencySwitch } from "@/components/pages/CurrencySwitch";
-import { IndiaPricingExtras } from "@/components/pages/IndiaPricingExtras";
+import { PricingExtras } from "@/components/pages/PricingExtras";
 import { PageHero } from "@/components/pages/PageHero";
 import { PricingCard } from "@/components/pages/PricingCard";
 import type { PricingTier } from "@/content/types";
@@ -31,9 +35,6 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Steps } from "@/components/ui/Steps";
 
 export const metadata = pageMetadata.pricing;
-
-/** The fixed-price promise from the intro, repeated on the sheet itself so it reads with the figures. */
-const FIXED_LINE = /Fixed prices\.[^.]*no exit fee\./i.exec(pricingPage.intro)?.[0] ?? null;
 
 /** The ruled columns of the rate card: one cell per tier, rules drawn between cells at every width. */
 function RateSheet({ tiers, idSuffix }: { tiers: readonly PricingTier[]; idSuffix?: string }) {
@@ -88,10 +89,12 @@ export default function PricingPage() {
             variant="text"
             heading={
               <span className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-                <span>Rates</span>
-                {FIXED_LINE ? (
-                  <span className="text-sm font-medium tracking-normal text-ink-2 normal-case">{FIXED_LINE}</span>
-                ) : null}
+                <span>{pricingRateCardHeader.label}</span>
+                <span className="flex flex-col gap-0.5 text-sm font-medium tracking-normal text-ink-2 normal-case">
+                  {pricingRateCardHeader.lines.map((line) => (
+                    <span key={line}>{line}</span>
+                  ))}
+                </span>
               </span>
             }
             label={currencyLabels.switchLabel}
@@ -99,7 +102,18 @@ export default function PricingPage() {
             labels={{ usd: currencyLabels.usd, inr: currencyLabels.inr }}
             className="paper-grain rounded-b-panel bg-paper shadow-[0_1px_0_var(--color-line-strong)]"
             panels={{
-              usd: <RateSheet tiers={pricingTiers} />,
+              usd: (
+                <>
+                  <RateSheet tiers={pricingTiers} />
+                  <PricingExtras
+                    idPrefix="usd-extras"
+                    heading={pricingExtrasHeading}
+                    extras={pricingExtrasUsd}
+                    note={pricingNote}
+                    taxNote={pricingTaxNote}
+                  />
+                </>
+              ),
               inr: (
                 <>
                   <div className="max-w-2xl px-5 pt-6 sm:px-7">
@@ -107,8 +121,11 @@ export default function PricingPage() {
                     <p className="mt-1.5 max-w-[60ch] text-[0.9375rem] leading-relaxed text-pretty text-muted">{pricingIndiaHeading.intro}</p>
                   </div>
                   <RateSheet tiers={pricingTiersInr} idSuffix="inr" />
-                  <IndiaPricingExtras
+                  <PricingExtras
+                    idPrefix="india-extras"
+                    heading="India extras"
                     extras={pricingIndiaExtras}
+                    notesHeading="Paying from India"
                     notes={pricingIndiaNotes}
                     comparison={pricingIndiaComparison}
                     note={pricingNoteInr}
@@ -117,13 +134,7 @@ export default function PricingPage() {
               ),
             }}
           />
-          <div className="mt-8 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-            <div className="max-w-[66ch] text-[0.9375rem] leading-relaxed text-pretty text-muted">
-              <p>
-                <PlaceholderText value={pricingNote} />
-              </p>
-              <p className="mt-2 font-medium text-ink-2">{pricingTaxNote}</p>
-            </div>
+          <div className="mt-8 flex flex-col gap-6 md:flex-row md:items-center md:justify-end">
             <div className="flex shrink-0 flex-col gap-4 sm:flex-row sm:items-center">
               <Button href="/services" variant="link">
                 Every service in detail
@@ -150,12 +161,13 @@ export default function PricingPage() {
           <Container className="grid gap-12 lg:grid-cols-[minmax(0,0.75fr)_minmax(0,1.25fr)] lg:gap-20">
             <SectionHeading
               id="pricing-faq-title"
-              title="Questions about pricing"
+              kicker={pricingFaqHeading.kicker}
+              title={pricingFaqHeading.title}
               className="lg:sticky lg:top-28 lg:self-start"
             >
               <div className="mt-8">
-                <Button href="/contact" variant="secondary">
-                  Ask us anything else
+                <Button href={pricingFaqHeading.cta.href} variant="secondary">
+                  {pricingFaqHeading.cta.label}
                 </Button>
               </div>
             </SectionHeading>

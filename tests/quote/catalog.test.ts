@@ -1,7 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { CATALOG, catalogItem, catalogItemForSlug, formatPrice, type CatalogKey, type CatalogPrice } from "@/lib/quote/catalog";
 import { services } from "@/content/services";
-import { pricingIndiaExtras, pricingTiers, pricingTiersInr } from "@/content/pricing";
+import {
+  pricingExtrasUsd,
+  pricingIndiaExtras,
+  pricingNote,
+  pricingNoteInr,
+  pricingOrderSteps,
+  pricingTiers,
+  pricingTiersInr,
+} from "@/content/pricing";
+import { auditQuoteCopy } from "@/content/audit";
 import { CONTACT_SERVICES } from "@/app/actions/contact-schema";
 
 /**
@@ -70,6 +79,44 @@ describe("catalog matches the published prices", () => {
     for (const item of CATALOG) {
       expect(item.inr !== null, `${item.key} INR published=${seen.has(item.key)}`).toBe(seen.has(item.key));
     }
+  });
+
+  it("USD 'Other services' mirror the India extras and agree with the catalog (R5 B12)", () => {
+    expect(pricingExtrasUsd.map((e) => [e.name, e.href, e.description])).toEqual(
+      pricingIndiaExtras.map((e) => [e.name, e.href, e.description]),
+    );
+    for (const extra of pricingExtrasUsd) {
+      const key = INDIA_EXTRA_KEYS[extra.name];
+      expect(key, `unmapped extra ${extra.name}`).toBeDefined();
+      expect(parsePrice(extra.price, "$"), extra.name).toEqual(catalogItem(key).usd);
+    }
+    expect(pricingExtrasUsd.map((e) => e.price)).toEqual(["$59", "$99 per location", "$49", "From $99"]);
+  });
+
+  it("the Fix sprint's larger-job price on /pricing and /services is the catalog's (R5 B1, ruling 6)", () => {
+    const larger = catalogItem("fix-sprint").largerJob!;
+    expect(larger.usd).toEqual({ amount: 249, kind: "from" });
+    expect(larger.inr).toEqual({ amount: 17999, kind: "from" });
+    const usdText = `from ${formatPrice(larger.usd.amount, "USD")}`;
+    const inrText = `from ${formatPrice(larger.inr!.amount, "INR")}`;
+    expect(pricingNote).toContain(`A job larger than 8 fixes gets a fixed quote ${usdText} before work starts.`);
+    expect(pricingNoteInr).toContain(`A job larger than 8 fixes gets a fixed quote ${inrText} before work starts.`);
+    const sprint = services.find((s) => s.slug === "technical-fixes")!;
+    expect(sprint.description).toContain(`Larger jobs get a fixed quote ${usdText} before work starts.`);
+    // Every larger-job figure anywhere in the pricing or services copy is the catalog's.
+    const copy = JSON.stringify({ services, pricingNote, pricingNoteInr, pricingOrderSteps });
+    for (const m of copy.matchAll(/(?:larger|more than 8)[^"]*?from ([$₹][\d,]+)/gi)) {
+      expect([formatPrice(larger.usd.amount, "USD"), formatPrice(larger.inr!.amount, "INR")]).toContain(m[1]);
+    }
+    expect(JSON.stringify(pricingOrderSteps)).not.toMatch(/Fixed prices stay fixed/);
+  });
+
+  it("one product name: the Fix sprint (R5 B10, ruling 8)", () => {
+    expect(catalogItem("fix-sprint").label).toBe("Fix sprint");
+    expect(services.find((s) => s.slug === "technical-fixes")!.name).toBe("Fix sprint");
+    expect(pricingTiers.some((t) => t.name === "Fix sprint")).toBe(true);
+    expect(auditQuoteCopy.fixListExplainer("USD")).toBe("One Fix sprint covers up to 8 of these for $149.");
+    expect(auditQuoteCopy.fixListExplainer("INR")).toBe("One Fix sprint covers up to 8 of these for ₹9,999.");
   });
 
   it("Content & entity has a rupee starting price in both the catalog and the India extras", () => {

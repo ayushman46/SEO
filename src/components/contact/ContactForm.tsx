@@ -19,7 +19,6 @@ import type {
   ContactFormState,
 } from "@/app/actions/contact-schema";
 import {
-  contactBudgetOptions,
   contactForm,
   contactQuoteCopy,
   contactServiceOptions,
@@ -46,7 +45,6 @@ const ORDER: ContactField[] = [
   "company",
   "website",
   "service",
-  "budget",
   "message",
   "consent",
 ];
@@ -63,7 +61,7 @@ const control = cx(
 const id = (field: string) => `contact-${field}`;
 
 type SelectProps = {
-  field: "service" | "budget";
+  field: "service";
   options: { value: string; label: string }[];
   defaultValue: string;
   error?: string;
@@ -84,6 +82,8 @@ function SelectField({ field, options, defaultValue, error, required }: SelectPr
       }
       help={help}
       error={error}
+      // alone on its row since the budget field went (R5 edit 9)
+      className="sm:col-span-2"
     >
       <div className="relative">
         <select
@@ -457,13 +457,6 @@ export function ContactForm({ honeypotName }: { honeypotName: string }) {
                 error={err("service")}
               />
             </Suspense>
-
-            <SelectField
-              field="budget"
-              options={contactBudgetOptions}
-              defaultValue={values.budget ?? ""}
-              error={err("budget")}
-            />
 
             <Field
               id={id("message")}

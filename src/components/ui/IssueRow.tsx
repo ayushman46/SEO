@@ -11,7 +11,7 @@ export const severityLabel: Record<Severity, string> = {
 };
 
 export const effortLabel: Record<Effort, string> = {
-  quick: "Quick win",
+  quick: "Quick fix",
   moderate: "Moderate",
   involved: "Involved",
 };

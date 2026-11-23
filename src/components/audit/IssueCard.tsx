@@ -114,7 +114,8 @@ export function IssueCard({
             {issue.impact > 0 ? (
               <span className="ml-auto text-xs font-semibold text-accent-ink tabular-nums" title={auditUi.impactLabel}>
                 <span className="sr-only">{auditUi.impactLabel}: </span>
-                {auditUi.impact(Math.round(issue.impact))}
+                {/* below 1 the raw value picks "Under +1 pt" (rounding would show 0 or overstate 0.6 as 1) */}
+                {auditUi.impact(issue.impact < 1 ? issue.impact : Math.round(issue.impact))}
               </span>
             ) : null}
           </div>

@@ -3,18 +3,18 @@ import type { PageCopy } from "./types";
 export const contactPage = {
   metaTitle: "Contact us about an audit or fix",
   metaDescription:
-    "Tell us about your website and what you need, from a full SEO or GEO audit to hands-on fixes. We reply by email with next steps and a fixed quote.",
+    "Tell us about your website. We reply within two working days, by email, with a fixed quote, and nothing starts until you agree to it.",
   kicker: "Contact",
   title: "Tell us about your website",
   intro:
-    "Tell us what you need. We reply by email within two working days with a fixed quote.",
+    "Tell us what you need. We reply within two working days, by email, with a fixed quote.",
 } satisfies PageCopy;
 
 /** Service values match the contact server action enum. */
 export const contactServiceOptions: { value: string; label: string }[] = [
   { value: "seo-audit", label: "SEO audit" },
   { value: "geo-audit", label: "GEO audit" },
-  { value: "technical-fixes", label: "Technical fixes" },
+  { value: "technical-fixes", label: "Fix sprint" },
   { value: "content-entity", label: "Content & entity" },
   { value: "monitoring", label: "Monitoring" },
   { value: "ai-fact-check", label: "AI fact-check & fix" },
@@ -23,7 +23,11 @@ export const contactServiceOptions: { value: string; label: string }[] = [
   { value: "not-sure", label: "Not sure yet" },
 ];
 
-/** Budget values: architect-backend should mirror these in the contact schema enum. */
+/**
+ * @deprecated R5 edit 9: the budget field is no longer in the form. The server still accepts the
+ * value as optional (CONTACT_BUDGETS in src/app/actions/contact-schema.ts mirrors these), and
+ * tests/backend/contact-schema.test.ts pins them, so this export stays until that test changes.
+ */
 export const contactBudgetOptions: { value: string; label: string }[] = [
   { value: "under-100", label: "Under $100" },
   { value: "100-300", label: "$100 to $300" },
@@ -47,7 +51,6 @@ export const contactForm = {
       placeholder: "example.com",
     },
     service: { label: "What do you need?", help: "Pick the closest match.", placeholder: "Choose a service" },
-    budget: { label: "Budget", help: "Optional. Helps us suggest the right scope.", placeholder: "Choose a range" },
     message: {
       label: "Message",
       help: "What's the goal, and is there anything we should know about your site?",
@@ -69,7 +72,8 @@ export const contactForm = {
     rateLimited: "You have sent several messages in a short time. Please wait a while and try again.",
     fieldsInvalid: "Please check the highlighted fields.",
   },
-  directEmailLabel: "No public email: use the form and we reply by email.",
+  /** @deprecated R5 edit 24: render nothing. Empty until frontend removes the line from the contact page. */
+  directEmailLabel: "",
 } as const;
 
 /** "What happens next" panel beside the contact form (added by frontend-designer for T006; content-seo may refine). */
@@ -86,7 +90,7 @@ export const contactNextSteps = {
     },
     {
       title: "Nothing starts until you agree",
-      body: "You pay nothing until you accept the quote. If we are not the right fit, we will say so.",
+      body: "You pay nothing until you accept the quote.",
     },
   ],
   auditPrompt: {
@@ -111,7 +115,7 @@ export const contactQuoteCopy = {
     steps: [
       {
         title: "A person checks your quote",
-        body: "We compare it with your audit. Where a price is a starting price, we confirm the final number within 1 business day.",
+        body: "We compare it with your audit. Where a price is a starting price, we confirm the final number within two working days.",
       },
       {
         title: "You get the quote in writing",

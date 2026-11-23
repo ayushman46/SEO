@@ -1,4 +1,5 @@
 import type { Service } from "@/content/types";
+import { serviceCardCta } from "@/content/services";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { PlaceholderText } from "@/components/ui/PlaceholderText";
@@ -8,7 +9,7 @@ import { PriceText } from "./PriceText";
  * One service on /services (T026): no card chrome and no icon tile; a ruled block
  * on paper. Name, tagline and price on the left; description, deliverables (bare
  * check marks) and "Who it's for" (a native disclosure) on the right from xl.
- * One quiet action per service ("Get a quote", secondary); the free audit is in
+ * One quiet action per service (serviceCardCta, "Order this", secondary); the free audit is in
  * the nav, hero and closing band. The section id is the slug (anchors from home,
  * footer and the in-page nav); html scroll-padding clears the floating nav.
  */
@@ -39,7 +40,8 @@ export function ServiceBlock({ service, index }: { service: Service; index: numb
         </p>
         <div className="mt-6">
           <Button href={`/contact?service=${service.slug}`} variant="secondary">
-            Get a quote<span className="sr-only"> for {service.name}</span>
+            {serviceCardCta.label}
+            <span className="sr-only">{serviceCardCta.srSuffix(service.name)}</span>
           </Button>
         </div>
       </div>

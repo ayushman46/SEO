@@ -32,7 +32,7 @@ export const site = {
       links: [
         { label: "SEO audit", href: "/services#seo-audit" },
         { label: "GEO audit", href: "/services#geo-audit" },
-        { label: "Technical fixes", href: "/services#technical-fixes" },
+        { label: "Fix sprint", href: "/services#technical-fixes" },
         { label: "Content & entity", href: "/services#content-entity" },
         { label: "Monitoring", href: "/services#monitoring" },
         { label: "AI fact-check & fix", href: "/services#ai-fact-check" },
@@ -77,6 +77,16 @@ export const contentUpdated = "2026-11-23";
  * overclaimed: the audit checks readiness, it does not report how you appear in these engines).
  */
 export const enginesHeading = "We check your site against what these engines need";
+
+/**
+ * The two positioning lines (R5, Fable's ruling 2). One source: home renders them above the
+ * services index (via home.servicesTeaser.body), /pricing in the rate-card header
+ * (pricingRateCardHeader), /services in its intro.
+ */
+export const offerLines = {
+  noContract: "Fixed prices. No contract, no minimum term, no exit fee.",
+  proof: "Before/after proof: we re-run the audit after the work and send you what changed.",
+} as const;
 
 /** Small line under the engine strip. */
 export const enginesDisclaimer =

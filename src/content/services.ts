@@ -1,14 +1,30 @@
 import type { PageCopy, Service } from "./types";
+import { offerLines } from "./site";
+import { catalogItem, formatPrice, largerJobPriceIn } from "@/lib/quote/catalog";
 
 export const servicesPage = {
-  metaTitle: "SEO and GEO services for small teams",
+  metaTitle: "Fixed-price SEO and GEO services, no contract",
   metaDescription:
-    "Eight fixed-scope services from seenhq: SEO and GEO audits, fixes, content, monitoring, AI fact-checks, local AI setup and AI crawler unblocking.",
+    "Fixed-price SEO and GEO services done by a person: Full audit $39, Fix sprint $149 for up to 8 fixes, monitoring $19 a month. No contract.",
   kicker: "Services",
-  title: "Get found on Google and cited by AI, without hiring an agency",
-  intro:
-    "Eight services, each with a fixed scope and done by a person. You get the price in writing before we start. None of them can promise what Google or an AI will say.",
+  title: "Eight services at published prices, no contract",
+  // The page-level limit (Fable's ruling 4): stated once here; cards keep only limits unique to them.
+  intro: `Each has a fixed scope and is done by a person. ${offerLines.proof} We cannot control what Google or an AI shows, so no service promises a ranking or a citation.`,
 } satisfies PageCopy;
+
+/** Label of the one action on each service card; it links to /contact?service=<slug> (Fable's ruling 4). */
+export const serviceCardCta = {
+  label: "Order this",
+  /** screen-reader suffix after the label: "Order this: Fix sprint" */
+  srSuffix: (name: string) => `: ${name}`,
+} as const;
+
+/** Larger-job starting price of the Fix sprint, from the catalog (one source; tests/quote/catalog.test.ts). */
+const fixSprintLargerJob = (() => {
+  const p = largerJobPriceIn(catalogItem("fix-sprint"), "USD");
+  if (!p) throw new Error("The Fix sprint has no larger-job price in the catalog");
+  return formatPrice(p.amount, "USD");
+})();
 
 /** The SEO and GEO audits are one product (the Full audit): both cards say so, and show one price for both. */
 const fullAuditNote = (other: "SEO" | "GEO") => `It comes with the ${other} audit as one Full audit.`;
@@ -26,7 +42,6 @@ export const services = [
       "Structured data and social sharing (Open Graph) check",
       "Core Web Vitals summary with the likely causes",
       "A written plan: what to fix first, what can wait and what to ignore",
-      "A written walkthrough of your report, by email",
     ],
     forWho:
       "Founders and owners who want to know exactly what to fix, and in what order, before spending on content or ads.",
@@ -50,16 +65,13 @@ export const services = [
   },
   {
     slug: "technical-fixes",
-    name: "Technical fixes",
+    name: "Fix sprint",
     tagline: "A one-time sprint where we fix the issues for you.",
-    description:
-      "We make up to 8 of the highest-impact fixes from your audit, on one site and a platform we can access: usually meta tags, canonicals, robots.txt, sitemap, structured data, llms.txt and quick speed wins. Larger jobs get a fixed quote from $249 before work starts.",
+    description: `We make up to 8 of the highest-impact fixes from your audit, on one site and a platform we can access. Larger jobs get a fixed quote from ${fixSprintLargerJob} before work starts.`,
     deliverables: [
       "Up to 8 fixes from your report, agreed up front",
-      "robots.txt, sitemap and llms.txt set up correctly",
-      "Organization or LocalBusiness and FAQ structured data",
-      "Quick performance wins such as image sizing and render-blocking scripts",
-      "Before/after proof for every fix: we re-run the audit and send you what changed",
+      "Typical fixes: page titles and descriptions, robots.txt, sitemap, structured data, llms.txt and image sizes",
+      "Before/after proof for every fix",
     ],
     forWho:
       "Teams without a developer to spare, and businesses on website builders who would rather not touch the code.",
@@ -101,7 +113,7 @@ export const services = [
     name: "AI fact-check & fix",
     tagline: "We check what AI assistants tell customers about you, and fix the sources behind wrong answers.",
     description:
-      "A person asks 4 AI assistants, such as ChatGPT, Gemini and Google AI Overviews, up to 10 questions about your business and compares every answer with the facts you give us: hours, phone and address for a local business, or pricing, plans and features for a product. We trace each wrong fact to its likely source, fix the sources you control, request corrections on the rest and re-test after 30 days. We cannot control what an AI says, and answers vary between runs, so our screenshots are a dated sample.",
+      "A person asks 4 AI assistants, such as ChatGPT, Gemini and Google AI Overviews, up to 10 questions about your business and compares every answer with the facts you give us: hours, phone and address for a local business, or pricing, plans and features for a product. We trace each wrong fact to its likely source, fix the sources you control, request corrections on the rest and re-test after 30 days.",
     deliverables: [
       "A one-page truth sheet we fill in with you: name, address, phone, hours and open status for a local business, or plans, prices, limits and key features for a SaaS product",
       "Up to 10 fixed customer questions typed by a person into 4 AI assistants, twice each, with dated screenshots",
@@ -109,8 +121,8 @@ export const services = [
       "Fixes to the sources you control: your website's facts or pricing page, structured data, Google Business Profile, Bing Places, Apple Business and up to 5 directories or listings (you complete any verification steps)",
       "Up to 5 correction requests to third-party pages that carry a wrong fact, plus feedback filed inside each assistant",
       "A re-test after 30 days with a before-and-after sheet",
-      "Not promised: third-party sites may ignore requests, an assistant may repeat an old fact for a while, and answers can differ by location",
-      "One price for the check, the fixes and the 30-day re-test, per location or product",
+      "Not promised: answers vary between runs and by location, third-party sites may ignore requests, and an assistant may repeat an old fact for a while",
+      "One price for the check, the fixes and the 30-day re-test, for one location or product",
     ],
     forWho:
       "Any business whose hours, contact details, prices or features AI assistants get wrong, and any business that has never looked.",
@@ -121,7 +133,7 @@ export const services = [
     name: "Local AI visibility setup",
     tagline: "Get your details right on the profiles AI assistants read beyond Google.",
     description:
-      "We correct your business facts on the profiles AI assistants read beyond Google: Bing Places, Apple Business, Yelp or a local equivalent, and the ChatGPT business profile where you are eligible. We write one fact sheet and make every profile match it. OpenAI currently lets local stores and restaurants claim a ChatGPT business profile only for an existing US listing; elsewhere we prepare it for when that opens. A complete profile does not mean any AI assistant will recommend you, and each platform publishes profiles on its own schedule.",
+      "We correct your business facts on the profiles AI assistants read beyond Google: Bing Places, Apple Business, Yelp or a local equivalent, and the ChatGPT business profile where you are eligible. We write one fact sheet and make every profile match it. OpenAI currently lets local stores and restaurants claim a ChatGPT business profile only for an existing US listing; elsewhere we prepare it for when that opens. Each platform publishes profiles on its own schedule.",
     deliverables: [
       "Before and after: 10-12 local questions typed by a person into ChatGPT, Gemini and Google AI Mode, with dated screenshots",
       "One master fact sheet: name, address, phone, hours, categories, description and services",
@@ -140,7 +152,7 @@ export const services = [
     name: "AI crawler unblock",
     tagline: "Find out what AI crawlers really get from your server, and fix what blocks them.",
     description:
-      "We test what AI crawlers such as GPTBot, ClaudeBot and PerplexityBot actually receive from your server, which is often not what your robots.txt says: the block can sit in a CDN, firewall, security plugin or host setting. We name the layer, change the settings you control or chase your host with a support ticket, then retest. A block set by your host is the host's decision. Our requests are simulated from our own servers, so they can be wrong in either direction, and being reachable does not mean being cited.",
+      "We test what AI crawlers such as GPTBot, ClaudeBot and PerplexityBot actually receive from your server, which is often not what your robots.txt says: the block can sit in a CDN, firewall, security plugin or host setting. We name the layer, change the settings you control or chase your host with a support ticket, then retest. Our requests are simulated from our own servers, so the real crawler may be treated differently.",
     deliverables: [
       "A status check of your key pages as each major AI crawler, compared with what your robots.txt declares",
       "The blocking layer named (CDN such as Cloudflare, firewall, security plugin, host or robots.txt), from response headers and screenshots of your settings",

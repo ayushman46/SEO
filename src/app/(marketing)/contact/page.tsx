@@ -1,5 +1,5 @@
 import { CONTACT_HONEYPOT_FIELD } from "@/app/actions/contact-schema";
-import { contactForm, contactNextSteps, contactPage } from "@/content/contact";
+import { contactNextSteps, contactPage } from "@/content/contact";
 import { site } from "@/content/site";
 import { JsonLd, innerPageLd, pageMetadata } from "@/lib/seo";
 import { ContactForm } from "@/components/contact/ContactForm";
@@ -40,9 +40,8 @@ export default function ContactPage() {
               <Steps steps={contactNextSteps.steps} layout="list" className="mt-6" />
 
               <div className="mt-10 border-t border-ink pt-6">
-                <p className="text-sm text-muted">{contactForm.directEmailLabel}</p>
                 {email ? (
-                  <p className="mt-1.5 text-lg font-medium break-all text-ink">
+                  <p className="text-lg font-medium break-all text-ink">
                     <a
                       href={`mailto:${email}`}
                       className="rounded-sm underline decoration-ink/25 underline-offset-[5px] hover:decoration-ink"
@@ -51,7 +50,7 @@ export default function ContactPage() {
                     </a>
                   </p>
                 ) : null}
-                <div className="mt-6 border-t border-line pt-5">
+                <div className={email ? "mt-6 border-t border-line pt-5" : undefined}>
                   <p className="text-[0.9375rem] leading-relaxed text-pretty text-muted">{contactNextSteps.auditPrompt.body}</p>
                   <Button href={contactNextSteps.auditPrompt.cta.href} variant="link" icon="arrow-right" className="mt-3">
                     {contactNextSteps.auditPrompt.cta.label}

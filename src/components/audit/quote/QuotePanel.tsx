@@ -8,7 +8,7 @@ import { useQuote } from "./QuoteContext";
 import { CurrencyToggle, QuoteTotal, RequestLink } from "./QuoteParts";
 
 /**
- * "Your fixed quote": visible in the partial report, before any email. Every number comes from
+ * "Your quote" (not "fixed": the total can be a "From" price, R5 ruling 1): visible in the partial report, before any email. Every number comes from
  * buildQuote(). The DIY and "safe to ignore" lists are always shown, and "I'll fix it myself"
  * sits beside the request with the same size. No urgency, no discounts, nothing pre-selected.
  */
@@ -101,6 +101,10 @@ export function QuotePanel({
 
       {quote.bundle ? <p className="mt-4 text-sm leading-relaxed text-pretty text-muted">{quote.bundle.reason}</p> : null}
 
+      <p className="mt-4 text-sm leading-relaxed text-pretty text-ink-2">
+        <PriceText value={auditQuoteCopy.fixListExplainer(q.currency)} />
+      </p>
+
       {hasLines ? (
         <div className="mt-6">
           <QuoteTotal quote={quote} />
@@ -155,6 +159,7 @@ export function QuotePanel({
               total: alt.price ?? 0,
               totalText: alt.priceText,
               fixedTotal: alt.priceKind === "fixed",
+              // stable key kept from the quote contract; the visible wording is QUOTE_TEXT.confirm ("two working days")
               confirmNote: alt.priceKind === "fixed" ? null : "person-confirms-within-1-business-day",
             }}
             variant="secondary"

@@ -843,7 +843,7 @@ export const ISSUE_CATALOG = {
     effort: "quick",
     title: "Your site doesn't link to any review profiles",
     description:
-      "We found no links to review profiles such as Google Business Profile, Trustpilot, G2 or Yelp. Evidence that this affects AI answers is mostly vendor-run and correlational, so it counts for little. We don't read the review sites themselves.",
+      "We found no links to review profiles such as Google Business Profile, Trustpilot, G2 or Yelp. This counts for little in your score. We don't read the review sites themselves.",
     howToFix:
       "Link your real review profiles from the footer or a \"Reviews\" page and add them to your Organization schema `sameAs`. In regulated fields (e.g. clinics in India) check the rules on soliciting reviews first.",
   },
@@ -876,9 +876,9 @@ export const ISSUE_CATALOG = {
     effort: "quick",
     title: "No sign your site is set up in Bing Webmaster Tools",
     description:
-      "We didn't find Bing's verification tag (`msvalidate.01`) on your homepage. Bing's index is confirmed to feed Microsoft Copilot; whether it feeds other assistants isn't confirmed. If you verified by DNS or an XML file, which we can't see, ignore this.",
+      "We didn't find Bing's verification tag (`msvalidate.01`) on your homepage. Bing feeds Microsoft Copilot. If you verified by DNS or an XML file, which we can't see, ignore this.",
     howToFix:
-      "1) Sign in to Bing Webmaster Tools and add your site (you can import it from Google Search Console). 2) Submit your sitemap there. 3) Turn on IndexNow (many hosts and SEO plugins have a switch; otherwise host the key file Bing gives you and ping IndexNow when pages change). Then check the AI Performance report.",
+      "1) Sign in to Bing Webmaster Tools and add your site (you can import it from Google Search Console). 2) Submit your sitemap there. 3) Turn on IndexNow (many hosts and SEO plugins have a switch; otherwise host the key file Bing gives you and ping IndexNow when pages change).",
   },
   "seo.bing-indexnow:stale-lastmod": {
     checkId: "seo.bing-indexnow",

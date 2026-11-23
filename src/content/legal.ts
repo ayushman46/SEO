@@ -122,7 +122,7 @@ export const terms = {
     {
       heading: "Paid services",
       body: [
-        "Paid services such as full audits, fix sprints, content work and monitoring are agreed by email before work starts. The agreed scope, price and timing in that email, together with these terms, form our agreement.",
+        "Paid services such as Full audits, Fix sprints, content work and monitoring are agreed by email before work starts. The agreed scope, price and timing in that email, together with these terms, form our agreement.",
         "Payment: we send an invoice before work starts, and you can pay by bank transfer, UPI or card. Payment is due before work starts for one-time services; monitoring is billed monthly in advance. Prices exclude applicable taxes.",
         "Refunds: if we haven't started the work, you get a full refund. Once work has started, we'll agree a fair partial refund based on what's been delivered.",
         "Monitoring can be cancelled any time by email and stops at the end of the month you have paid for.",

@@ -1,21 +1,17 @@
+import { offerLines } from "./site";
 import type { HomeContent } from "./types";
 
 export const home = {
   hero: {
-    eyebrow: "SEO + GEO audits for startups and local businesses",
     title: "Be seen by people and by the machines they ask.",
+    // States the offer on the first screen (Fable's ruling 2): free audit, then fixed-price fixes. 40 words max.
     subtitle:
-      "Paste your website address. In about a minute you get scores and a ranked list of what stops Google and AI answer engines like ChatGPT and Perplexity from reading and quoting your site, with the fix for each.",
+      "Get a free audit in about a minute: a ranked list of what stops Google and AI assistants like ChatGPT from reading your site. Then we can fix it at fixed prices from $149, with no contract and before/after proof.",
     primaryCta: { label: "Run a free audit", href: "/audit" },
-    secondaryCta: { label: "See services", href: "/services" },
   },
 
-  proofLine:
-    "Reads up to six public pages, plus the robots.txt, sitemap and llms.txt files crawlers use.",
-
   problem: {
-    kicker: "Problem",
-    title: "People still search. More and more, they ask.",
+    title: "Buyers now ask AI, not only Google",
     body: "Many buyers now ask ChatGPT, Perplexity or Google's AI Overviews and get one written answer instead of a list of links. If those systems can't read or quote your site, you are not in the answer, however well you rank on Google. In BrightLocal's October 2026 survey of 1,002 US local business owners, 46% had not checked or did not know whether they appear in AI results.",
     points: [
       {
@@ -26,7 +22,7 @@ export const home = {
       {
         icon: "file",
         title: "Pages don't answer the question",
-        body: "Answer engines quote clear, self-contained statements. Vague hero copy and walls of marketing text rarely get cited.",
+        body: "Answer engines quote short, clear statements. A page that never says what you do, where and for how much gives them nothing to quote.",
       },
       {
         icon: "eye",
@@ -35,8 +31,8 @@ export const home = {
       },
       {
         icon: "gauge",
-        title: "Slow pages lose twice",
-        body: "Poor Core Web Vitals hurt rankings and conversions, and slow, script-heavy pages are harder for every crawler to read.",
+        title: "Slow pages lose visitors and rankings",
+        body: "A slow page ranks lower on Google and loses visitors on phones. Pages that depend on heavy scripts are also harder for crawlers to read.",
       },
     ],
   },
@@ -46,7 +42,6 @@ export const home = {
       id: "seo",
       label: "SEO",
       title: "What Google needs to index you",
-      body: "We read your homepage and up to five key pages the way a crawler does, and check the basics that decide whether you get indexed and clicked.",
       bullets: [
         {
           icon: "search",
@@ -60,7 +55,7 @@ export const home = {
         },
         {
           icon: "link",
-          title: "Canonicals, robots and sitemap",
+          title: "Indexing, robots.txt and sitemap",
           body: "Search engines can find, crawl and index the pages you care about.",
         },
         {
@@ -74,12 +69,11 @@ export const home = {
       id: "geo",
       label: "GEO",
       title: "Ready to be read and cited by AI",
-      body: "GEO (Generative Engine Optimization) means making your site easy for AI answer engines to read and quote. We check what gets in their way.",
       bullets: [
         {
           icon: "bot",
           title: "AI crawler access",
-          body: "Which AI bots your robots.txt allows or blocks, plus a simulated fetch as those bots that names the layer refusing them, such as a firewall or CDN.",
+          body: "Which AI bots your robots.txt allows or blocks, plus a simulated request as each bot to see whether a firewall refuses it.",
         },
         {
           icon: "sparkles",
@@ -112,7 +106,6 @@ export const home = {
       id: "performance",
       label: "Performance",
       title: "Speed measured with Google's own tool",
-      body: "We run Google PageSpeed Insights on the mobile version of your homepage and translate the numbers into plain language.",
       bullets: [
         {
           icon: "gauge",
@@ -121,7 +114,7 @@ export const home = {
         },
         {
           icon: "clock",
-          title: "Largest Contentful Paint",
+          title: "Time until the main content shows",
           body: "How long it takes for the main content to appear on screen.",
         },
         {
@@ -135,7 +128,6 @@ export const home = {
       id: "fixes",
       label: "Fixes",
       title: "A ranked list of what to fix first",
-      body: "Every problem comes with why it matters, how to fix it and how much effort it takes, ordered by the points it can recover on your score.",
       bullets: [
         {
           icon: "list",
@@ -155,7 +147,7 @@ export const home = {
         {
           icon: "sparkles",
           title: "Or we do it for you",
-          body: "Hand the list to us as a one-time fix sprint if you'd rather not touch the code.",
+          body: "Hand the list to us as a Fix sprint, at a fixed price, if you'd rather not touch the code.",
         },
       ],
     },
@@ -163,7 +155,6 @@ export const home = {
 
   howItWorks: {
     kicker: "How it works",
-    title: "Three steps, about a minute",
     steps: [
       {
         title: "Paste your website address",
@@ -175,7 +166,7 @@ export const home = {
       },
       {
         title: "Unlock the full report with your email",
-        body: "Enter your email to see every issue, check and fix, plus ready-to-paste drafts. Export it as developer tickets or one prompt for a coding agent, or ask us to handle it.",
+        body: "Enter your email to see every issue with its fix. Send the list to whoever builds your site, or have us fix it at a fixed price.",
       },
     ],
   },
@@ -190,20 +181,14 @@ export const home = {
   servicesTeaser: {
     kicker: "Services",
     title: "We can fix it for you",
-    body: "Eight services, each with a fixed scope and a price shown up front, each done by a person. Before/after proof: we re-run the audit after the work and send you what changed.",
-  },
-
-  pricingTeaser: {
-    kicker: "Pricing",
-    title: "Free audit. Paid work is quoted first.",
-    body: "A person-reviewed Full audit, a one-time fix sprint and monthly monitoring. Fixed prices. No contract, no minimum term, no exit fee.",
-    cta: { label: "See pricing", href: "/pricing" },
+    // Render as the SectionHeading body above the services index (R5 edit 4, Fable's ruling 2).
+    body: `${offerLines.noContract} ${offerLines.proof}`,
   },
 
   nightSky: {
     kicker: "AI search",
-    title: "The answer is written before anyone visits your site.",
-    body: "When someone asks an AI assistant for the best clinic or café nearby, it has already chosen its sources. The free audit checks whether those engines can read and quote your site, and lists what to change if they can't.",
+    title: "Check whether AI assistants can read your site",
+    body: "In about a minute the free audit shows what stops them reading and quoting your pages, and what to change.",
     cta: { label: "Check my site", href: "/audit" },
   },
 
@@ -230,7 +215,7 @@ export const home = {
     },
     {
       q: "Why do you ask for my email to see the full report?",
-      a: "Because we may contact you about the report, and we store your email with it. Scores and your top three issues need no email, and you can ask us to delete yours at any time.",
+      a: "So we can contact you about your report. Scores and your top three issues need no email. You can ask us to delete it at any time.",
     },
     {
       q: "What if an AI assistant says something wrong about my business?",
@@ -238,7 +223,7 @@ export const home = {
     },
     {
       q: "Can you guarantee rankings or AI citations?",
-      a: "No. Nobody controls what Google or an AI engine shows. We remove what stops your site being read and quoted.",
+      a: "No. We cannot control what Google or an AI engine shows. We remove what stops your site being read and quoted.",
     },
   ],
 
@@ -248,6 +233,9 @@ export const home = {
     cta: { label: "Run a free audit", href: "/audit" },
   },
 } satisfies HomeContent;
+
+/** Heading of the home FAQ section (R5 edit 15; replaces the hard-coded "Questions, answered plainly"). */
+export const homeFaqHeading = "Questions";
 
 /**
  * Source of the one statistic on the home page (named in home.problem.body). Optional for the UI:
@@ -262,7 +250,7 @@ export const homeProblemSource = {
 export const homeMeta = {
   metaTitle: "seenhq: SEO and GEO audits for Google and AI search",
   metaDescription:
-    "Free SEO and GEO audit for startups and local businesses. Check what Google and AI answer engines need from your site, and get a ranked list of fixes.",
+    "Free SEO and GEO audit in about a minute, then fixed-price fixes done for you: Full audit $39, Fix sprint $149 for up to 8 fixes. No contract.",
 };
 
 /** Meta for /sample-report (an illustrative report, built by frontend from sample data). */

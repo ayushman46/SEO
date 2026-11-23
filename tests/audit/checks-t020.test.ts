@@ -95,8 +95,8 @@ describe("geo.review-signals", () => {
     expect(named.status).toBe("pass");
   });
 
-  it("copy states the evidence is correlational and vendor-run", () => {
-    expect(ISSUE_CATALOG["geo.review-signals:no-profiles"].description).toMatch(/vendor-run and correlational/);
+  it("copy says the check counts for little (the evidence caveat lives on /methodology, R5 edit 26)", () => {
+    expect(ISSUE_CATALOG["geo.review-signals:no-profiles"].description).toMatch(/counts for little/);
     expect(CHECK_WEIGHTS["geo.review-signals"]).toBeLessThanOrEqual(4);
   });
 });
@@ -118,7 +118,9 @@ describe("seo.bing-indexnow", () => {
 
   it("parses lastmod and copy is honest about Copilot", () => {
     expect(newestLastmod("<lastmod>2025-01-01</lastmod><lastmod>2026-02-03T10:00:00+00:00</lastmod>")?.toISOString().slice(0, 10)).toBe("2026-02-03");
-    expect(ISSUE_CATALOG["seo.bing-indexnow:not-verified"].description).toMatch(/confirmed to feed Microsoft Copilot; whether it feeds other assistants isn't confirmed/);
+    // R5 edit 26: say only what is confirmed (Copilot), and claim nothing about other assistants.
+    expect(ISSUE_CATALOG["seo.bing-indexnow:not-verified"].description).toMatch(/Bing feeds Microsoft Copilot\./);
+    expect(ISSUE_CATALOG["seo.bing-indexnow:not-verified"].description).not.toMatch(/ChatGPT|Perplexity|Gemini|Claude/);
     expect(ISSUE_CATALOG["seo.bing-indexnow:not-verified"].howToFix).toMatch(/1\).*2\).*3\)/);
   });
 });

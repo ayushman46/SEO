@@ -91,7 +91,7 @@ export function Problem() {
 
 /* ---------- Services index ---------- */
 
-/** Leading price token: "$49", "From $199", "₹2,999/month", "$29/month". */
+/** Leading price token: "$39", "From $99", "₹999/month", "$19/month". */
 const PRICE_TOKEN = /^(From\s+)?[$₹][\d,]+(?:\.\d+)?(\/month)?/;
 
 function splitPrice(value: string) {
@@ -115,7 +115,12 @@ export function ServicesTeaser() {
       <div className="paper-grain bg-paper py-20 sm:py-28">
         <Container>
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <SectionHeading id="services-title" kicker={servicesTeaser.kicker} title={servicesTeaser.title} />
+            <SectionHeading
+              id="services-title"
+              kicker={servicesTeaser.kicker}
+              title={servicesTeaser.title}
+              body={servicesTeaser.body}
+            />
             <Button href="/services" variant="secondary" className="self-start lg:self-auto">
               All services
             </Button>
@@ -173,7 +178,7 @@ export function Faq() {
       <Container className="grid gap-10 lg:grid-cols-[minmax(0,0.75fr)_minmax(0,1.25fr)] lg:gap-20">
         <SectionHeading
           id="faq-title"
-          title="Questions, answered plainly"
+          title={homeContent.homeFaqHeading}
           className="lg:sticky lg:top-28 lg:self-start"
         />
         <Accordion visible={6} items={home.faq.map((f) => ({ title: f.q, content: <p>{f.a}</p> }))} />

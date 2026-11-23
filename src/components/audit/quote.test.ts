@@ -110,7 +110,9 @@ describe("per-issue actions", () => {
     const i = issue("seo.canonical:missing");
     const html = withQuote(createElement(IssueCard, { issue: i }), { issues: [i] });
     expect(html).toContain(auditQuoteCopy.fixMyself);
-    expect(html).toContain(esc(auditQuoteCopy.haveUsFix("$149")));
+    expect(html).toContain(esc(auditQuoteCopy.addToFixList));
+    // no price on the per-issue button (Fable's ruling 1 on R5)
+    expect(html).not.toContain("$149");
     expect(html).toContain('aria-pressed="false"');
   });
 
@@ -120,14 +122,14 @@ describe("per-issue actions", () => {
     const i = issue(id, { severity: "low" });
     const html = withQuote(createElement(IssueCard, { issue: i }), { issues: [i] });
     expect(html).toContain(auditQuoteCopy.fixMyself);
-    expect(html).not.toContain("Have us fix this");
+    expect(html).not.toContain(auditQuoteCopy.addToFixList);
   });
 
   it("keeps the paid option as a quiet text button on DIY issues", () => {
     const i = issue("seo.title:duplicate");
     expect(routeFor({ id: i.id }).fixer).toBe("diy");
     const html = withQuote(createElement(IssueCard, { issue: i }), { issues: [i] });
-    expect(html).toContain("Have us fix this");
+    expect(html).toContain(auditQuoteCopy.addToFixList);
     expect(html).toMatch(/aria-pressed="false" class="[^"]*underline/);
   });
 

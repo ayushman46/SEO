@@ -232,14 +232,15 @@ export const methodologySections: DocSection[] = [
       },
       { id: "limit.ai", label: "One model, one run", body: "The AI reading can be wrong and can vary between runs. When the model is unavailable or too slow, the audit finishes without it." },
       { id: "limit.speed", label: "Lab speed data", body: "PageSpeed Insights results vary between runs and are sometimes unavailable; we then score without them." },
-      { id: "limit.outcomes", label: "No promised outcomes", body: "Scores reflect good practice at the time of the audit. No one can guarantee a ranking or an AI citation." },
+      { id: "limit.outcomes", label: "No promised outcomes", body: "Scores reflect good practice at the time of the audit. We cannot guarantee a ranking or an AI citation." },
     ],
   },
   {
     id: "data-removal",
     title: "Your data, and how to have it removed",
     body: [
-      "We keep audit records (the address audited and its results, including any AI reading), report unlock emails and contact messages for up to 24 months, then delete them. Text from audited pages is sent to NVIDIA's hosted model API for the AI reading; visitor emails and contact messages are never sent to it.",
+      "As of 23 November 2026 we do not run a database. Audit requests, report unlock emails and contact messages are processed in memory and appear in our hosting provider's server logs, which it keeps for a limited time. Notifications we receive by email are deleted within 24 months. If we add a database, we will update the privacy policy first, and keep audit records, unlock emails and contact messages for up to 24 months, then delete them.",
+      "Text from audited pages is sent to NVIDIA's hosted model API for the AI reading; visitor emails and contact messages are never sent to it.",
       "To have an audit record, an email or a message deleted sooner, send a request through the contact form with the website address or email it relates to. We act on requests within 30 days. To stop seenhqbot from fetching your internal pages, see the crawler page.",
     ],
     cta: { label: "Request removal", href: "/contact" },

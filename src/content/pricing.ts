@@ -1,5 +1,7 @@
 import type { FaqItem, PageCopy, PriceExtra, PricingTier } from "./types";
 import { services } from "./services";
+import { offerLines } from "./site";
+import { catalogItem, formatPrice, largerJobPriceIn, type QuoteCurrency } from "@/lib/quote/catalog";
 
 /** A service's published price, lower-cased for use mid-sentence ("From $99" → "from $99"). */
 function servicePrice(slug: string): string {
@@ -8,15 +10,31 @@ function servicePrice(slug: string): string {
   return s.priceFrom.replace(/^From /, "from ");
 }
 
+/** The Fix sprint's larger-job starting price, read from the catalog (one source): "$249", "₹17,999". */
+export function largerJobPriceText(currency: QuoteCurrency): string {
+  const p = largerJobPriceIn(catalogItem("fix-sprint"), currency);
+  if (!p) throw new Error(`No larger-job price for the Fix sprint in ${currency}`);
+  return formatPrice(p.amount, currency);
+}
+
 export const pricingPage = {
-  metaTitle: "Pricing: free audit, then pay as you go",
+  metaTitle: "Pricing: free audit, fixed prices, no contract",
   metaDescription:
-    "Free SEO and GEO audit. Full audit $39, fix sprint $149, monitoring $19 a month. Fixed prices, no contract, no minimum term and no exit fee.",
+    "Free SEO and GEO audit. Full audit $39, Fix sprint $149, monitoring $19 a month. Fixed prices, no contract, no minimum term and no exit fee.",
   kicker: "Pricing",
-  title: "Prices for small teams and local businesses",
-  intro:
-    "The audit is free. Fixed prices. No contract, no minimum term, no exit fee. Before/after proof: we re-run the audit after the work and send you what changed. Our Full audit and Fix sprint are priced below typical freelancer and agency rates for the same scope. We confirm scope and a fixed quote in writing before any paid work starts.",
+  // $19 (Monitoring, a month) is the lowest paid price, so "from $19" is the true floor.
+  title: "Fixed prices from $19. No contract.",
+  intro: "The audit is free. A Full audit reviewed by a person is $39, and a Fix sprint of up to 8 fixes is $149.",
 } satisfies PageCopy;
+
+/**
+ * Header strip of the rate card on /pricing (R5, Fable's ruling 2): render `label`, then both
+ * `lines`. Replaces the FIXED_LINE regex the page used to cut out of the intro.
+ */
+export const pricingRateCardHeader = {
+  label: "Rates",
+  lines: [offerLines.noContract, offerLines.proof],
+} as const;
 
 export const pricingTiers = [
   {
@@ -43,7 +61,6 @@ export const pricingTiers = [
       "Covers up to 15 pages, not just six",
       "A person reads your key pages and checks what a script can't judge",
       "A written plan: what to fix first, what can wait, what to ignore",
-      "A written walkthrough of your report, by email",
     ],
     cta: { label: "Request a full audit", href: "/contact?service=seo-audit" },
     highlighted: true,
@@ -55,12 +72,11 @@ export const pricingTiers = [
     description: "Up to 8 fixes from your audit on one site, at a fixed price. Larger jobs get a fixed quote before work starts.",
     features: [
       "Up to 8 fixes from your audit, agreed up front",
-      "robots.txt, sitemap and llms.txt set up",
-      "Structured data for your business and FAQs",
-      "Quick performance wins",
+      "Typical fixes: robots.txt, sitemap, llms.txt, structured data, image sizes",
+      "On one site, on a platform we can access",
       "Before/after proof for every fix",
     ],
-    cta: { label: "Request a fix sprint", href: "/contact?service=technical-fixes" },
+    cta: { label: "Request a Fix sprint", href: "/contact?service=technical-fixes" },
   },
   {
     name: "Monitoring",
@@ -87,8 +103,8 @@ export const pricingFaq = [
     a: "A person. The free audit runs fixed checks on six pages. In the Full audit someone reads up to 15 pages, judges what a script can't, such as whether a page really answers a customer's question, and emails you a plan: what to fix first, what can wait and what to ignore.",
   },
   {
-    q: "What is the difference between the Full audit and the fix sprint?",
-    a: "The Full audit tells you what to fix and in what order. The fix sprint is us making up to 8 of those fixes. You can buy the audit, fix the quick wins yourself and hand the rest to us.",
+    q: "What is the difference between the Full audit and the Fix sprint?",
+    a: "The Full audit tells you what to fix and in what order. The Fix sprint is us making up to 8 of those fixes. You can buy the audit, fix the quick wins yourself and hand the rest to us.",
   },
   {
     q: "What does monitoring actually involve?",
@@ -100,7 +116,7 @@ export const pricingFaq = [
   },
   {
     q: "Do you work with website builders like Wix, Squarespace, Shopify or WordPress?",
-    a: "Yes. The audit works on any public website. For fix sprints we work within what your platform allows and tell you up front if something can't be changed there.",
+    a: "Yes. The audit works on any public website. For a Fix sprint we work within what your platform allows and tell you up front if something can't be changed there.",
   },
   {
     q: "How do I pay?",
@@ -115,9 +131,11 @@ export const pricingFaq = [
 /** Label on the highlighted tier card. Factual, not a "most popular" claim (added by frontend-designer for T006). */
 export const pricingHighlightLabel = "Reviewed by a person";
 
-/** Short note under the tier grid (added by frontend-designer for T006; content-seo may refine). */
-export const pricingNote =
-  "Prices are in US dollars. A job larger than 8 fixes gets a fixed quote from $249 before work starts. The AI fact-check, local AI setup, AI crawler unblock and content work are priced on the services page.";
+/**
+ * Short note under the USD tier grid. Carries the site's one market comparison, for the Full audit
+ * and Fix sprint only (sources: docs/research/PRICING_RECOMMENDATION.md, appendix).
+ */
+export const pricingNote = `Prices are in US dollars. Our Full audit and Fix sprint are priced below typical freelancer and agency rates for the same scope. A job larger than 8 fixes gets a fixed quote from ${largerJobPriceText("USD")} before work starts.`;
 
 /** Heading above the pricing FAQ list. */
 export const pricingFaqHeading = {
@@ -136,6 +154,47 @@ export const pricingClosing = {
   primaryCta: { label: "Tell us about your site", href: "/contact" },
   secondaryCta: { label: "Run a free audit", href: "/audit" },
 };
+
+/* ------------------------------------------------------------------ */
+/* Services that are not pricing tiers, in both currencies (R5 B12).   */
+/* ------------------------------------------------------------------ */
+
+/** One description per extra, shared by the dollar and rupee lists. */
+const EXTRAS = [
+  {
+    slug: "ai-fact-check",
+    description: "We compare what AI assistants say about you with your real facts and correct the sources behind wrong answers.",
+  },
+  {
+    slug: "local-ai-setup",
+    description: "We complete and align your business profiles, such as Google, Bing Places and the directories your customers use.",
+  },
+  {
+    slug: "ai-crawler-unblock",
+    description: "We find out why AI crawlers are turned away from your site and fix what is in your control.",
+  },
+  {
+    slug: "content-entity",
+    description: "We rewrite the openings of your key pages so they answer questions directly and make your business details match everywhere.",
+  },
+] as const;
+
+function extra(slug: (typeof EXTRAS)[number]["slug"], price: string): PriceExtra {
+  const s = services.find((x) => x.slug === slug);
+  const e = EXTRAS.find((x) => x.slug === slug);
+  if (!s || !e) throw new Error(`Unknown extra "${slug}"`);
+  return { name: s.name, price, description: e.description, href: `/services#${slug}` };
+}
+
+/** Heading above the extras list in the USD view. The INR view keeps its own "India extras" heading. */
+export const pricingExtrasHeading = "Other services";
+
+/** "Other services" in US dollars: the same four rows as pricingIndiaExtras. Prices are the services page prices. */
+export const pricingExtrasUsd = EXTRAS.map((e) => {
+  const s = services.find((x) => x.slug === e.slug);
+  if (!s) throw new Error(`Unknown extra "${e.slug}"`);
+  return extra(e.slug, s.priceFrom);
+}) satisfies PriceExtra[];
 
 /* ------------------------------------------------------------------ */
 /* India pricing in rupees (T010). Additive: the USD exports above are */
@@ -171,35 +230,15 @@ export const pricingIndiaHeading = {
   kicker: "India",
   title: "India pricing in rupees",
   intro:
-    "The same plans and the same work, priced in rupees for businesses in India. Prices are per site and exclude applicable taxes. We show the total including tax in writing before you pay.",
+    "The same plans and the same work, priced in rupees for businesses in India. Prices exclude applicable taxes. We show the total including tax in writing before you pay.",
 } as const;
 
 /** "India extras": rupee prices for the services that are not pricing tiers. */
 export const pricingIndiaExtras = [
-  {
-    name: "AI fact-check & fix",
-    price: "₹3,999",
-    description: "We compare what AI assistants say about you with your real facts and correct the sources behind wrong answers.",
-    href: "/services#ai-fact-check",
-  },
-  {
-    name: "Local AI visibility setup",
-    price: "₹3,999 per location",
-    description: "We complete and align your business profiles, such as Google, Bing Places and the directories your customers use.",
-    href: "/services#local-ai-setup",
-  },
-  {
-    name: "AI crawler unblock",
-    price: "₹2,999",
-    description: "We find out why AI crawlers are turned away from your site and fix what is in your control.",
-    href: "/services#ai-crawler-unblock",
-  },
-  {
-    name: "Content & entity",
-    price: "From ₹6,999",
-    description: "We rewrite the openings of your key pages so they answer questions directly and make your business details match everywhere.",
-    href: "/services#content-entity",
-  },
+  extra("ai-fact-check", "₹3,999"),
+  extra("local-ai-setup", "₹3,999 per location"),
+  extra("ai-crawler-unblock", "₹2,999"),
+  extra("content-entity", "From ₹6,999"),
 ] satisfies PriceExtra[];
 
 /** Short notes under the rupee prices. Keep these honest; see docs/MARKET_RESEARCH.md. */
@@ -218,15 +257,17 @@ export const pricingIndiaComparison = {
 } as const;
 
 /** Short note under the rupee tier grid. */
-export const pricingNoteInr =
-  "Rupee prices are for businesses based in India; elsewhere the US dollar prices apply. A job larger than 8 fixes gets a fixed quote from ₹17,999 before work starts.";
+export const pricingNoteInr = `Rupee prices are for businesses based in India; elsewhere the US dollar prices apply. A job larger than 8 fixes gets a fixed quote from ${largerJobPriceText("INR")} before work starts.`;
 
 /* ------------------------------------------------------------------ */
 /* Pricing page repairs (T022, research change 11). Additive.          */
 /* ------------------------------------------------------------------ */
 
-/** Taxes line under the USD tier grid (the INR view says it once in pricingIndiaHeading.intro). */
-export const pricingTaxNote = "Prices are per site and exclude applicable taxes. We show the total including tax in writing before you pay.";
+/**
+ * Taxes line under the USD tier grid (the INR view says it once in pricingIndiaHeading.intro).
+ * Not "per site": Local AI setup is priced per location (R5 B11).
+ */
+export const pricingTaxNote = "Prices exclude applicable taxes. We show the total including tax in writing before you pay.";
 
 /** "What happens after you order": three short steps under the tiers. */
 export const pricingOrderSteps = {
@@ -238,7 +279,7 @@ export const pricingOrderSteps = {
     },
     {
       title: "A person confirms it",
-      body: "Fixed prices stay fixed. Where a price is a starting price, we confirm the final number within 1 business day.",
+      body: "A job within its published scope keeps its published price. A larger or more involved job gets a fixed quote in writing within two working days, before work starts.",
     },
     {
       title: "Work starts when you agree",

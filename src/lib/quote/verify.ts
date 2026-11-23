@@ -5,6 +5,7 @@
  */
 import {
   catalogItemForSlug,
+  largerJobPriceIn,
   MAX_ORDER_ITEMS,
   priceIn,
   type CatalogKey,
@@ -79,7 +80,9 @@ export function verifyOrder(input: {
         problem: "unknown-service",
       };
     }
-    const p = priceIn(item, input.currency);
+    // A quote above the Fix sprint's scope cap carries its larger-job starting price (always "from").
+    const larger = largerJobPriceIn(item, input.currency);
+    const p = larger && it.from && it.price === larger.amount ? larger : priceIn(item, input.currency);
     const catalogPrice = p === null ? null : p.amount;
     // "on-request" (no price in this currency) is a starting point, never fixed.
     const catalogFrom = p === null ? true : p.kind === "from";

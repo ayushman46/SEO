@@ -177,7 +177,7 @@ function FixesCard() {
           as="li"
           dense
           issue={{
-            severity: "critical",
+            severity: "high",
             title: "Unblock AI crawlers",
             category: "geo",
             effort: "quick",
@@ -187,7 +187,7 @@ function FixesCard() {
           as="li"
           dense
           issue={{
-            severity: "high",
+            severity: "medium",
             title: "Add meta descriptions",
             category: "seo",
             effort: "quick",

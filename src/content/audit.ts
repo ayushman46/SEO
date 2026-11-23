@@ -1,4 +1,5 @@
 import type { PageCopy } from "./types";
+import { catalogItem, formatPrice, priceIn, QUOTE_SCOPE_CAP, type QuoteCurrency } from "@/lib/quote/catalog";
 
 export const auditPage = {
   metaTitle: "Free SEO and GEO audit for your website",
@@ -7,7 +8,7 @@ export const auditPage = {
   kicker: "Free audit",
   title: "Audit your site for Google and AI search",
   intro:
-    "Enter your website address. We read your homepage and up to five more pages, score them for SEO, GEO and mobile speed, and rank what to fix first. It takes about a minute.",
+    "We read your homepage and up to five more pages, score them for Google, AI answer engines and mobile speed, and rank what to fix first. About a minute. No email needed for your scores and top three issues.",
 } satisfies PageCopy;
 
 export const auditForm = {
@@ -174,7 +175,8 @@ export const auditExportCopy = {
  * Rules: no urgency, no discounts, no pre-selected extras, no loss estimates.
  */
 export const auditQuoteCopy = {
-  title: "Your fixed quote",
+  // Not "fixed": the total can be a "From" price (R5 edit 1, Fable's ruling 1).
+  title: "Your quote",
   intro: "Our price to fix what this audit found. Or fix it yourself: every issue has the steps.",
   currencyLabel: "Currency",
   currencyUsd: "USD $",
@@ -194,7 +196,18 @@ export const auditQuoteCopy = {
   diy: "I'll fix it myself",
   // per issue
   fixMyself: "Fix it myself",
-  haveUsFix: (priceText: string) => `Have us fix this · ${priceText}`,
+  /**
+   * Per-issue toggle (Fable's ruling 1): one constant label, no price on the issue. Render
+   * `addToFixList` with aria-pressed="false" and `onFixList` with aria-pressed="true".
+   */
+  addToFixList: "Add to my fix list",
+  onFixList: "On my fix list",
+  /** One line in the fix-list tray and the quote panel: "One Fix sprint covers up to 8 of these for $149." */
+  fixListExplainer: (currency: QuoteCurrency) => {
+    const p = priceIn(catalogItem("fix-sprint"), currency);
+    const price = p ? formatPrice(p.amount, currency) : "a fixed price";
+    return `One Fix sprint covers up to ${QUOTE_SCOPE_CAP.maxPaidIssues} of these for ${price}.`;
+  },
   /** screen-reader name after "Copy": "Copy as a ticket: <issue title>" */
   copyTicket: "as a ticket",
   // tray

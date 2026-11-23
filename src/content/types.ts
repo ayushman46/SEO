@@ -54,14 +54,15 @@ export interface SiteConfig {
 }
 
 export interface HomeContent {
-  hero: { eyebrow: string; title: string; subtitle: string; primaryCta: Cta; secondaryCta: Cta };
-  proofLine: string; // honest, e.g. "Checks your site against the engines people now ask first"
-  problem: { kicker: string; title: string; body: string; points: FeatureItem[] };
-  tabs: { id: string; label: string; title: string; body: string; bullets: FeatureItem[] }[]; // 4 tabs: SEO, GEO, Performance, Fixes
-  howItWorks: { kicker: string; title: string; steps: { title: string; body: string }[] };
+  // Orphaned fields (hero.eyebrow, hero.secondaryCta, proofLine, problem.kicker, tabs[].body,
+  // howItWorks.title, pricingTeaser) removed in T031: the home page no longer renders them.
+  hero: { title: string; subtitle: string; primaryCta: Cta };
+  problem: { title: string; body: string; points: FeatureItem[] };
+  tabs: { id: string; label: string; title: string; bullets: FeatureItem[] }[]; // 4 tabs: SEO, GEO, Performance, Fixes
+  /** `kicker` is the heading of AuditSteps on /audit. */
+  howItWorks: { kicker: string; steps: { title: string; body: string }[] };
   sampleReport: { kicker: string; title: string; body: string; note: string }; // note: "Illustrative sample report"
   servicesTeaser: { kicker: string; title: string; body: string };
-  pricingTeaser: { kicker: string; title: string; body: string; cta: Cta };
   nightSky: { kicker: string; title: string; body: string; cta: Cta }; // dark section
   faq: FaqItem[];
   finalCta: { title: string; body: string; cta: Cta };

@@ -81,7 +81,7 @@ function quoteLines(quote: StoredQuote | null, attachment: ContactAttachment): s
   const money = (n: number | null): string => (n === null ? "by email" : formatPrice(n, currency));
   lines.push(
     `Quote (${currency}): ${quote.fixed ? "" : "from "}${money(quote.catalogTotal)} at catalog prices, excl. taxes, ` +
-      `${quote.fixed ? "FIXED" : "NOT fixed: confirm within 1 business day"}`,
+      `${quote.fixed ? "FIXED" : "NOT fixed: confirm within two working days"}`,
   );
   lines.push(
     quote.valid
