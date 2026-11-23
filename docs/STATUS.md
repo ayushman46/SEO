@@ -1,5 +1,13 @@
 # Status log (newest on top)
 
+## 2026-11-23 09:20 IST: feedback loop round 1 done and on preview; round 2 critics running
+- **Committed + pushed (13f3c91):** copy rewrite (115 edits, docs/COPY_STYLE.md + style tests), below-market price ladder (Full audit $39/₹2,999, Fix sprint fixed $149/₹9,999 up to 8 fixes, Monitoring $19/₹999, fact-check $59/₹3,999, local setup $99/₹3,999, unblock $49/₹2,999, content from $99/₹6,999), Lenis smooth scroll (gated, self-disabling guard, docs/SCROLL_PERF.md), design review R4 (56 findings), three signature moments (eye blink, report front page, pricing rate card). 711 tests, typecheck, lint, build green.
+- **Preview:** https://seenhq-8jlrmdrps-ayushs-projects-32c1d225.vercel.app. **Production is still v1.1 with the OLD prices and copy.**
+- **Running (round 2):** copy critic -> docs/reviews/R5-copy.md; rendered design/a11y/scroll QA -> docs/reviews/R5-design-qa.md.
+- **Exact next step:** apply R5 findings (content-seo for copy, frontend-designer for design; sequential), rebuild, preview, then round 3 critics; repeat until critics find little or the usage limit hits. Ask founder before production deploy (new prices go live with it).
+- **Not verified:** scroll feel and FPS in a visible real browser (the in-app pane was hidden and throttled). Headless timespan measured 60 fps at 1x CPU.
+- **Research:** docs/research/pricing-1-price-points.md, pricing-2-buyers-and-gap.md, PRICING_RECOMMENDATION.md.
+
 ## 2026-11-23 07:50 IST: v1.1 LIVE in production; round 3 started (pricing research, smooth scroll, slop removal)
 - **Production:** https://seenhq.vercel.app is v1.1 (founder approved 07:05). PageSpeed mobile: / 98, /audit 99, /sample-report 96, /methodology 98; a11y/BP/SEO 100. docs/LAUNCH_REPORT.md updated.
 - **Founder request (07:40):** deeper pricing + exact-gap research; agents in a feedback loop to fix the site and remove AI slop; awwwards-style smooth scrolling with no FPS cost.
