@@ -56,6 +56,8 @@ export function Nav() {
               ))}
             </ul>
           </nav>
+          {/* v1.1 (restored in T033): the blue menu button lives inside the logo pill */}
+          <MobileMenu links={menuLinks} cta={audit} className="lg:hidden" />
         </div>
 
         <div className="pointer-events-auto flex items-center gap-2">
@@ -67,12 +69,10 @@ export function Nav() {
               {contact.label}
             </Link>
           ) : null}
-          {/* a little narrower below 360 px so the three pills fit a 320 px screen */}
+          {/* a little narrower below 360 px so both pills fit a 320 px screen */}
           <Button href={audit.href} size="md" className="max-[359px]:px-4">
             {audit.label}
           </Button>
-          {/* the menu trigger sits where the sheet's close button appears (top right) */}
-          <MobileMenu links={menuLinks} cta={audit} className="lg:hidden" />
         </div>
       </Container>
     </header>

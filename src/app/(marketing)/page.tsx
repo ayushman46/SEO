@@ -6,14 +6,20 @@ import { FinalCta } from "@/components/home/FinalCta";
 import { Hero } from "@/components/home/Hero";
 import { NightSky } from "@/components/home/NightSky";
 import { SampleReport } from "@/components/home/SampleReport";
-import { Faq, Problem, ProofAndEngines, ServicesTeaser } from "@/components/home/Sections";
+import {
+  Faq,
+  HowItWorks,
+  PricingTeaser,
+  Problem,
+  ProofAndEngines,
+  ServicesTeaser,
+} from "@/components/home/Sections";
 
 export const metadata = pageMetadata.home;
 
 /**
- * Nine sections (T026): the night sky moves up to be the change of pace after the
- * feature tabs; "how it works" lives in the sample-report column; the pricing
- * teaser is gone (every service row shows its price; Pricing is in the nav).
+ * The v1.1 home, restored in T033 (founder decision): eleven sections in the
+ * v1.1 order. Inner pages keep their later redesign.
  */
 export default function HomePage() {
   const updated = lastUpdated();
@@ -25,12 +31,14 @@ export default function HomePage() {
       <ProofAndEngines />
       <Problem />
       <FeatureTabs />
-      <NightSky />
+      <HowItWorks />
       <SampleReport />
       <ServicesTeaser />
+      <PricingTeaser />
+      <NightSky />
       <Faq />
       <FinalCta />
-      <Container className="pb-10">
+      <Container className="-mt-8 pb-10 sm:-mt-14">
         <p className="text-center text-xs text-muted">
           {updated.label} <time dateTime={updated.iso}>{updated.display}</time>
         </p>

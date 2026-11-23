@@ -67,7 +67,8 @@ export function MobileMenu({ links, cta, className }: { links: Cta[]; cta: Cta; 
         aria-controls={id}
         aria-label="Open menu"
         className={cx(
-          "grid size-11 place-items-center rounded-pill bg-white/95 text-ink shadow-pill ring-1 ring-ink/[0.06] transition-colors hover:bg-white",
+          // v1.1 look (restored in T033): a blue square-ish button inside the logo pill
+          "grid size-10 place-items-center rounded-[0.8rem] bg-accent-600 text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.22)] transition-colors hover:bg-accent-700 active:bg-accent-800",
           className,
         )}
       >

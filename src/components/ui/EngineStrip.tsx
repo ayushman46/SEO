@@ -73,18 +73,32 @@ export function EngineStrip({
   label,
   engines,
   disclaimer,
+  labelStyle = "lead",
+  marquee = "below-lg",
   className,
 }: {
   label: string;
   engines: readonly string[];
   disclaimer: string;
+  /** "lead": sentence-case line (default). "kicker": small uppercase label (the home's v1.1 look, T033). */
+  labelStyle?: "lead" | "kicker";
+  /** "below-lg": static row from lg (default). "always": the marquee runs at every width (home, v1.1). */
+  marquee?: "below-lg" | "always";
   className?: string;
 }) {
   const trackId = useId();
   const list = collapseGoogle(engines);
   return (
-    <div className={cx("engine-strip", className)}>
-      <p aria-hidden className="mx-auto max-w-2xl text-center text-[0.9375rem] leading-relaxed text-balance text-ink-2">
+    <div className={cx("engine-strip", className)} data-marquee={marquee}>
+      <p
+        aria-hidden
+        className={cx(
+          "mx-auto max-w-2xl text-center text-balance",
+          labelStyle === "kicker"
+            ? "text-kicker font-semibold text-muted uppercase"
+            : "text-[0.9375rem] leading-relaxed text-ink-2",
+        )}
+      >
         {label}
       </p>
       <div className="engine-strip-viewport mt-6 border-y border-line">

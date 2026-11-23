@@ -336,10 +336,9 @@ dialog.menu-sheet::backdrop {
     transform: translate3d(-50%, 0, 0);
   }
 }
-/* Reduced motion, and from lg for everyone (T026: no logo marquee on desktop):
-   no movement, no duplicate, no pause control; the names wrap into a centred
-   static row inside the hairline band. */
-@media (prefers-reduced-motion: reduce), (min-width: 1024px) {
+/* Reduced motion: no movement, no duplicate, no pause control; the names wrap
+   into a centred static row inside the hairline band. */
+@media (prefers-reduced-motion: reduce) {
   .engine-strip-track {
     width: 100%;
     animation: none;
@@ -359,6 +358,33 @@ dialog.menu-sheet::backdrop {
     display: none;
   }
   .engine-strip-item {
+    height: 3rem;
+    padding-inline: 0.75rem;
+    border-right: 0;
+  }
+}
+/* From lg the strip is static too (T026), unless it asks to keep moving
+   (data-marquee="always": the home strip, v1.1 look restored in T033). */
+@media (min-width: 1024px) {
+  .engine-strip:not([data-marquee="always"]) .engine-strip-track {
+    width: 100%;
+    animation: none;
+    transform: none;
+  }
+  .engine-strip:not([data-marquee="always"]) .engine-strip-list {
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+    justify-content: center;
+    column-gap: 0.5rem;
+    padding-block: 0.5rem;
+  }
+  .engine-strip:not([data-marquee="always"]) .engine-strip-list[aria-hidden="true"],
+  .engine-strip:not([data-marquee="always"]) .engine-strip-toggle,
+  .engine-strip:not([data-marquee="always"]) .engine-strip-viewport::before,
+  .engine-strip:not([data-marquee="always"]) .engine-strip-viewport::after {
+    display: none;
+  }
+  .engine-strip:not([data-marquee="always"]) .engine-strip-item {
     height: 3rem;
     padding-inline: 0.75rem;
     border-right: 0;

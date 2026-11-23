@@ -3,14 +3,22 @@ import type { HomeContent } from "./types";
 
 export const home = {
   hero: {
+    eyebrow: "SEO + GEO audits for startups and local businesses",
     title: "Be seen by people and by the machines they ask.",
     // States the offer on the first screen (Fable's ruling 2): free audit, then fixed-price fixes. 40 words max.
     subtitle:
       "Get a free audit in about a minute: a ranked list of what stops Google and AI assistants like ChatGPT from reading your site. Then we can fix it at fixed prices from $149, with no contract and before/after proof.",
     primaryCta: { label: "Run a free audit", href: "/audit" },
+    secondaryCta: { label: "See services", href: "/services" },
   },
 
+  // The line between hairlines above the engine strip (v1.1 layout, T033). States what the audit is
+  // made of; it does not claim to report how you appear in any engine.
+  proofLine:
+    "One report for Google and AI answer engines: fixed-rule checks, one AI model's reading of your pages and Google's own speed test.",
+
   problem: {
+    kicker: "The shift to AI answers",
     title: "Buyers now ask AI, not only Google",
     body: "Many buyers now ask ChatGPT, Perplexity or Google's AI Overviews and get one written answer instead of a list of links. If those systems can't read or quote your site, you are not in the answer, however well you rank on Google. In BrightLocal's October 2026 survey of 1,002 US local business owners, 46% had not checked or did not know whether they appear in AI results.",
     points: [
@@ -42,6 +50,7 @@ export const home = {
       id: "seo",
       label: "SEO",
       title: "What Google needs to index you",
+      body: "We read your homepage and up to five more pages the way a crawler does, and check the basics that decide whether you get indexed and clicked.",
       bullets: [
         {
           icon: "search",
@@ -69,6 +78,7 @@ export const home = {
       id: "geo",
       label: "GEO",
       title: "Ready to be read and cited by AI",
+      body: "GEO is making your site easy for AI answer engines to read and quote. We check what they need from a source, and a language model reads your pages to see how clearly they describe you.",
       bullets: [
         {
           icon: "bot",
@@ -106,6 +116,7 @@ export const home = {
       id: "performance",
       label: "Performance",
       title: "Speed measured with Google's own tool",
+      body: "We run Google PageSpeed Insights on the mobile version of your homepage and explain the numbers in plain words.",
       bullets: [
         {
           icon: "gauge",
@@ -128,6 +139,7 @@ export const home = {
       id: "fixes",
       label: "Fixes",
       title: "A ranked list of what to fix first",
+      body: "Every problem comes with why it matters, how to fix it and how much work it takes, ordered by the points it can recover on your score.",
       bullets: [
         {
           icon: "list",
@@ -155,6 +167,7 @@ export const home = {
 
   howItWorks: {
     kicker: "How it works",
+    title: "From web address to a ranked fix list in three steps",
     steps: [
       {
         title: "Paste your website address",
@@ -183,6 +196,13 @@ export const home = {
     title: "We can fix it for you",
     // Render as the SectionHeading body above the services index (R5 edit 4, Fable's ruling 2).
     body: `${offerLines.noContract} ${offerLines.proof}`,
+  },
+
+  pricingTeaser: {
+    kicker: "Pricing",
+    title: "Start free, then pay a fixed price",
+    body: "The audit is free. Each paid service has one published price, and you see the total in writing before you pay.",
+    cta: { label: "See pricing", href: "/pricing" },
   },
 
   nightSky: {

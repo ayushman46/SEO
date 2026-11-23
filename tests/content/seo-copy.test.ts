@@ -241,7 +241,7 @@ describe("content rules", () => {
     expect(text("ai-crawler-unblock")).toMatch(/a host can refuse to lift a block/);
   });
 
-  it("states the offer on the home first screen and above the services index (R5 ruling 2)", () => {
+  it("states the offer on the home first screen and above the services index (R5 ruling 2, T033)", () => {
     const sub = home.hero.subtitle;
     expect(sub.trim().split(/\s+/).length).toBeLessThanOrEqual(40);
     expect(sub).toMatch(/free audit in about a minute/);
@@ -252,11 +252,17 @@ describe("content rules", () => {
     expect(home.servicesTeaser.body).toBe(`${offerLines.noContract} ${offerLines.proof}`);
     expect(offerLines.noContract).toBe("Fixed prices. No contract, no minimum term, no exit fee.");
     expect([...pricingRateCardHeader.lines]).toEqual([offerLines.noContract, offerLines.proof]);
-    // Orphaned home copy is gone (R5 B9, ruling 10).
-    expect(home).not.toHaveProperty("proofLine");
-    expect(home).not.toHaveProperty("pricingTeaser");
-    expect(home.hero).not.toHaveProperty("eyebrow");
-    for (const t of home.tabs) expect(t).not.toHaveProperty("body");
+    // The v1.1 home layout is back (T033, founder decision): its fields are restored and rendered.
+    expect(home.hero.eyebrow).toBeTruthy();
+    expect(home.hero.secondaryCta.href).toBe("/services");
+    expect(home.proofLine).toBeTruthy();
+    expect(home.proofLine).not.toMatch(/how you show up/i);
+    expect(home.problem.kicker).toBeTruthy();
+    for (const t of home.tabs) expect(t.body.length).toBeGreaterThan(0);
+    expect(home.howItWorks.title).toBeTruthy();
+    expect(home.pricingTeaser.cta.href).toBe("/pricing");
+    // the pricing teaser body names no figure: the tier list beside it carries the current prices
+    expect(home.pricingTeaser.body).not.toMatch(/[$₹]\d/);
   });
 
   it("pricing leads with a number, keeps the intro short and the market line once (R5 ruling 3)", () => {

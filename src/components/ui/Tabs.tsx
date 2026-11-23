@@ -53,6 +53,7 @@ export function Tabs({
   className,
   layout = "stack",
   asideFrame,
+  tone = "quiet",
 }: {
   items: TabItem[];
   /** Accessible name for the tablist. */
@@ -63,7 +64,13 @@ export function Tabs({
   layout?: "stack" | "split";
   /** Shared aside wrapper containing a <TabsAsideSlot />; replaces the per-item aside list. */
   asideFrame?: ReactNode;
+  /**
+   * "quiet" (default): paper segmented bar used on inner pages.
+   * "accent": the home's electric-blue segmented bar (v1.1 look, restored in T033).
+   */
+  tone?: "quiet" | "accent";
 }) {
+  const accent = tone === "accent";
   const uid = useId();
   const [active, setActive] = useState(defaultId ?? items[0]?.id);
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
@@ -88,7 +95,12 @@ export function Tabs({
       role="tablist"
       aria-label={label}
       aria-orientation="horizontal"
-      className="inline-flex max-w-full items-center gap-1 rounded-pill bg-paper-2 p-1 shadow-[inset_0_0_0_1px_var(--color-line)]"
+      className={cx(
+        "inline-flex max-w-full items-center gap-1 rounded-pill p-1",
+        accent
+          ? "bg-accent-600 shadow-[inset_0_1px_0_rgb(255_255_255/0.18),0_10px_24px_-14px_rgb(26_111_232/0.9)]"
+          : "bg-paper-2 shadow-[inset_0_0_0_1px_var(--color-line)]",
+      )}
     >
       {items.map((item, i) => {
         const selected = item.id === active;
@@ -108,10 +120,16 @@ export function Tabs({
             onKeyDown={(e) => onKeyDown(e, i)}
             className={cx(
               "relative h-9 rounded-pill px-3.5 text-sm font-medium whitespace-nowrap transition-[background-color,color,box-shadow] duration-300 ease-(--ease-paper) sm:h-10 sm:px-5 sm:text-[0.9375rem]",
-              "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+              accent
+                ? "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                : "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
               selected
-                ? "bg-white text-ink shadow-paper"
-                : "text-ink-2 hover:text-ink",
+                ? accent
+                  ? "bg-white text-accent-ink shadow-[0_1px_2px_rgb(17_79_173/0.35),0_4px_10px_-4px_rgb(17_79_173/0.5)]"
+                  : "bg-white text-ink shadow-paper"
+                : accent
+                  ? "text-white hover:bg-white/[0.14]"
+                  : "text-ink-2 hover:text-ink",
             )}
           >
             {item.label}

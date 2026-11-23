@@ -3,17 +3,50 @@ import { cx } from "./cx";
 
 export type AccordionItem = { id?: string; title: ReactNode; content: ReactNode };
 
-function Row({ item, name, H }: { item: AccordionItem; name?: string; H: "h2" | "h3" | "h4" }) {
+function Row({
+  item,
+  name,
+  H,
+  marker,
+}: {
+  item: AccordionItem;
+  name?: string;
+  H: "h2" | "h3" | "h4";
+  marker: "plus" | "circle";
+}) {
+  const circle = marker === "circle";
   return (
     <details name={name} className="group border-b border-line">
-      <summary className="flex cursor-pointer items-start justify-between gap-6 rounded-sm py-5 text-left transition-colors hover:text-accent-ink">
-        <H className="text-[1.0625rem] leading-snug font-medium text-pretty">{item.title}</H>
-        <span aria-hidden className="relative mt-1.5 grid size-3 shrink-0 place-items-center text-muted">
-          <span className="absolute h-px w-3 bg-current" />
-          <span className="absolute h-3 w-px bg-current transition-transform duration-300 ease-(--ease-paper) group-open:scale-y-0" />
-        </span>
+      <summary
+        className={cx(
+          "flex cursor-pointer items-start justify-between gap-6 rounded-sm text-left transition-colors hover:text-accent-ink",
+          circle ? "py-6" : "py-5",
+        )}
+      >
+        <H className={cx("text-[1.0625rem] leading-snug font-medium text-pretty", circle && "sm:text-lg")}>
+          {item.title}
+        </H>
+        {circle ? (
+          <span
+            aria-hidden
+            className="relative mt-0.5 grid size-7 shrink-0 place-items-center rounded-full text-ink shadow-[inset_0_0_0_1px_var(--color-line-strong)] transition-colors duration-200 group-open:bg-ink group-open:text-white"
+          >
+            <span className="absolute h-px w-3 bg-current" />
+            <span className="absolute h-3 w-px bg-current transition-transform duration-300 ease-(--ease-paper) group-open:scale-y-0" />
+          </span>
+        ) : (
+          <span aria-hidden className="relative mt-1.5 grid size-3 shrink-0 place-items-center text-muted">
+            <span className="absolute h-px w-3 bg-current" />
+            <span className="absolute h-3 w-px bg-current transition-transform duration-300 ease-(--ease-paper) group-open:scale-y-0" />
+          </span>
+        )}
       </summary>
-      <div className="max-w-[66ch] pr-2 pb-6 text-[0.9375rem] leading-relaxed text-pretty text-muted sm:pr-12">
+      <div
+        className={cx(
+          "pr-2 leading-relaxed text-pretty text-muted sm:pr-12",
+          circle ? "max-w-3xl pb-7 text-[0.9875rem]" : "max-w-[66ch] pb-6 text-[0.9375rem]",
+        )}
+      >
         {item.content}
       </div>
     </details>
@@ -32,6 +65,7 @@ export function Accordion({
   headingLevel = 3,
   visible,
   moreLabel = "More questions",
+  marker = "plus",
   className,
 }: {
   items: AccordionItem[];
@@ -40,6 +74,8 @@ export function Accordion({
   /** show this many, fold the rest */
   visible?: number;
   moreLabel?: string;
+  /** "plus" (default): thin plus. "circle": the home's ringed plus that fills ink when open (v1.1, T033). */
+  marker?: "plus" | "circle";
   className?: string;
 }) {
   const H = `h${headingLevel}` as "h2" | "h3" | "h4";
@@ -49,7 +85,7 @@ export function Accordion({
   return (
     <div className={cx("border-t border-line", className)}>
       {shown.map((item, i) => (
-        <Row key={item.id ?? i} item={item} name={name} H={H} />
+        <Row key={item.id ?? i} item={item} name={name} H={H} marker={marker} />
       ))}
       {rest.length ? (
         <details className="group/more">
@@ -62,7 +98,7 @@ export function Accordion({
           </summary>
           <div className="border-t border-line">
             {rest.map((item, i) => (
-              <Row key={item.id ?? `more-${i}`} item={item} name={name} H={H} />
+              <Row key={item.id ?? `more-${i}`} item={item} name={name} H={H} marker={marker} />
             ))}
           </div>
         </details>

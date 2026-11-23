@@ -11,6 +11,7 @@ export function SectionHeading({
   align = "left",
   size = "md",
   tone = "light",
+  measure = "text",
   className,
   children,
 }: {
@@ -22,6 +23,8 @@ export function SectionHeading({
   align?: "left" | "center";
   size?: "sm" | "md" | "lg";
   tone?: "light" | "night";
+  /** Body width: "text" = 60ch (default), "wide" = max-w-2xl (the home's v1.1 measure, T033). */
+  measure?: "text" | "wide";
   className?: string;
   children?: ReactNode;
 }) {
@@ -52,7 +55,8 @@ export function SectionHeading({
       {body ? (
         <p
           className={cx(
-            "mt-5 max-w-[60ch] text-[1.0625rem] leading-relaxed text-pretty",
+            "mt-5 text-[1.0625rem] leading-relaxed text-pretty",
+            measure === "wide" ? "max-w-2xl" : "max-w-[60ch]",
             align === "center" && "mx-auto",
             night ? "text-night-muted" : "text-muted",
           )}

@@ -4,6 +4,7 @@ import type { FeatureItem } from "@/content/types";
 import { FeatureCollage, FloatingCard } from "@/components/collage/FeatureCollage";
 import { Container } from "@/components/ui/Container";
 import { cx } from "@/components/ui/cx";
+import { Icon } from "@/components/ui/Icon";
 import { IssueRow } from "@/components/ui/IssueRow";
 import { ScoreRing } from "@/components/ui/ScoreRing";
 import { Tabs, TabsAsideSlot, type TabItem } from "@/components/ui/Tabs";
@@ -55,6 +56,28 @@ export function FeatureList({
         </details>
       ) : null}
     </div>
+  );
+}
+
+/**
+ * The home's v1.1 feature list (restored in T033): every bullet with an icon
+ * tile, two columns from sm. The hairline FeatureList above stays for other uses.
+ */
+function IconFeatureList({ items, className }: { items: FeatureItem[]; className?: string }) {
+  return (
+    <ul className={cx("grid gap-x-8 gap-y-7 sm:grid-cols-2", className)}>
+      {items.map((item) => (
+        <li key={item.title} className="flex gap-4">
+          <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-paper text-ink shadow-[inset_0_0_0_1px_var(--color-line)]">
+            <Icon name={item.icon} size={20} />
+          </span>
+          <div className="min-w-0">
+            <h4 className="text-[0.9875rem] font-semibold text-ink">{item.title}</h4>
+            <p className="mt-1.5 text-[0.9375rem] leading-relaxed text-pretty text-muted">{item.body}</p>
+          </div>
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -224,7 +247,8 @@ export function FeatureTabs() {
       content: (
         <div>
           <h3 className="max-w-xl font-serif text-display-sm text-balance text-ink">{tab.title}</h3>
-          <FeatureList items={tab.bullets} visible={4} className="mt-8" />
+          <p className="mt-4 max-w-xl text-[1.0625rem] leading-relaxed text-pretty text-muted">{tab.body}</p>
+          <IconFeatureList items={tab.bullets} className="mt-9" />
         </div>
       ),
       aside: <Card />,
@@ -232,9 +256,9 @@ export function FeatureTabs() {
   });
 
   return (
-    <section aria-labelledby="features-title" className="relative overflow-clip py-20 sm:py-28">
+    <section aria-labelledby="features-title" className="relative overflow-clip py-24 sm:py-32">
       <Container>
-        <h2 id="features-title" className="mb-10 max-w-3xl font-serif text-display-md text-balance text-ink">
+        <h2 id="features-title" className="sr-only">
           What the audit checks
         </h2>
         {/* One shared collage; only the floating card swaps with the tab. */}
@@ -242,6 +266,7 @@ export function FeatureTabs() {
           items={items}
           label="Audit areas"
           layout="split"
+          tone="accent"
           asideFrame={
             <FeatureCollage seed={9}>
               <TabsAsideSlot />
