@@ -1,5 +1,12 @@
 # Status log (newest on top)
 
+## 2026-11-23 07:50 IST: v1.1 LIVE in production; round 3 started (pricing research, smooth scroll, slop removal)
+- **Production:** https://seenhq.vercel.app is v1.1 (founder approved 07:05). PageSpeed mobile: / 98, /audit 99, /sample-report 96, /methodology 98; a11y/BP/SEO 100. docs/LAUNCH_REPORT.md updated.
+- **Founder request (07:40):** deeper pricing + exact-gap research; agents in a feedback loop to fix the site and remove AI slop; awwwards-style smooth scrolling with no FPS cost.
+- **Running (5 agents):** pricing research 1 (price points, India, unit economics) -> docs/research/pricing-1-price-points.md; pricing research 2 (buyer quotes, demand, exact gap) -> docs/research/pricing-2-buyers-and-gap.md; frontend T025 smooth scroll (Lenis, gated; docs/SCROLL_PERF.md); critic copy slop -> docs/reviews/R4-copy-slop.md; critic design/UX -> docs/reviews/R4-design-ux.md.
+- **Exact next step:** when critics + scroll agent finish: content-seo applies R4-copy-slop, frontend-designer applies R4-design-ux (sequential, different files), then a second critic round on the result (loop until critics find little), build, real-browser scroll/FPS check, Lighthouse, preview deploy, ask founder before production. Synthesize the two pricing docs into a recommended price ladder and ask the founder before changing live prices.
+- **Note:** a Workflow launch was denied by the permission system; use ordinary agents.
+
 ## 2026-11-23 03:20 IST: platform-aware fixes added; still WAITING for founder yes to deploy production
 - **Committed + pushed:** platform detection + 135 vendor-verified where-to-click fix entries (ADR-019). 675 tests, typecheck, lint, build green.
 - **Latest preview (final candidate):** https://seenhq-14z10gium-ayushs-projects-32c1d225.vercel.app (audit of webflow.com via its API: 200 in 4.8 s, score 92).
