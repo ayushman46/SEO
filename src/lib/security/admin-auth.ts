@@ -7,7 +7,7 @@
  */
 
 export const ADMIN_USER = "admin";
-export const ADMIN_REALM = "seenhq admin";
+export const ADMIN_REALM = "noticr admin";
 /** Shorter passwords are treated as "not configured" (→ /admin is a 404). */
 export const ADMIN_PASSWORD_MIN_LENGTH = 12;
 

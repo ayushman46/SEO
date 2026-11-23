@@ -5,7 +5,7 @@ import { catalogItem, formatPrice, largerJobPriceIn } from "@/lib/quote/catalog"
 export const servicesPage = {
   metaTitle: "Fixed-price SEO and GEO services, no contract",
   metaDescription:
-    "Fixed-price SEO and GEO services done by a person: Full audit $39, Fix sprint $149 for up to 8 fixes, monitoring $19 a month. No contract.",
+    "Fixed-price SEO and GEO services done by a person: Full audit $39, Fix sprint $149 for up to 8 code fixes, monitoring $19 a month. No contract.",
   kicker: "Services",
   title: "Eight services at published prices, no contract",
   // The page-level limit (Fable's ruling 4): stated once here; cards keep only limits unique to them.
@@ -67,9 +67,9 @@ export const services = [
     slug: "technical-fixes",
     name: "Fix sprint",
     tagline: "A one-time sprint where we fix the issues for you.",
-    description: `We make up to 8 of the highest-impact fixes from your audit, on one site and a platform we can access. Larger jobs get a fixed quote from ${fixSprintLargerJob} before work starts.`,
+    description: `We make up to 8 of the highest-impact code fixes from your audit, on one site and a platform we can access. Larger jobs get a fixed quote from ${fixSprintLargerJob} before work starts.`,
     deliverables: [
-      "Up to 8 fixes from your report, agreed up front",
+      "Up to 8 code fixes from your report, agreed up front",
       "Typical fixes: page titles and descriptions, robots.txt, sitemap, structured data, llms.txt and image sizes",
       "Before/after proof for every fix",
     ],

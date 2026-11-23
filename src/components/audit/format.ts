@@ -14,10 +14,14 @@ export function splitInlineCode(text: string): { code: boolean; text: string }[]
   return parts.map((t, i) => ({ code: i % 2 === 1, text: t })).filter((p) => p.text.length > 0);
 }
 
-/** Only http(s) URLs become links; anything else renders as text. */
+/** Reserved TLDs (RFC 2606/6761) can never resolve, e.g. the sample report's fictional site. */
+const RESERVED_TLD = /\.(example|test|invalid|localhost)\.?$/i;
+
+/** Only http(s) URLs on a resolvable host become links; anything else renders as text. */
 export function safeHref(url: string): string | null {
   try {
     const u = new URL(url);
+    if (RESERVED_TLD.test(u.hostname)) return null; // a link there only opens a DNS error (R7 #13)
     return u.protocol === "http:" || u.protocol === "https:" ? u.href : null;
   } catch {
     return null;

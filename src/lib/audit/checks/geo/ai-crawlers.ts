@@ -30,7 +30,7 @@ export const aiCrawlersCheck: Check = (ctx) => {
   // leaves the homepage open while hiding the content.
   const urls = [...new Set([home, ...ctx.pages.map((p) => p.url)])];
   // A generic deep path tells "blocks the site except a few pages" apart from "blocks one section".
-  const probe = `${ctx.origin}/seenhq-robots-probe/page`;
+  const probe = `${ctx.origin}/noticr-robots-probe/page`;
 
   const blocked: typeof AI_BOTS = [];
   const partial: { bot: (typeof AI_BOTS)[number]; disallowed: string[] }[] = [];

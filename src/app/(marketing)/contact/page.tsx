@@ -6,10 +6,14 @@ import { ContactForm } from "@/components/contact/ContactForm";
 import { PageHero } from "@/components/pages/PageHero";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
+import { cx } from "@/components/ui/cx";
 import { stripPlaceholder } from "@/components/ui/PlaceholderText";
 import { Steps } from "@/components/ui/Steps";
 
 export const metadata = pageMetadata.contact;
+
+/** Hides the audit prompt while the form carries a quote from an audit (ContactForm's data-has-quote, R7 #11). */
+const HIDE_WITH_QUOTE = "group-has-[[data-has-quote]]/contact:hidden";
 
 export default function ContactPage() {
   const email = stripPlaceholder(site.contactEmail).trim();
@@ -28,7 +32,7 @@ export default function ContactPage() {
 
       <div className="mt-8 border-t border-line-strong sm:mt-10">
         <div className="paper-grain bg-paper py-10 sm:py-14">
-          <Container className="grid gap-10 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)] lg:gap-14 xl:gap-20">
+          <Container className="group/contact grid gap-10 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)] lg:gap-14 xl:gap-20">
             <div className="min-w-0">
               <ContactForm honeypotName={CONTACT_HONEYPOT_FIELD} />
             </div>
@@ -39,7 +43,8 @@ export default function ContactPage() {
               </h2>
               <Steps steps={contactNextSteps.steps} layout="list" className="mt-6" />
 
-              <div className="mt-10 border-t border-ink pt-6">
+              {/* without an email the prompt is all this block holds, so the whole block hides with it */}
+              <div className={cx("mt-10 border-t border-ink pt-6", email ? undefined : HIDE_WITH_QUOTE)}>
                 {email ? (
                   <p className="text-lg font-medium break-all text-ink">
                     <a
@@ -50,7 +55,7 @@ export default function ContactPage() {
                     </a>
                   </p>
                 ) : null}
-                <div className={email ? "mt-6 border-t border-line pt-5" : undefined}>
+                <div className={cx(email ? "mt-6 border-t border-line pt-5" : undefined, HIDE_WITH_QUOTE)}>
                   <p className="text-[0.9375rem] leading-relaxed text-pretty text-muted">{contactNextSteps.auditPrompt.body}</p>
                   <Button href={contactNextSteps.auditPrompt.cta.href} variant="link" icon="arrow-right" className="mt-3">
                     {contactNextSteps.auditPrompt.cta.label}

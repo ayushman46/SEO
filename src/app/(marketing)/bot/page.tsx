@@ -16,7 +16,7 @@ export default function BotPage() {
     <div className="grid grid-cols-[minmax(0,1fr)] gap-6">
       <div>
         <h3 className="text-[0.9375rem] font-semibold text-ink">Normal requests</h3>
-        <CodeBlock label="seenhqbot user agent" className="mt-2.5">
+        <CodeBlock label="noticrbot user agent" className="mt-2.5">
           {botUserAgent(origin)}
         </CodeBlock>
       </div>
@@ -41,7 +41,7 @@ export default function BotPage() {
         </h3>
         <CopyButton text={botRobotsRule} label="robots.txt rule" />
       </div>
-      <CodeBlock label="robots.txt rule that blocks seenhqbot" className="mt-3">
+      <CodeBlock label="robots.txt rule that blocks noticrbot" className="mt-3">
         {botRobotsRule}
       </CodeBlock>
     </div>
@@ -51,7 +51,7 @@ export default function BotPage() {
     <>
       <JsonLd
         data={[
-          ...innerPageLd({ name: "About seenhqbot", description: botPage.metaDescription, path: "/bot" }),
+          ...innerPageLd({ name: "About noticrbot", description: botPage.metaDescription, path: "/bot" }),
           ...(hasFaqLd ? [faq] : []),
         ]}
       />

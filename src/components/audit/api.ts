@@ -5,7 +5,7 @@ import type { AuditResult, PartialAuditReport } from "@/lib/audit/types";
 export interface FlowError {
   code: string;
   message: string;
-  /** seconds until a retry is allowed (429 only) */
+  /** seconds until a retry is allowed (rate_limited and server_busy) */
   retryAfter?: number;
   /** epoch ms when the error was received, to compute the retry time */
   at: number;
@@ -15,7 +15,13 @@ const SITE_CODES = new Set(["invalid_url", "blocked_host", "unreachable", "timeo
 
 /** Whether a "Try again" with the same input is likely to help. */
 export function isRetryable(code: string): boolean {
-  return code === "unreachable" || code === "timeout" || code === "generic" || code === "internal_error";
+  return (
+    code === "unreachable" ||
+    code === "timeout" ||
+    code === "generic" ||
+    code === "internal_error" ||
+    code === "server_busy"
+  );
 }
 
 export function isSiteError(code: string): boolean {
@@ -33,6 +39,7 @@ export function toFlowError(code: string, retryAfter?: number): FlowError {
     case "not_html":
     case "too_large":
     case "rate_limited":
+    case "server_busy":
     case "invalid_or_expired":
       message = auditErrors[code];
       break;

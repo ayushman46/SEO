@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { auditEmailGate, auditErrors } from "@/content/audit";
 import type { AuditIssue } from "@/lib/audit/types";
-import { isRetryable, looksLikeEmail, toFlowError } from "./api";
+import { afterEach, vi } from "vitest";
+import { isRetryable, looksLikeEmail, requestAudit, toFlowError } from "./api";
 import { displayUrl, formatMetric, groupIssues, rateMetric, safeHref, splitInlineCode } from "./format";
 
 describe("splitInlineCode", () => {
@@ -31,6 +32,13 @@ describe("safeHref / displayUrl", () => {
     expect(safeHref("https://a.com/x")).toBe("https://a.com/x");
     expect(safeHref("javascript:alert(1)")).toBeNull();
     expect(safeHref("not a url")).toBeNull();
+  });
+  it("never links to a reserved TLD that cannot resolve (R7 #13)", () => {
+    expect(safeHref("https://www.marigold-dental.example/fees/")).toBeNull();
+    expect(safeHref("http://site.test/")).toBeNull();
+    expect(safeHref("https://a.invalid./x")).toBeNull();
+    expect(safeHref("https://example.com/")).toBe("https://example.com/");
+    expect(safeHref("https://shop.example.co.uk/")).toBe("https://shop.example.co.uk/");
   });
   it("shortens same-host URLs to their path", () => {
     expect(displayUrl("https://www.a.com/blog?p=1", "a.com")).toBe("/blog?p=1");
@@ -79,7 +87,7 @@ describe("groupIssues", () => {
 
 describe("error mapping", () => {
   it("maps every API code to copy", () => {
-    for (const code of ["invalid_url", "blocked_host", "unreachable", "timeout", "not_html", "too_large", "rate_limited", "invalid_or_expired"] as const) {
+    for (const code of ["invalid_url", "blocked_host", "unreachable", "timeout", "not_html", "too_large", "rate_limited", "server_busy", "invalid_or_expired"] as const) {
       expect(toFlowError(code).message).toBe(auditErrors[code]);
     }
     expect(toFlowError("consent_required").message).toBe(auditEmailGate.consentRequired);
@@ -94,9 +102,31 @@ describe("error mapping", () => {
   it("knows what is retryable", () => {
     expect(isRetryable("timeout")).toBe(true);
     expect(isRetryable("blocked_host")).toBe(false);
+    expect(isRetryable("server_busy")).toBe(true);
+  });
+  it("keeps server_busy and its retry time (R7 #8)", () => {
+    expect(toFlowError("server_busy", 30)).toMatchObject({ code: "server_busy", message: auditErrors.server_busy, retryAfter: 30 });
   });
   it("checks emails loosely", () => {
     expect(looksLikeEmail("a@b.co")).toBe(true);
     expect(looksLikeEmail("nope")).toBe(false);
+  });
+});
+
+describe("requestAudit error bodies", () => {
+  afterEach(() => vi.unstubAllGlobals());
+  const respond = (status: number, body: unknown) =>
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } })));
+
+  it("shows the server's specific invalid_url reason (R7 #24)", async () => {
+    respond(400, { error: { code: "invalid_url", message: "Only standard web ports (80 and 443) are supported." } });
+    const out = await requestAudit("example.com:8443", new AbortController().signal);
+    expect(out).toMatchObject({ ok: false, error: { code: "invalid_url", message: "Only standard web ports (80 and 443) are supported." } });
+  });
+
+  it("maps a 503 server_busy to its own copy and retry time (R7 #8)", async () => {
+    respond(503, { error: { code: "server_busy", message: "An audit from your network is already running.", retryAfter: 30 } });
+    const out = await requestAudit("example.com", new AbortController().signal);
+    expect(out).toMatchObject({ ok: false, error: { code: "server_busy", message: auditErrors.server_busy, retryAfter: 30 } });
   });
 });

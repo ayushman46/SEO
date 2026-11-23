@@ -47,3 +47,7 @@ next-env.d.ts
 
 .vercel
 .env*
+
+# launch video project (standalone Remotion project)
+/video/node_modules
+/video/out

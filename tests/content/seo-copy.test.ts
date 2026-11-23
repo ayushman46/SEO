@@ -60,6 +60,7 @@ import {
   innerPageLd,
   founderName,
   offerCatalogLd,
+  offerSourceFromExtra,
   organizationLd,
   serializeJsonLd,
   serviceLd,
@@ -142,7 +143,7 @@ describe("page meta lengths", () => {
       const rendered = page.metaTitle + TITLE_SUFFIX;
       expect(rendered.length).toBeGreaterThanOrEqual(30);
       expect(rendered.length).toBeLessThanOrEqual(60);
-      expect(rendered.match(/seenhq/gi)).toHaveLength(1);
+      expect(rendered.match(/noticr/gi)).toHaveLength(1);
     });
     it(`${name}: description 120-155 chars`, () => {
       expect(page.metaDescription.length).toBeGreaterThanOrEqual(120);
@@ -153,7 +154,7 @@ describe("page meta lengths", () => {
   it("home: absolute title <= 60 and description 120-155", () => {
     expect(homeMeta.metaTitle.length).toBeLessThanOrEqual(60);
     expect(homeMeta.metaTitle.length).toBeGreaterThanOrEqual(30);
-    expect(homeMeta.metaTitle.match(/seenhq/gi)).toHaveLength(1);
+    expect(homeMeta.metaTitle.match(/noticr/gi)).toHaveLength(1);
     expect(homeMeta.metaDescription.length).toBeGreaterThanOrEqual(120);
     expect(homeMeta.metaDescription.length).toBeLessThanOrEqual(155);
   });
@@ -171,8 +172,8 @@ describe("page meta lengths", () => {
 });
 
 describe("content rules", () => {
-  it("brand is always lowercase seenhq", () => {
-    expect(allCopy).not.toMatch(/SeenHQ|Seenhq|SEENHQ|seenHQ/);
+  it("brand is always lowercase noticr", () => {
+    expect(allCopy).not.toMatch(/Noticr|NOTICR|NoticR/);
   });
 
   it("never mentions sign up, log in, dashboards or accounts", () => {
@@ -246,7 +247,7 @@ describe("content rules", () => {
     expect(sub.trim().split(/\s+/).length).toBeLessThanOrEqual(40);
     expect(sub).toMatch(/free audit in about a minute/);
     // R6 finding 3: the floor price is $19, so the hero names the Fix sprint terms, not "from $149".
-    expect(sub).toMatch(/fix up to 8 issues for \$149/);
+    expect(sub).toMatch(/up to 8 code fixes for \$149/);
     expect(sub).not.toMatch(/from \$149/);
     expect(sub).toMatch(/no contract/);
     expect(sub).toMatch(/before\/after proof/);
@@ -340,7 +341,9 @@ describe("content rules", () => {
       expect(auditFlowCopy).toHaveProperty(key);
     }
     expect(auditFlowCopy.retryIn(1, "10:00")).toBe("You can try again in about a minute (around 10:00).");
-    expect(auditErrors.server_busy).toBe("We're running a lot of audits right now. Please try again in a minute.");
+    expect(auditErrors.server_busy).toBe(
+      "An earlier audit from your network is still finishing, or we're running a lot of audits right now. Please try again in a minute.",
+    );
     expect(pricingFaqHeading.cta.href).toBe("/contact");
     expect(pricingServicesLink.href).toBe("/services");
   });
@@ -428,6 +431,18 @@ describe("content rules", () => {
     expect(offers[3].priceSpecification).toMatchObject({ price: 19, priceCurrency: "USD", unitText: "MONTH" });
   });
 
+  it("the /pricing catalog covers the tiers and every 'Other services' row (R7 #20)", () => {
+    const offers = offerCatalogLd([...pricingTiers, ...pricingExtrasUsd.map(offerSourceFromExtra)])
+      .itemListElement as Array<Record<string, unknown>>;
+    expect(offers).toHaveLength(8);
+    expect(offers.map((o) => o.price)).toEqual([0, 39, 149, 19, 59, 99, 49, 99]);
+    for (const o of offers) expect(o.priceCurrency).toBe("USD");
+    const local = offers.find((o) => o.name === pricingExtrasUsd[1].name)!;
+    expect(local.priceSpecification).toMatchObject({ price: 99, priceCurrency: "USD", unitText: "per location" });
+    const content = offers[7];
+    expect(content.priceSpecification).toMatchObject({ minPrice: 99, priceCurrency: "USD" });
+  });
+
   it("payment, refund, cancellation, reply time and governing law use the agreed neutral wording", () => {
     const termsText = terms.sections.flatMap((x) => x.body).join(" ");
     expect(termsText).toContain("if we haven't started the work, you get a full refund.");
@@ -449,7 +464,7 @@ describe("content rules", () => {
     expect(site.contactEmail).toBe("");
     // The only address allowed is the contact form's example input placeholder.
     expect(allCopy.replaceAll("you@company.com", "")).not.toMatch(/[\w.+-]+@[\w-]+\.[\w.]+/);
-    expect(aboutSections.map((x) => x.title)).not.toContain("Who is behind seenhq");
+    expect(aboutSections.map((x) => x.title)).not.toContain("Who is behind noticr");
     expect(founderName).toBe("");
     const org = organizationLd();
     expect(org).not.toHaveProperty("email");
@@ -507,10 +522,10 @@ describe("no placeholders left", () => {
 describe("siteUrl", () => {
   afterEach(() => vi.unstubAllEnvs());
   it("normalises scheme-less values and strips paths", () => {
-    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "www.seenhq.example");
-    expect(siteUrl()).toBe("https://www.seenhq.example");
-    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://seenhq.example/home/");
-    expect(siteUrl()).toBe("https://seenhq.example");
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "www.noticr.example");
+    expect(siteUrl()).toBe("https://www.noticr.example");
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://noticr.example/home/");
+    expect(siteUrl()).toBe("https://noticr.example");
   });
 });
 
@@ -621,7 +636,7 @@ describe("json-ld placeholders, authors and dates", () => {
 describe("llms.txt", () => {
   it("follows the llmstxt.org shape", () => {
     const txt = buildLlmsTxt();
-    expect(txt.startsWith("# seenhq\n\n> ")).toBe(true);
+    expect(txt.startsWith("# noticr\n\n> ")).toBe(true);
     expect(txt).toMatch(/^## Key pages$/m);
     expect(txt).toMatch(/^- \[Pricing\]\(https?:\/\/.+\/pricing\): .+$/m);
     const firstH2 = txt.indexOf("\n## ");
@@ -727,16 +742,16 @@ describe("methodology and bot pages (T018)", () => {
   });
 
   it("bot page documents the real user agent, the robots rule and contact", () => {
-    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://seenhq.example");
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://noticr.example");
     expect(botUserAgent(siteUrl())).toBe(userAgent());
     expect([...botSimulatedTokens]).toEqual([...SIMULATED_BOT_TOKENS]);
     for (const t of botSimulatedTokens) expect(botSimulatedUserAgent(t, siteUrl())).toBe(simulatedUserAgent(t));
     vi.unstubAllEnvs();
-    expect(botToken).toBe("seenhqbot");
-    expect(botRobotsRule).toBe("User-agent: seenhqbot\nDisallow: /");
+    expect(botToken).toBe("noticrbot");
+    expect(botRobotsRule).toBe("User-agent: noticrbot\nDisallow: /");
     expect(botSections.find((x) => x.id === "contact")!.cta!.href).toBe("/contact");
     expect(JSON.stringify(botSections)).toMatch(/up to five internal pages/);
-    expect(botFaq.map((f) => f.q)).toContain("How do I block seenhqbot?");
+    expect(botFaq.map((f) => f.q)).toContain("How do I block noticrbot?");
   });
 
   it("new FAQs are kept whole in FAQPage JSON-LD", () => {
@@ -758,6 +773,6 @@ describe("methodology and bot pages (T018)", () => {
     const txt = buildLlmsTxt();
     expect(txt).toMatch(/^- \[How the audit works\]\(https?:\/\/.+\/methodology\): .+$/m);
     expect(txt).toMatch(/^- \[Sample audit report\]\(https?:\/\/.+\/sample-report\): .+$/m);
-    expect(txt).toMatch(/^- \[About seenhqbot\]\(https?:\/\/.+\/bot\): .+$/m);
+    expect(txt).toMatch(/^- \[About noticrbot\]\(https?:\/\/.+\/bot\): .+$/m);
   });
 });

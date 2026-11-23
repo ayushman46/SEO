@@ -19,9 +19,9 @@ Line 78 replace the answer with: "Yes. Our prices are set for small teams and lo
 
 ## 3. [high] [honesty] src/content/legal.ts:39
 
-**Issue:** Privacy policy says "We respect robots.txt rules for seenhqbot", but src/lib/audit/crawl.ts fetches the entered URL (line 165), /sitemap.xml and /llms.txt (lines 237-242) before robots.txt is even parsed and regardless of its rules; only the up-to-five internal pages are filtered with isBlocked(..., OUR_BOT) (crawl.ts:287). Also line 40 says "the homepage address" is sent to Google, while crawl.ts:160 sends the URL the user entered (`fetchPsi(requestedUrl)`), which may be a deeper page.
+**Issue:** Privacy policy says "We respect robots.txt rules for noticrbot", but src/lib/audit/crawl.ts fetches the entered URL (line 165), /sitemap.xml and /llms.txt (lines 237-242) before robots.txt is even parsed and regardless of its rules; only the up-to-five internal pages are filtered with isBlocked(..., OUR_BOT) (crawl.ts:287). Also line 40 says "the homepage address" is sent to Google, while crawl.ts:160 sends the URL the user entered (`fetchPsi(requestedUrl)`), which may be a deeper page.
 
-**Fix:** Line 39 replace with: "When you enter a website address, our crawler (user agent \"seenhqbot\") fetches publicly available pages from that site: the address you entered (normally the homepage), robots.txt, the sitemap, llms.txt and up to five internal pages. We always read the page you asked us to audit; for the internal pages we skip anything the site's robots.txt disallows for seenhqbot. We never submit forms and never access password-protected areas."
+**Fix:** Line 39 replace with: "When you enter a website address, our crawler (user agent \"noticrbot\") fetches publicly available pages from that site: the address you entered (normally the homepage), robots.txt, the sitemap, llms.txt and up to five internal pages. We always read the page you asked us to audit; for the internal pages we skip anything the site's robots.txt disallows for noticrbot. We never submit forms and never access password-protected areas."
 Line 40 replace with: "We also send the address you entered to Google PageSpeed Insights to measure performance. Google processes that request under its own terms and privacy policy."
 
 ## 4. [high] [conversion] src/content/services.ts:29
@@ -72,7 +72,7 @@ Leave pricing.ts:39 (href "/contact?service=seo-audit") as is: the contact enum 
 
 **`C:\Users\Ayush\Downloads\SEO\src\content\services.ts:21`** — changed from the proposal (drop "and corrected"):
 ```
-"The automated seenhq report for your key pages, checked by a person",
+"The automated noticr report for your key pages, checked by a person",
 ```
 
 **`services.ts:25`** — as proposed:
@@ -89,16 +89,16 @@ If the founder does want a fixed question count, add it later as a `[PLACEHOLDER
 
 ## 6. [high] [conversion] src/content/home.ts:196
 
-**Issue:** The dark section promises something the free audit does not do, then sends the reader to the free audit. Body: "the engine has already decided which sources to trust. seenhq shows you whether yours is one of them", CTA "Check my site" -> /audit. The free audit never asks an AI engine anything: its GEO checks are readiness signals only (src/lib/audit/checks/geo: ai-crawlers, llms-txt, organization-schema, faq, author, dates, answer-ready, entity-consistency). Only the paid GEO audit looks at who engines actually mention (services.ts:36). A founder who runs the audit expecting "am I cited by ChatGPT: yes/no" gets a score instead, which reads as bait and undercuts the honest tone of the FAQ at home.ts:231.
+**Issue:** The dark section promises something the free audit does not do, then sends the reader to the free audit. Body: "the engine has already decided which sources to trust. noticr shows you whether yours is one of them", CTA "Check my site" -> /audit. The free audit never asks an AI engine anything: its GEO checks are readiness signals only (src/lib/audit/checks/geo: ai-crawlers, llms-txt, organization-schema, faq, author, dates, answer-ready, entity-consistency). Only the paid GEO audit looks at who engines actually mention (services.ts:36). A founder who runs the audit expecting "am I cited by ChatGPT: yes/no" gets a score instead, which reads as bait and undercuts the honest tone of the FAQ at home.ts:231.
 
 **Fix:** home.ts:196, replace body with:
   body: "When someone asks an AI assistant for the best tool, clinic or café near them, the engine has already decided which sources to trust. The free audit shows whether your site gives those engines what they need to read, trust and quote you, and what to change if it doesn't.",
 
 ## 7. [high] [self-audit] src/lib/seo/metadata.ts:93
 
-**Issue:** No author signal is emitted anywhere, so our own `geo.author` check (weight 7 of 88 GEO points, src/lib/audit/checks/geo/author.ts) scores 0 on seenhq. The engine accepts only <meta name="author">, rel=author, byline classes, JSON-LD `author`, a Person node or `founder`. rootMetadata sets `creator` and `publisher`, which Next 16.4 renders as <meta name="creator"> / <meta name="publisher"> (not recognised), buildMetadata sets neither, and no JSON-LD helper emits author/founder/Person.
+**Issue:** No author signal is emitted anywhere, so our own `geo.author` check (weight 7 of 88 GEO points, src/lib/audit/checks/geo/author.ts) scores 0 on noticr. The engine accepts only <meta name="author">, rel=author, byline classes, JSON-LD `author`, a Person node or `founder`. rootMetadata sets `creator` and `publisher`, which Next 16.4 renders as <meta name="creator"> / <meta name="publisher"> (not recognised), buildMetadata sets neither, and no JSON-LD helper emits author/founder/Person.
 
-**Fix:** In metadata.ts add `authors` in both places (Next renders it as <meta name="author" content="seenhq"> plus <link rel="author" href=…>, confirmed in node_modules/next/dist/lib/metadata/metadata-elements.js):
+**Fix:** In metadata.ts add `authors` in both places (Next renders it as <meta name="author" content="noticr"> plus <link rel="author" href=…>, confirmed in node_modules/next/dist/lib/metadata/metadata-elements.js):
 1) buildMetadata return, after line 63 `description,`:
     authors: [{ name: site.name, url: siteUrl() }],
 2) rootMetadata, before line 93 `creator: site.name,`:
@@ -121,10 +121,10 @@ Every page that renders websiteLd() then satisfies hasDateSignal() (`typeof n.da
 
 ## 9. [medium] [honesty] src/content/home.ts:196
 
-**Issue:** Promises AI-visibility detection the product does not have. "the engine has already decided which sources to trust. seenhq shows you whether yours is one of them" claims seenhq reports whether AI engines trust/cite the site; the free audit only checks readiness signals (crawler access, llms.txt, schema, answer-ready content) and never queries any engine. Same overclaim in homeMeta.metaDescription (line 246: "See how Google, ChatGPT, Perplexity and AI Overviews read your site") and in the AI Overviews FAQ (line 211: being a linked source "depends on the same signals our GEO checks look at"), which states as fact how Google selects sources and is also emitted into FAQPage JSON-LD and llms.txt.
+**Issue:** Promises AI-visibility detection the product does not have. "the engine has already decided which sources to trust. noticr shows you whether yours is one of them" claims noticr reports whether AI engines trust/cite the site; the free audit only checks readiness signals (crawler access, llms.txt, schema, answer-ready content) and never queries any engine. Same overclaim in homeMeta.metaDescription (line 246: "See how Google, ChatGPT, Perplexity and AI Overviews read your site") and in the AI Overviews FAQ (line 211: being a linked source "depends on the same signals our GEO checks look at"), which states as fact how Google selects sources and is also emitted into FAQPage JSON-LD and llms.txt.
 
 **Fix:** Required change (src/content/home.ts line 196), replace the body string with:
-"When someone asks an AI assistant for the best tool, clinic or café near them, the engine has already decided which sources to trust. seenhq shows you whether your site is ready to be one of them, and what to change if it isn't."
+"When someone asks an AI assistant for the best tool, clinic or café near them, the engine has already decided which sources to trust. noticr shows you whether your site is ready to be one of them, and what to change if it isn't."
 
 Optional, safe but not required (treat as low priority, not part of the defect):
 - Line 211 answer: "Google AI Overviews are AI-generated summaries that appear at the top of some Google search results, with links to the sources they draw on. Google decides which sources to link. Pages that are crawlable, well structured and answer the question clearly are easier to use as a source, and that is what our GEO checks look at."
@@ -177,7 +177,7 @@ The second assertion guards against an empty (invalid) FAQPage if every item eve
 
 ## 13. [medium] [seo-tech] src/lib/seo/llms.ts:40
 
-**Issue:** The "## Definitions" section breaks the llmstxt.org format. Per the spec, free-form content (paragraphs, lists) must come before the first H2; every H2 section is a "file list" whose items are markdown links `[name](url)` with optional `: notes`. Lines 40-43 emit an H2 whose list items are plain Q+A text with no link (`- What is GEO...? GEO, or ...`), so spec-following parsers (e.g. llms_txt2ctx) will drop or mis-parse these items. This is also the format seenhq's own audit sells checks for.
+**Issue:** The "## Definitions" section breaks the llmstxt.org format. Per the spec, free-form content (paragraphs, lists) must come before the first H2; every H2 section is a "file list" whose items are markdown links `[name](url)` with optional `: notes`. Lines 40-43 emit an H2 whose list items are plain Q+A text with no link (`- What is GEO...? GEO, or ...`), so spec-following parsers (e.g. llms_txt2ctx) will drop or mis-parse these items. This is also the format noticr's own audit sells checks for.
 
 **Fix:** Delete lines 40-43 ("## Definitions", "", ...definitions.map(...), "") and emit the definitions as heading-less paragraphs in the pre-H2 details area, immediately before the `Last updated: ${contentUpdated}` line (line 25):
 
@@ -196,7 +196,7 @@ pricing.ts:44 -> price: "From $199 [PLACEHOLDER]",
 pricing.ts:58 -> price: "From $29 [PLACEHOLDER]",
 
 pricing.ts:10, replace intro with:
-  "The seenhq audit is free. If you want a deeper review, hands-on fixes or ongoing monitoring, pick the option that fits. Prices shown are starting prices for a small site. If yours needs more, you get a fixed price by email before any work starts, and you pay nothing until you agree to it. One-time prices are paid once, and monitoring can be cancelled any month."
+  "The noticr audit is free. If you want a deeper review, hands-on fixes or ongoing monitoring, pick the option that fits. Prices shown are starting prices for a small site. If yours needs more, you get a fixed price by email before any work starts, and you pay nothing until you agree to it. One-time prices are paid once, and monitoring can be cancelled any month."
 
 (Both price strings still contain "[PLACEHOLDER", so tests/content/seo-copy.test.ts keeps passing.)
 
@@ -253,7 +253,7 @@ Do not change pricing.ts:78.
 
 ## 17. [medium] [conversion] src/content/audit.ts:47
 
-**Issue:** The paid CTAs are weak or misleading at the two points where intent is highest. (a) After the report, helpCta is a vague "Get help fixing this" -> "/contact" with no service preselected, although the matching offer exists (fix sprint) and /contact prefills its select from ?service= (docs/tasks/006-pages.md:12; pricing.ts already uses it). The reader who just saw a list of problems is not told that seenhq will do the fixing. (b) On pricing, "Book a fix sprint" (pricing.ts:54) and "Start monitoring" (pricing.ts:67) promise a booking or an instant start, but both open the contact form: v1 has no checkout, and pricing.ts:94 says scope is agreed by email and work starts after an invoice is paid. The first tier is honest ("Request a full audit"); the other two are not, and the three verbs are inconsistent for the same action.
+**Issue:** The paid CTAs are weak or misleading at the two points where intent is highest. (a) After the report, helpCta is a vague "Get help fixing this" -> "/contact" with no service preselected, although the matching offer exists (fix sprint) and /contact prefills its select from ?service= (docs/tasks/006-pages.md:12; pricing.ts already uses it). The reader who just saw a list of problems is not told that noticr will do the fixing. (b) On pricing, "Book a fix sprint" (pricing.ts:54) and "Start monitoring" (pricing.ts:67) promise a booking or an instant start, but both open the contact form: v1 has no checkout, and pricing.ts:94 says scope is agreed by email and work starts after an invoice is paid. The first tier is honest ("Request a full audit"); the other two are not, and the three verbs are inconsistent for the same action.
 
 **Fix:** audit.ts:47 -> helpCta: { label: "Have us fix these for you", href: "/contact?service=technical-fixes" },
 
@@ -296,7 +296,7 @@ Callers: /privacy and /terms pass `dateModified: privacy.updated` / `terms.updat
 
 **Issue:** No heading in any content file matches the engine's summary pattern (/tl;dr|summary|key takeaways|in short|at a glance|in brief|quick answer|the short answer|bottom line/ in src/lib/audit/checks/geo/answer-ready.ts), so `geo.answer-ready` (weight 15) is capped at 0.8 and our own report would list the issue `geo.answer-ready:no-summary`. I checked every title/heading string in home.ts, services.ts, pricing.ts, about.ts, contact.ts, audit.ts and legal.ts; 'summary' appears only inside list items, never in a heading.
 
-**Fix:** Line 15: change `title: "What seenhq does",` to `title: "seenhq at a glance",`. The section body is already a genuine 55-word, 2-sentence summary of the product, and /about is one of the five nav links the crawler picks, so hasSummary() becomes true (the check ORs across crawled pages). Requires aboutSections titles to be rendered as h2/h3, which is the natural rendering.
+**Fix:** Line 15: change `title: "What noticr does",` to `title: "noticr at a glance",`. The section body is already a genuine 55-word, 2-sentence summary of the product, and /about is one of the five nav links the crawler picks, so hasSummary() becomes true (the check ORs across crawled pages). Requires aboutSections titles to be rendered as h2/h3, which is the natural rendering.
 
 ## 20. [medium] [self-audit] src/lib/seo/jsonld.tsx:103
 
@@ -310,9 +310,9 @@ Callers: /privacy and /terms pass `dateModified: privacy.updated` / `terms.updat
 
 ## 21. [medium] [self-audit] src/content/legal.ts:5
 
-**Issue:** Two rendered titles are below the engine's 30-character minimum (`seo.title`, 30-60 chars, -0.3 per page plus a `seo.title:length` issue): 'Privacy policy · seenhq' is 23 chars and 'Terms of service · seenhq' is 25 chars. The existing vitest only asserts the upper bound (<= 60), so this slipped through. All other titles measure 45-54 chars and all descriptions 139-155.
+**Issue:** Two rendered titles are below the engine's 30-character minimum (`seo.title`, 30-60 chars, -0.3 per page plus a `seo.title:length` issue): 'Privacy policy · noticr' is 23 chars and 'Terms of service · noticr' is 25 chars. The existing vitest only asserts the upper bound (<= 60), so this slipped through. All other titles measure 45-54 chars and all descriptions 139-155.
 
-**Fix:** Line 5: `metaTitle: "Privacy policy: how we handle your data",` (48 chars with the ' · seenhq' suffix).
+**Fix:** Line 5: `metaTitle: "Privacy policy: how we handle your data",` (48 chars with the ' · noticr' suffix).
 Line 11: `metaTitle: "Terms of service: audits and paid services",` (51 chars with suffix).
 The on-page H1s come from privacy.title / terms.title and llms.ts uses its own literals, so nothing else changes. Recommended companion assertion in tests/content/seo-copy.test.ts: `expect((page.metaTitle + TITLE_SUFFIX).length).toBeGreaterThanOrEqual(30)`.
 
@@ -324,7 +324,7 @@ The on-page H1s come from privacy.title / terms.title and llms.ts uses its own l
 
 ## 23. [low] [seo-tech] src/lib/seo/metadata.ts:27
 
-**Issue:** siteUrl() trusts NEXT_PUBLIC_SITE_URL verbatim. A scheme-less value such as `seenhq.com` or `www.seenhq.com` (an easy mistake in the Vercel env UI) makes `new URL(siteUrl())` at lines 61 and 86 throw `TypeError: Invalid URL` at module load, which fails every page plus robots.txt, sitemap.xml and llms.txt with an error that does not name the env var. A value with a path (e.g. `https://seenhq.com/home`) would silently prefix every canonical, sitemap URL and JSON-LD @id with that path.
+**Issue:** siteUrl() trusts NEXT_PUBLIC_SITE_URL verbatim. A scheme-less value such as `noticr.com` or `www.noticr.com` (an easy mistake in the Vercel env UI) makes `new URL(siteUrl())` at lines 61 and 86 throw `TypeError: Invalid URL` at module load, which fails every page plus robots.txt, sitemap.xml and llms.txt with an error that does not name the env var. A value with a path (e.g. `https://noticr.com/home`) would silently prefix every canonical, sitemap URL and JSON-LD @id with that path.
 
 **Fix:** Normalise to an origin in siteUrl():
 
@@ -413,7 +413,7 @@ If no square asset is added at all, delete lines 33-38 (the `logo` property) and
 
 ## 27. [low] [seo-tech] src/content/about.ts:4
 
-**Issue:** Two metaTitles already contain the brand and then receive the ` · seenhq` template suffix, so the rendered <title> and og:title repeat it: "About seenhq: SEO and GEO for real businesses · seenhq" (about.ts:4) and "Contact seenhq about an audit or fix · seenhq" (src/content/contact.ts:4). types.ts defines PageCopy.metaTitle as "<title> without brand suffix"; the duplicate brand token wastes title width and is a common trigger for Google title rewrites.
+**Issue:** Two metaTitles already contain the brand and then receive the ` · noticr` template suffix, so the rendered <title> and og:title repeat it: "About noticr: SEO and GEO for real businesses · noticr" (about.ts:4) and "Contact noticr about an audit or fix · noticr" (src/content/contact.ts:4). types.ts defines PageCopy.metaTitle as "<title> without brand suffix"; the duplicate brand token wastes title width and is a common trigger for Google title rewrites.
 
 **Fix:** about.ts line 4: `metaTitle: "About us: SEO and GEO for real businesses",` (41 chars, 50 with suffix).
 contact.ts line 4: `metaTitle: "Contact us about an audit or fix",` (32 chars, 41 with suffix).
@@ -425,5 +425,5 @@ Both stay unique and under the 60-char test limit.
 
 **Fix:** Move the definitions into the free-form area before the first H2 (prose is allowed there). Delete lines 40-43 (`"## Definitions", "", ...definitions.map(...), "",`) and insert after line 26 (the blank line following `Last updated`), before `"## Key pages"`:
     ...definitions.flatMap((f) => [`${f.q} ${f.a}`, ""]),
-The existing llms.txt test (starts with '# seenhq\n\n> ', has '## Key pages', Pricing link line) still passes.
+The existing llms.txt test (starts with '# noticr\n\n> ', has '## Key pages', Pricing link line) still passes.
 

@@ -58,7 +58,7 @@ export class ResendMailer implements Mailer {
   }
 }
 
-const DEFAULT_FROM = "seenhq <onboarding@resend.dev>";
+const DEFAULT_FROM = "noticr <onboarding@resend.dev>";
 
 export function getMailer(): Mailer {
   const env = getServerEnv();

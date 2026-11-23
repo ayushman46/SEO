@@ -375,7 +375,7 @@ const det = runChecks(ctx);
 /* A made-up URL redirects to the homepage (a common CMS setting), so seo.soft-404 warns. */
 const soft404: Soft404Probe = {
   status: "ok",
-  url: u("/seenhq-check-7f3a9c2e"),
+  url: u("/noticr-check-7f3a9c2e"),
   statusCode: 301,
   location: HOME,
   title: null,

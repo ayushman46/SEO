@@ -1,4 +1,4 @@
--- seenhq — 0001_init
+-- noticr — 0001_init
 -- Requires PostgreSQL 13+ (gen_random_uuid() is built in; no extension needed).
 -- Idempotent: safe to run more than once. scripts/migrate.ts wraps each file in a transaction,
 -- so this file deliberately has no BEGIN/COMMIT.

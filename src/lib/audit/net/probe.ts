@@ -9,7 +9,7 @@ import { safeFetch, type SafeFetchOptions, type SafeFetchResult, type SimulatedB
  * Live AI-crawler probe (T016 C, ADR-017). Same host only, through safeFetch (SSRF-pinned), with a
  * labelled simulated User-Agent per bot. HEAD first; GET (small body cap) only for the homepage
  * or when HEAD looks refused/unsupported. Low concurrency, short per-request timeout and a hard
- * phase deadline. The "browser" baseline is the crawler's own seenhqbot response. Never throws.
+ * phase deadline. The "browser" baseline is the crawler's own noticrbot response. Never throws.
  */
 
 export const PROBE_MAX_MS = 6_000;
@@ -104,7 +104,7 @@ export async function probeCrawlers(ctx: AuditContext, opts: ProbeOptions): Prom
   try {
     const home = ctx.pages[0];
     if (!home) return { status: "skipped", reason: "error" };
-    // Baseline: the response our crawler already got. If seenhqbot itself was refused, we can't compare.
+    // Baseline: the response our crawler already got. If noticrbot itself was refused, we can't compare.
     if (home.statusCode >= 400) return { status: "inconclusive", baselineStatus: home.statusCode };
     if (opts.signal?.aborted) return { status: "skipped", reason: "aborted" };
 

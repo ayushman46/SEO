@@ -275,9 +275,9 @@ describe("order hand-off", () => {
 
   it("rejects malformed stored data", () => {
     const { store } = fakeWindow();
-    store.set("seenhq:quote", JSON.stringify({ ...stored, orderFields: { ...stored.orderFields, quote_currency: "EUR" } }));
+    store.set("noticr:quote", JSON.stringify({ ...stored, orderFields: { ...stored.orderFields, quote_currency: "EUR" } }));
     expect(readStoredQuote()).toBeNull();
-    store.set("seenhq:quote", "{not json");
+    store.set("noticr:quote", "{not json");
     expect(readStoredQuote()).toBeNull();
   });
 

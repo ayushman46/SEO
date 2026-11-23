@@ -3,18 +3,18 @@ import type { PageCopy } from "./types";
 export const aboutPage = {
   metaTitle: "About us: a small SEO and GEO studio",
   metaDescription:
-    "seenhq is a small SEO and GEO studio for startups, SaaS teams and local businesses: free audit, fixed-price fixes, no promised rankings.",
+    "noticr is a small SEO and GEO studio for startups, SaaS teams and local businesses: free audit, fixed-price fixes, no promised rankings.",
   kicker: "About",
   title: "A small studio for SEO and AI search",
   intro:
-    "seenhq is a small SEO and GEO studio. We audit websites for Google and AI answer engines, then fix what the audit finds.",
+    "noticr is a small SEO and GEO studio. We audit websites for Google and AI answer engines, then fix what the audit finds.",
 } satisfies PageCopy;
 
 export const aboutSections: { title: string; body: string }[] = [
   {
     // "In short" keeps one summary heading on our own site (geo.answer-ready looks for one).
-    title: "seenhq in short",
-    body: "seenhq checks for free, in about a minute, whether Google and AI answer engines such as ChatGPT can read your website. Our paid services fix what it finds at a fixed price, with no contract.",
+    title: "noticr in short",
+    body: "noticr checks for free, in about a minute, whether Google and AI answer engines such as ChatGPT can read your website. Our paid services fix what it finds at a fixed price, with no contract.",
   },
   {
     title: "Who we work with",

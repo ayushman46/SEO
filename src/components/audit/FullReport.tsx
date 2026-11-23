@@ -25,7 +25,11 @@ function SubHeading({ id, children, count }: { id: string; children: ReactNode; 
     <h4 id={id} className="scroll-mt-14 font-serif text-display-sm text-balance text-ink lg:scroll-mt-0">
       {children}
       {typeof count === "number" ? (
-        <span className="ml-3 font-sans text-sm font-medium whitespace-nowrap text-muted tabular-nums">{count}</span>
+        <>
+          {/* Out-of-flow separator so the heading text reads "All issues, 18", not "All issues18" (R7 #18). */}
+          <span className="sr-only">, </span>
+          <span className="ml-3 font-sans text-sm font-medium whitespace-nowrap text-muted tabular-nums">{count}</span>
+        </>
       ) : null}
     </h4>
   );
@@ -246,7 +250,12 @@ export function FullReport({
                 className="inline-flex min-h-9 items-center gap-1.5 rounded-pill bg-white px-3.5 text-sm whitespace-nowrap text-ink-2 shadow-[inset_0_0_0_1px_var(--color-line-strong)] hover:text-ink"
               >
                 {t.label}
-                {typeof t.count === "number" ? <span className="text-xs text-muted tabular-nums">{t.count}</span> : null}
+                {typeof t.count === "number" ? (
+                  <>
+                    <span className="sr-only">, </span>
+                    <span className="text-xs text-muted tabular-nums">{t.count}</span>
+                  </>
+                ) : null}
               </a>
             </li>
           ))}
@@ -262,7 +271,12 @@ export function FullReport({
                 className="-ml-px flex items-baseline justify-between gap-2 border-l border-transparent py-1.5 pr-1 pl-4 text-sm text-muted transition-colors hover:border-ink hover:text-ink"
               >
                 {t.label}
-                {typeof t.count === "number" ? <span className="text-xs tabular-nums">{t.count}</span> : null}
+                {typeof t.count === "number" ? (
+                  <>
+                    <span className="sr-only">, </span>
+                    <span className="text-xs tabular-nums">{t.count}</span>
+                  </>
+                ) : null}
               </a>
             </li>
           ))}

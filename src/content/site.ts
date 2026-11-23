@@ -5,10 +5,10 @@ import type { SiteConfig } from "./types";
  * UI and JSON-LD must treat an empty contactEmail as "no public email".
  */
 export const site = {
-  name: "seenhq",
+  name: "noticr",
   tagline: "Be seen by people and by the machines they ask.",
   description:
-    "seenhq audits your website for Google and AI answer engines like ChatGPT and Perplexity, then fixes what stops them reading and quoting it.",
+    "noticr audits your website for Google and AI answer engines like ChatGPT and Perplexity, then fixes what stops them reading and quoting it.",
   contactEmail: "",
   location: "Remote, worldwide",
   nav: [
@@ -90,7 +90,7 @@ export const offerLines = {
 
 /** Small line under the engine strip. */
 export const enginesDisclaimer =
-  "Logos are trademarks of their respective owners. seenhq is not affiliated with or endorsed by them.";
+  "Logos are trademarks of their respective owners. noticr is not affiliated with or endorsed by them.";
 
 /** Visible label for the "Last updated" line pages render next to contentUpdated. */
 export const lastUpdatedLabel = "Last updated";

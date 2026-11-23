@@ -15,7 +15,7 @@ import { isAuthorizedAdmin } from "@/lib/security/admin-auth";
  * <Suspense> boundary makes this content request-time while the shell stays static.
  */
 export const metadata: Metadata = {
-  title: "Admin · seenhq",
+  title: "Admin · noticr",
   robots: { index: false, follow: false, nocache: true },
 };
 
@@ -78,7 +78,7 @@ function QuoteCell({ quote, auditId, auditUrl }: { quote: StoredQuote | null; au
 export default function AdminPage() {
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-10 text-foreground">
-      <h1 className="text-2xl font-semibold">seenhq admin</h1>
+      <h1 className="text-2xl font-semibold">noticr admin</h1>
       <Suspense fallback={<p className="mt-6 text-sm opacity-70">Loading…</p>}>
         <AdminContent />
       </Suspense>

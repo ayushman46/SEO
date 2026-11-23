@@ -252,7 +252,9 @@ export function ContactForm({ honeypotName }: { honeypotName: string }) {
   }, [state]);
 
   return (
-    <div>
+    // Marks the page while a quote is attached (or was just sent with one: the stored quote is
+    // cleared on success), so /contact can hide its "Haven't run the free audit yet?" prompt (R7 #11).
+    <div data-has-quote={stored !== null || sentWithQuote ? "" : undefined}>
       {/* short status text only: always present so the change is announced; the panel below gets focus */}
       <div role="status" aria-live="polite" className="sr-only">
         {state?.ok ? contactForm.success.title : quoteNote}
@@ -269,15 +271,18 @@ export function ContactForm({ honeypotName }: { honeypotName: string }) {
             {contactForm.success.title}
           </h2>
           <p className="mt-4 max-w-lg text-[1.0625rem] leading-relaxed text-pretty text-muted">
-            <PlaceholderText value={contactForm.success.body} />
+            <PlaceholderText value={sentWithQuote ? contactForm.successWithQuote.body : contactForm.success.body} />
           </p>
           {/* the generic steps are already beside the form; repeat steps only when they differ (quote sent) */}
           {sentWithQuote ? <NextSteps steps={contactQuoteCopy.nextSteps} /> : null}
-          <div className="mt-8">
-            <Button href={contactForm.success.cta.href} icon="arrow-right">
-              {contactForm.success.cta.label}
-            </Button>
-          </div>
+          {/* a buyer who just sent a quote from their report has already run the audit (R7 #11) */}
+          {sentWithQuote ? null : (
+            <div className="mt-8">
+              <Button href={contactForm.success.cta.href} icon="arrow-right">
+                {contactForm.success.cta.label}
+              </Button>
+            </div>
+          )}
         </div>
       ) : null}
 

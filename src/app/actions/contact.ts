@@ -160,7 +160,7 @@ export async function submitContact(
   const kind = quote && !quote.malformed ? "order request" : "enquiry";
   after(async () => {
     const emailed = await notifyTeam(
-      `New seenhq ${kind}: ${data.name} (${data.service})`,
+      `New noticr ${kind}: ${data.name} (${data.service})`,
       [
         `Name: ${data.name}`,
         `Email: ${data.email}`,

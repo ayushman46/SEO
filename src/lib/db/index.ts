@@ -10,14 +10,14 @@ export type { Sql };
  * can degrade gracefully. Cached on globalThis so dev hot-reloads don't leak connection pools.
  */
 const globalForDb = globalThis as typeof globalThis & {
-  __seenhqDb?: { url: string; sql: Sql };
+  __noticrDb?: { url: string; sql: Sql };
 };
 
 export function getDb(): Sql | null {
   const url = getServerEnv().DATABASE_URL;
   if (!url) return null;
 
-  const cached = globalForDb.__seenhqDb;
+  const cached = globalForDb.__noticrDb;
   if (cached && cached.url === url) return cached.sql;
 
   const sql = postgres(url, {
@@ -32,7 +32,7 @@ export function getDb(): Sql | null {
     query_timeout: 5,
     onnotice: false,
   });
-  globalForDb.__seenhqDb = { url, sql };
+  globalForDb.__noticrDb = { url, sql };
   return sql;
 }
 

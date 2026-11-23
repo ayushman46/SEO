@@ -13,7 +13,7 @@ Not copy, but seen while reading: the build was made without `NEXT_PUBLIC_SITE_U
 ## First screens
 
 **/** First 60 words: "Be seen by people and by the machines they ask. Paste your website address. In about a minute you get scores and a ranked list of what stops Google and AI answer engines like ChatGPT and Perplexity from reading and quoting your site, with the fix for each. [Website address] [Run free audit] We only read public pages, the same way a search engine does. See a sample report."
-Would they act: yes on the free audit, the field is right there. But the H1 is still the slogan, and nothing says seenhq fixes things, what that costs, or that there is no contract. The owner escaping a retainer gets no signal until a price list six screens down. See edits 3 and 4.
+Would they act: yes on the free audit, the field is right there. But the H1 is still the slogan, and nothing says noticr fixes things, what that costs, or that there is no contract. The owner escaping a retainer gets no signal until a price list six screens down. See edits 3 and 4.
 
 **/pricing** First 60 words: "Prices for small teams and local businesses. The audit is free. Fixed prices. No contract, no minimum term, no exit fee. Before/after proof: we re-run the audit after the work and send you what changed. Our Full audit and Fix sprint are priced below typical freelancer and agency rates for the same scope. We confirm scope and a fixed quote in writing before any paid work starts."
 Would they act: they would keep reading, which is the problem. Sixty words and no number. The H1 says who it is for, not what it costs, and the intro is six sentences, one of them an unsourced comparison. See edit 5.
@@ -38,7 +38,7 @@ Reason: the sample report shows 18 issues, 11 of them with a "Have us fix this Â
 ### 3. `src/content/home.ts:8` (hero.subtitle)
 Current: `"Paste your website address. In about a minute you get scores and a ranked list of what stops Google and AI answer engines like ChatGPT and Perplexity from reading and quoting your site, with the fix for each."`
 Replace: `"Paste your website address. In about a minute you get a free, ranked list of what stops Google and AI answer engines like ChatGPT from reading your site. Fix it yourself, or we fix up to 8 items for $149. No contract."`
-Reason: the hero never says free in prose, never says seenhq does the work, and never names a price. This puts the whole offer in the first 45 words.
+Reason: the hero never says free in prose, never says noticr does the work, and never names a price. This puts the whole offer in the first 45 words.
 
 ### 4. `src/components/home/Sections.tsx:118` and `src/content/home.ts:193` (servicesTeaser.body, not rendered)
 Current (in content, never shown): `"Eight services, each with a fixed scope and a price shown up front, each done by a person. Before/after proof: we re-run the audit after the work and send you what changed."`
@@ -169,13 +169,13 @@ Replace: `"You pay nothing until you accept the quote."`
 Reason: the first is an apology nobody asked for and step 2 already says the reply comes by email. "Not the right fit" is agency talk.
 
 ### 25. `src/content/about.ts:17,25,32`
-Current: `"A small business has no easy way to tell whether Google and AI answer engines such as ChatGPT and Perplexity can read its website. seenhq checks that for free in about a minute. Our paid services fix what it finds, with no agency retainer."`
-Replace: `"seenhq checks for free, in about a minute, whether Google and AI answer engines such as ChatGPT can read your website. Our paid services fix what it finds at a fixed price, with no contract."`
+Current: `"A small business has no easy way to tell whether Google and AI answer engines such as ChatGPT and Perplexity can read its website. noticr checks that for free in about a minute. Our paid services fix what it finds, with no agency retainer."`
+Replace: `"noticr checks for free, in about a minute, whether Google and AI answer engines such as ChatGPT can read your website. Our paid services fix what it finds at a fixed price, with no contract."`
 Current: `"Before we start, you get what we found, what is worth fixing and a fixed price. We never promise rankings or AI citations."`
 Replace: `"Before we start, you get what we found, what is worth fixing and a fixed price. After the work we re-run the audit and send you what changed. We never promise rankings or AI citations."`
 Current: `"Start with the free audit, or tell us about your site and we will reply by email with next steps."`
 Replace: `"Start with the free audit, or tell us about your site and we reply by email within two working days."`
-Reason: result first (rule 1); the proof line is missing from the page that explains how seenhq works; the reply time is stated everywhere except here.
+Reason: result first (rule 1); the proof line is missing from the page that explains how noticr works; the reply time is stated everywhere except here.
 Not fixable by an editor: "done by a person" appears on six pages and /about names no person. Do not invent one. If the founder is willing to be named, one line here is worth more than every other edit in this list.
 
 ### 26. `src/lib/audit/issues.ts:844-846` and `:879-882` (over-explained issue text)
@@ -194,7 +194,7 @@ Reason: rule 4, no question headings outside an FAQ. The test only covers `title
 
 ### 28. Meta
 `src/content/pricing.ts:12` Current: `"Pricing: free audit, then pay as you go"` Replace: `"Pricing: free audit, fixed prices, no contract"` (55 rendered chars). Reason: nothing is pay-as-you-go; it is fixed price per job.
-`src/content/services.ts:4-6` Current title: `"SEO and GEO services for small teams"` Replace: `"Fixed-price SEO and GEO services, no contract"` (54). Current description: `"Eight fixed-scope services from seenhq: SEO and GEO audits, fixes, content, monitoring, AI fact-checks, local AI setup and AI crawler unblocking."` Replace: `"Fixed-price SEO and GEO services done by a person: Full audit $39, Fix sprint $149 for up to 8 fixes, monitoring $19 a month. No contract."` (138).
+`src/content/services.ts:4-6` Current title: `"SEO and GEO services for small teams"` Replace: `"Fixed-price SEO and GEO services, no contract"` (54). Current description: `"Eight fixed-scope services from noticr: SEO and GEO audits, fixes, content, monitoring, AI fact-checks, local AI setup and AI crawler unblocking."` Replace: `"Fixed-price SEO and GEO services done by a person: Full audit $39, Fix sprint $149 for up to 8 fixes, monitoring $19 a month. No contract."` (138).
 `src/content/home.ts:265` Current: `"Free SEO and GEO audit for startups and local businesses. Check what Google and AI answer engines need from your site, and get a ranked list of fixes."` Replace: `"Free SEO and GEO audit in about a minute, then fixed-price fixes done for you: Full audit $39, Fix sprint $149 for up to 8 fixes. No contract."` (142).
 `src/content/contact.ts:6` Current: `"Tell us about your website and what you need, from a full SEO or GEO audit to hands-on fixes. We reply by email with next steps and a fixed quote."` Replace: `"Tell us about your website. A person replies by email within two working days with a fixed quote, and nothing starts until you agree to it."` (139).
 All other titles (41 to 60 rendered) and descriptions (136 to 153) are in range and match their pages.

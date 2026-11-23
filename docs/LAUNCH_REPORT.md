@@ -1,4 +1,4 @@
-# seenhq launch report
+# noticr launch report
 
 ## Before you take orders
 Until these are set in Vercel, every contact message, order request and audit lead exists **only in the Vercel runtime logs**, which are short-lived and alert nobody. The visitor is still told "your message is in".
@@ -47,7 +47,7 @@ Our own audit of the live site: 98 overall (SEO 99, GEO 98). Three low warnings:
 | /pricing | 98 | 100 | 100 | 100 |
 | /about | 99 | 100 | 100 | 100 |
 
-Home metrics: FCP 1.1 s, LCP 2.5 s, TBT 30 ms, CLS 0. seenhq's own free audit scores the live site 100 / 100 / 100 (SEO / GEO, all 21 checks pass).
+Home metrics: FCP 1.1 s, LCP 2.5 s, TBT 30 ms, CLS 0. noticr's own free audit scores the live site 100 / 100 / 100 (SEO / GEO, all 21 checks pass).
 
 ## What shipped
 - **Marketing site:** Home, Services (8 services), Pricing (USD + India ₹ switch), About, Contact, Privacy, Terms, 404. Metadata, JSON-LD (Organization, WebSite, Service, OfferCatalog, FAQPage, Breadcrumb), sitemap.xml, robots.txt (AI crawlers allowed), llms.txt, OG image, icons.

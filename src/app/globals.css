@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /*
- * seenhq design tokens. Light mode only in v1, but every color is a CSS
+ * noticr design tokens. Light mode only in v1, but every color is a CSS
  * variable so a dark palette is a swap later (ADR-004).
  * Documented in docs/DESIGN_SYSTEM.md.
  */
@@ -226,14 +226,16 @@
 
 /* Fix tray (audit/quote/FixTray). While it is shown: sticky panels (the email gate) size
    themselves above it (T026); focus and anchor scrolling keep targets clear of it, and the
-   page end can scroll out from under it (R5 #3, WCAG 2.2 SC 2.4.11). FixTray writes the
-   measured height inline on <html>; 5.25rem is only the pre-measure fallback. The body
+   page end can scroll out from under it (R5 #3, WCAG 2.2 SC 2.4.11). FixTray sets
+   data-fix-tray-open on <html> while it is mounted and visible (not merely present in a hidden,
+   kept-alive route: R7 #21) and writes the measured height inline; 5.25rem is only the
+   pre-measure fallback. The body
    padding sits behind the (white) tray when scrolled to the end, so it is never seen. */
-html:has([data-fix-tray]) {
+html[data-fix-tray-open] {
   --fix-tray-h: 5.25rem;
   scroll-padding-bottom: calc(var(--fix-tray-h) + 0.75rem);
 }
-html:has([data-fix-tray]) body {
+html[data-fix-tray-open] body {
   padding-bottom: var(--fix-tray-h);
 }
 

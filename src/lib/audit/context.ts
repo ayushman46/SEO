@@ -110,7 +110,7 @@ export type ProbeTargetKind = "page" | "robots" | "llms";
 export interface ProbeTarget {
   url: string;
   kind: ProbeTargetKind;
-  /** status the crawler (seenhqbot) got for this URL */
+  /** status the crawler (noticrbot) got for this URL */
   baselineStatus: number | null;
   /** body size the crawler got (chars), when known */
   baselineSize: number | null;

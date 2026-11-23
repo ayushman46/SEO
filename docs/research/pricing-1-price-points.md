@@ -1,6 +1,6 @@
-# Pricing research 1: price points for seenhq (2026-11-23)
+# Pricing research 1: price points for noticr (2026-11-23)
 
-Scope: published prices for offers comparable to seenhq's, worldwide and in India, plus unit economics for a small India-based team. This file does not repeat `docs/MARKET_RESEARCH_3_FULL.md` or `docs/CONVERSION_RESEARCH.md`; where a source from those files matters here it is named as "prior research" and not re-listed.
+Scope: published prices for offers comparable to noticr's, worldwide and in India, plus unit economics for a small India-based team. This file does not repeat `docs/MARKET_RESEARCH_3_FULL.md` or `docs/CONVERSION_RESEARCH.md`; where a source from those files matters here it is named as "prior research" and not re-listed.
 
 ## How to read this
 
@@ -8,8 +8,8 @@ Scope: published prices for offers comparable to seenhq's, worldwide and in Indi
 - Source tags: **[V]** vendor selling the thing priced (or a competing thing); **[M]** public marketplace listing; **[3P]** third-party aggregator or blog; **[O]** official or regulator.
 - All prices are sellers' list prices. No transaction data and no buyer willingness-to-pay data was found for these price points. That is the main limit of this file.
 - Exchange rate used: Rs 92.97 per US dollar, the RBI/FBIL reference rate for 2026-11-20 as shown at https://www.msei.in/markets/currency/historical-data/rbireferenceratearchives [3P republishing O]. Rounded to Rs 93 in the sums.
-- seenhq's own page, opened today (https://seenhq.vercel.app/pricing): Full audit $49 / Rs 3,999 "a person reviews an SEO audit and a GEO audit covering up to 50 pages", written plan, written walkthrough, short call on request; Fix sprint from $199 / Rs 14,999 (top issues, robots.txt, sitemap, llms.txt, structured data for business and FAQs, quick performance wins, before/after re-audit); Monitoring $29 / Rs 1,999 per month (monthly re-audit of key pages, short email). Prices exclude tax. No turnaround and no hour cap are stated.
-- At Rs 93 per dollar seenhq's rupee prices equal $43 (audit), $161 (sprint), $21.50 (monitoring), $54 (fact-check), $107.50 (local setup, crawler unblock). India is priced 12% to 28% below the USD list.
+- noticr's own page, opened today (https://seenhq.vercel.app/pricing): Full audit $49 / Rs 3,999 "a person reviews an SEO audit and a GEO audit covering up to 50 pages", written plan, written walkthrough, short call on request; Fix sprint from $199 / Rs 14,999 (top issues, robots.txt, sitemap, llms.txt, structured data for business and FAQs, quick performance wins, before/after re-audit); Monitoring $29 / Rs 1,999 per month (monthly re-audit of key pages, short email). Prices exclude tax. No turnaround and no hour cap are stated.
+- At Rs 93 per dollar noticr's rupee prices equal $43 (audit), $161 (sprint), $21.50 (monitoring), $54 (fact-check), $107.50 (local setup, crawler unblock). India is priced 12% to 28% below the USD list.
 
 ### Not accessible (recorded, not worked around)
 
@@ -106,7 +106,7 @@ Two figures seen only in search-result snippets and **not** confirmed on an open
 ### 1.3 Verdict on $49, $199 and $29/month
 
 **$49 full audit (human, SEO + GEO, up to 50 pages): reads as suspiciously cheap to a buyer outside India.**
-- The cheapest human audits found cost the same or more for a fraction of the scope: $50 for 6 pages from a Pakistan-based freelancer (row 1) and $100 for 10 URLs (row 2). seenhq's per-page price is $0.98; those are $8.30 and $10.
+- The cheapest human audits found cost the same or more for a fraction of the scope: $50 for 6 pages from a Pakistan-based freelancer (row 1) and $100 for 10 URLs (row 2). noticr's per-page price is $0.98; those are $8.30 and $10.
 - Every productised GEO audit with a named seller sits at $249 to $497 (rows 8-11). The vendor-written band for "automated scans" is $99-$499 (row 12), so $49 is priced below what the market calls automated.
 - The $49 price point is already used for automated reports: AisleReady's fix report (prior research) and GoWP gives an AI visibility audit away monthly on its free plan (row 39). A buyer comparing will assume $49 means a tool export.
 - Prior research (WebFX, not re-opened) had 1.72% of 250 US businesses paying under $50 for an audit.
@@ -119,7 +119,7 @@ Two figures seen only in search-result snippets and **not** confirmed on an open
 
 **$29/month monitoring: reads as normal, at the floor for anything with a person in it.**
 - Same price as Seahawk's entry care plan (row 38) and within $10 of GoWP Pro (row 39). Web Cited charges $49/month for weekly prompt readings plus a monthly site re-scan (row 14). Prior research had Otterly at EUR 29.
-- It is far below managed local or GBP services ($499+, rows 32-34), but those include ongoing work, which seenhq's monitoring does not.
+- It is far below managed local or GBP services ($499+, rows 32-34), but those include ongoing work, which noticr's monitoring does not.
 - Risk at this price is not credibility but substitution: GoWP's free plan and free graders cover part of the same job.
 
 ---
@@ -200,9 +200,9 @@ Reading: mainstream SEO suites do not publish rupee list prices. An Indian owner
 |---|---|---|
 | RBI Payment System Report (December 2025 issue, published 2026-05-18), H2 2025: UPI is 85.5% of payment volume but 9.5% of value; NEFT 3.6% of volume and 14.9% of value; RTGS 0.1% of volume and 68.6% of value. Average UPI ticket fell to Rs 1,313 in 2025 | https://rbi.org.in/Scripts/PublicationsView.aspx?id=23813 | O |
 | Razorpay standard pricing (updated May 2026): 2% platform fee on all domestic instruments including UPI, up to 3% on international cards, 18% GST on the fee, no setup fee | https://razorpay.com/pricing/ | V |
-| What Indian service sellers print: Codingclave invoices at the start of each month and takes USD by bank transfer; W3era takes payment in advance at the start of each quarterly cycle; seenhq lists bank transfer, UPI or card with an invoice before work | URLs in 2.1; https://www.w3era.com/seo/pricing/gmb-service-packages/ | V |
+| What Indian service sellers print: Codingclave invoices at the start of each month and takes USD by bank transfer; W3era takes payment in advance at the start of each quarterly cycle; noticr lists bank transfer, UPI or card with an invoice before work | URLs in 2.1; https://www.w3era.com/seo/pricing/gmb-service-packages/ | V |
 
-Reading (inference from the RBI split, not a survey): small-ticket payments run on UPI and larger business payments on NEFT/RTGS. seenhq's rupee prices (Rs 1,999 to Rs 14,999) are small tickets, so UPI by link or QR is the natural default, with bank transfer for GST-registered buyers who want an invoice trail. A survey of how Indian small businesses prefer to pay service vendors: **not found**. Cost of collection: 2.36% domestic and up to 3.54% international through a gateway (fee plus GST on the fee); a direct UPI or bank transfer avoids it.
+Reading (inference from the RBI split, not a survey): small-ticket payments run on UPI and larger business payments on NEFT/RTGS. noticr's rupee prices (Rs 1,999 to Rs 14,999) are small tickets, so UPI by link or QR is the natural default, with bank transfer for GST-registered buyers who want an invoice trail. A survey of how Indian small businesses prefer to pay service vendors: **not found**. Cost of collection: 2.36% domestic and up to 3.54% international through a gateway (fee plus GST on the fee); a direct UPI or bank transfer avoids it.
 
 ### 2.5 GST
 
@@ -217,7 +217,7 @@ Reading (inference from the RBI split, not a survey): small-ticket payments run 
 
 The official texts (section 22 and 24 of the CGST Act, the rate annexure) were **not** read today: the CBIC pages returned no usable content. Treat the table as a brief for a chartered accountant, not as advice.
 
-What this means for the price page: Indian competitors that publish prices state them GST-inclusive (Codingclave, Gaurav Tiwari). seenhq says "prices exclude applicable taxes". If seenhq is registered, a clinic that cannot claim input credit pays Rs 4,719 for the Rs 3,999 audit and Rs 17,699 for the Rs 14,999 sprint, which makes the sprint 18% dearer than Codingclave's near-identical Rs 15,000 inclusive sprint. If seenhq is under the threshold and unregistered, it charges no GST and should say so.
+What this means for the price page: Indian competitors that publish prices state them GST-inclusive (Codingclave, Gaurav Tiwari). noticr says "prices exclude applicable taxes". If noticr is registered, a clinic that cannot claim input credit pays Rs 4,719 for the Rs 3,999 audit and Rs 17,699 for the Rs 14,999 sprint, which makes the sprint 18% dearer than Codingclave's near-identical Rs 15,000 inclusive sprint. If noticr is under the threshold and unregistered, it charges no GST and should say so.
 
 ### 2.6 Credible INR price points
 
@@ -228,7 +228,7 @@ What this means for the price page: Indian competitors that publish prices state
 | One-time | **Rs 2,000 to Rs 10,000** | Google Business listing services at Rs 2,000-5,000 a year (2.1 rows 29, 30); freelancer audit floor Rs 5,000 (row 14); Techpullers audit Rs 10,000 (row 4); local SEO setup Rs 10,000-30,000 from freelancers (row 14) is the ceiling this buyer hears |
 | Monthly | **Rs 1,000 to Rs 4,000 for a light service; Rs 5,000 to Rs 10,000 for managed local SEO** | Listing services Rs 999-3,999/month (rows 16, 31); median IndiaMART SEO listing Rs 10,000/month; Codingclave Local SEO Rs 10,000 incl. GST (row 1); Coherent Lab Rs 10,000-25,000 for clinics and restaurants (row 12) |
 
-seenhq's Rs 3,999 audit and Rs 1,999 monitoring sit inside these ranges. Rs 9,999 for a one-time profile setup is at the top of the range, against listing services sold at Rs 2,000-5,000. Rs 14,999 for a sprint is 1.5 months of a median IndiaMART retainer, which is a real sum for this buyer.
+noticr's Rs 3,999 audit and Rs 1,999 monitoring sit inside these ranges. Rs 9,999 for a one-time profile setup is at the top of the range, against listing services sold at Rs 2,000-5,000. Rs 14,999 for a sprint is 1.5 months of a median IndiaMART retainer, which is a real sum for this buyer.
 
 **(b) Funded startup**
 
@@ -237,7 +237,7 @@ seenhq's Rs 3,999 audit and Rs 1,999 monitoring sit inside these ranges. Rs 9,99
 | One-time | **Rs 10,000 to Rs 25,000 for an audit; Rs 15,000 to Rs 60,000 for audit plus fixes** | Techpullers Rs 10,000 (row 4); Gaurav Tiwari Rs 25,000 (prior research); OneCity Rs 15,000-50,000 (row 7); Codingclave sprint Rs 15,000 (row 2); freelancer one-time optimisation Rs 15,000-60,000 (row 14). GEO-labelled audits from agencies start at Rs 1,50,000 (row 10) but that is a seller's estimate |
 | Monthly | **Rs 2,500 to Rs 6,000 for tracking or monitoring; Rs 25,000 to Rs 45,000 for a retainer** | Pallix Rs 2,499-5,999 (prior research); Codingclave Rs 25,000-45,000 (row 1); Techpullers from Rs 25,000 (row 5); Gaurav Tiwari GEO from Rs 30,000 (row 9); Noir & Blanco Rs 35,000-65,000 (row 6) |
 
-For this buyer seenhq's rupee prices are below the bottom of the range for the audit (Rs 3,999 against Rs 10,000) and at the bottom for the sprint. A startup is not the buyer the 12-28% India discount needs to serve.
+For this buyer noticr's rupee prices are below the bottom of the range for the audit (Rs 3,999 against Rs 10,000) and at the bottom for the sprint. A startup is not the buyer the 12-28% India discount needs to serve.
 
 ---
 
@@ -300,7 +300,7 @@ Bold marks the grade of person the work realistically needs: a mid-level reviewe
 
 **$199 / Rs 14,999 fix sprint: it fits if "from" means a capped job; it does not fit an open-ended "top issues".**
 - Budget is 8 to 10 hours of a technical person (or 14 to 17 of a mid-level one).
-- Market check: eSEOspace sells exactly 8 hours of fixes for $800; Codingclave sells a near-identical scope on sites up to 50 pages for Rs 15,000 including GST over 10 working days; the PeoplePerHour seller does WordPress-only at $190 in 2 days at volume. So 8-10 hours is the normal size of this job, and seenhq's price matches the two cheapest credible sellers.
+- Market check: eSEOspace sells exactly 8 hours of fixes for $800; Codingclave sells a near-identical scope on sites up to 50 pages for Rs 15,000 including GST over 10 working days; the PeoplePerHour seller does WordPress-only at $190 in 2 days at volume. So 8-10 hours is the normal size of this job, and noticr's price matches the two cheapest credible sellers.
 - My estimate (not sourced): robots.txt, sitemap, llms.txt 1-1.5 h; Organization/LocalBusiness and FAQ schema 2-3 h; top three to five audit fixes 2-4 h; quick performance wins 1-2 h; access, QA, re-audit and report 1.5-2 h = 7.5 to 12.5 h. On WordPress with admin access it lands inside the budget. On custom or headless sites, or where the client's developer must deploy, it will not.
 - Conclusion: keep the floor, but state what the floor buys (for example one CMS, up to N fixes or a stated hour cap) and quote above it for anything else. The rupee floor leaves only 8 technical hours, so it has less slack than the dollar floor.
 

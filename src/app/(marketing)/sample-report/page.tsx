@@ -61,7 +61,7 @@ export default function SampleReportPage() {
                   <span className="mb-3 flex items-center gap-2.5 text-kicker font-semibold text-muted uppercase">
                     <span aria-hidden className="h-px w-6 bg-ink/30" />
                     {auditUi.reportFor}
-                  </span>
+                  </span>{" "}
                   <span className="block font-serif text-display-md text-ink [overflow-wrap:anywhere]">{r.hostname}</span>
                 </h2>
               </div>

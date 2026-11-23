@@ -1,6 +1,6 @@
 # Pricing research 2: buyers' own words, demand signals, the exact gap (2026-11-23)
 
-Scope: market-gap and willingness-to-pay evidence for seenhq. This file does not repeat `MARKET_RESEARCH.md`, `MARKET_RESEARCH_2_PRODUCT.md`, `MARKET_RESEARCH_3_FULL.md` or `CONVERSION_RESEARCH.md`; where an earlier finding is needed it is marked "(earlier doc)".
+Scope: market-gap and willingness-to-pay evidence for noticr. This file does not repeat `MARKET_RESEARCH.md`, `MARKET_RESEARCH_2_PRODUCT.md`, `MARKET_RESEARCH_3_FULL.md` or `CONVERSION_RESEARCH.md`; where an earlier finding is needed it is marked "(earlier doc)".
 
 ## How to read this
 
@@ -8,7 +8,7 @@ Scope: market-gap and willingness-to-pay evidence for seenhq. This file does not
 - Pages were read through an automated page reader. Quotes are as the reader returned them; **re-open the page and check the wording before reusing any quote publicly**.
 - Labels: **[B]** buyer speaking first-hand. **[V]** vendor or seller source. **[R]** relayed by a third party. **[S]** seen only in a search-result snippet, page not opened: treat as a lead, not evidence.
 - **Not accessible** (HTTP 403 or equivalent, not worked around): reddit.com, indiehackers.com, community.getjobber.com, biggerpockets.com, flyingsolo.com.au, ukbusinessforums.co.uk, blackhatworld.com, consumeraffairs.com, bbb.org, g2.com, fiverr.com, upwork.com, searchengineland.com (Backlinko survey page), emarketer.com, skynova.com, therodinhoods.com. Failed for other reasons: surmado.com (500), brandedaudits.com (did not resolve), explodingtopics.com topic page (404), wix.com/ai-visibility-overview (404), Shopify App Store search (results did not load), Rankability keyword PDF (downloaded, text not extractable).
-- Selection bias, stated once: most first-hand quotes come from complaint reviews of large small-business marketing vendors on Trustpilot. They show what angry buyers paid, not what satisfied buyers paid or what anyone would pay seenhq.
+- Selection bias, stated once: most first-hand quotes come from complaint reviews of large small-business marketing vendors on Trustpilot. They show what angry buyers paid, not what satisfied buyers paid or what anyone would pay noticr.
 
 ---
 
@@ -73,7 +73,7 @@ BrightLocal, 1,002 US local business owners with 1-50 staff, 2026-10-21 [V]: 85%
 | Founders and startups | $2,000/month (cancelled); $10,000/month (regretted); $700 to $1,250 link package (declined) | 22, 23, 24 |
 | Survey average (2019) | $497/month | 1.2 |
 
-seenhq's $49 / $199 / $149 sit below every monthly figure above and inside the one-off range ($160 to $700). The closest first-hand anchor to a "fix sprint" is the Shopify one-off range.
+noticr's $49 / $199 / $149 sit below every monthly figure above and inside the one-off range ($160 to $700). The closest first-hand anchor to a "fix sprint" is the Shopify one-off range.
 
 ### 1.4 Reasons for distrust, in order of how often they appear in the opened posts
 
@@ -198,7 +198,7 @@ Fiverr and Upwork: **not accessible**. The only Fiverr data is second-hand: GEO 
 | Freelancer quote in Shopify Community [V] | "around $300", 5 to 7 days | A forum reply, not a product; no terms | https://community.shopify.com/t/looking-for-a-shopify-seo-freelance-any-good-suggestions/650709 |
 | OneTimeGEO $297 / $597 / $997 (earlier doc); Upwork "$199 website SEO overhaul" and $199 / $299 tiers [S, not accessible] | | | |
 
-**Verdict: closed on price, open on proof.** Fixed-price fixes at $50 to $300 already exist in several places. What none of the pages opened offers together: a fix list generated from an audit the buyer has already seen, before/after evidence per fix, a named accountable person, coverage of Wix / Squarespace / Shopify as well as WordPress, and nothing held hostage (section 1.4). seenhq's $199 is not cheaper than the market; it has to be more verifiable.
+**Verdict: closed on price, open on proof.** Fixed-price fixes at $50 to $300 already exist in several places. What none of the pages opened offers together: a fix list generated from an audit the buyer has already seen, before/after evidence per fix, a named accountable person, coverage of Wix / Squarespace / Shopify as well as WordPress, and nothing held hostage (section 1.4). noticr's $199 is not cheaper than the market; it has to be more verifiable.
 
 ### (2) Fixing wrong facts about a business in AI answers, under $300
 
@@ -294,7 +294,7 @@ Caution: do not contact reviewers directly; publish for the searches they make.
 | **One-time vs subscription** | Localogy survey of SMB software buying (data April 2023): freemium 29%, one-time purchase 24%, monthly with free trial 22%, monthly without 20%. Sample size not stated. | Usage of software, not preference for services [V] | https://www.localogy.com/2023/12/what-pricing-models-rule-smb-saas/ |
 | | Backlinko 2019: 65% of small-business SEO clients have used several providers; 30% would recommend the current one. | Churn in retainers, old | section 1.2 |
 | | Lock-in, exit fees and billing after cancellation are the third most common complaint in the reviews opened. | Anecdote [B] | section 1.4 |
-| **Very low entry price leading to higher-priced work** | A consulting blog says a $2,000 audit converted 35% of clients to engagements of $20,000 or more (Danilo Kreimer) and that a $2,500 audit leads most clients to $25,000+ (Mike Gammarino). The article attributes figures inconsistently. | Second-hand, vendor blog, far above seenhq's price level [V] | https://wayfront.com/blog/productized-consulting |
+| **Very low entry price leading to higher-priced work** | A consulting blog says a $2,000 audit converted 35% of clients to engagements of $20,000 or more (Danilo Kreimer) and that a $2,500 audit leads most clients to $25,000+ (Mike Gammarino). The article attributes figures inconsistently. | Second-hand, vendor blog, far above noticr's price level [V] | https://wayfront.com/blog/productized-consulting |
 | | Counter-example: a $160 entry offer that grew to $545 was read by the buyer as "too many red flags". | One buyer [B] | section 1.1 row 19 |
 | | No published conversion rate from a paid audit under $100 to a fix under $300. | **Not found** | |
 | **Guarantees on services** | Andreoni, American Economic Journal: Microeconomics (2018), lab experiment: buyers offered $5.60 to $5.70 when the seller gave even a non-binding guarantee, against $1.80 to $2.70 with none; where sellers could choose, only 17% of refund requests were honoured. | Peer-reviewed, but students in a lab game | https://www.aeaweb.org/research/satisfaction-guarantee-buyer-seller-trust |
@@ -306,7 +306,7 @@ Caution: do not contact reviewers directly; publish for the searches they make.
 | | For services in India the evidence is list prices only: agency GEO audits ₹1,50,000+, small-business SEO ₹15,000 to ₹40,000/month, IndiaMART around ₹5,000/month [S]. | Sellers' prices | section 3 (7) |
 | | No controlled test of rupee pricing for a service. | **Not found** | |
 
-What the evidence supports for seenhq's price page, without overreach:
+What the evidence supports for noticr's price page, without overreach:
 
 1. Show every price, including a "from" price for the sprint; the one test found favours a low visible starting price over no price, and a high visible starting price can hurt.
 2. Keep the paid entry small but fix its scope in writing, and never raise the price mid-job; the only first-hand story of a low entry price shows escalation destroying the sale.

@@ -20,7 +20,7 @@ Licenses were checked on the source page / API on 2026-11-22 (Wikimedia `extmeta
 
 ## Brand assets (generated, not third-party)
 `public/logo.png` (512×512), `src/app/icon.svg`, `src/app/apple-icon.png` (180×180) and `src/app/favicon.ico` (32 + 16 px) are
-rendered by `scripts/optimize-images.mjs` from the seenhq eye mark SVG in `src/components/site/Logo.tsx`. Original work, no license needed.
+rendered by `scripts/optimize-images.mjs` from the noticr eye mark SVG in `src/components/site/Logo.tsx`. Original work, no license needed.
 
 ## Engine logos (`public/logos/`, T015)
 

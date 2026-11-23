@@ -476,11 +476,11 @@ export const ISSUE_CATALOG = {
     category: "geo",
     severity: "medium",
     effort: "quick",
-    title: "Pages don't show when they were published or updated",
+    title: "Pages have no published or updated date that search engines and AI can read",
     description:
       "AI assistants prefer fresh, dated information. Without dates they can't tell whether your prices, hours or advice are current.",
     howToFix:
-      "Show a \"Last updated\" date on key pages using `<time datetime=\"2026-01-15\">15 Jan 2026</time>`, and add `datePublished` / `dateModified` to your Article or WebPage schema.",
+      "A date typed as plain text is not counted. Add `\"dateModified\": \"2026-01-15\"` (and `datePublished`) to the page's WebPage or Article JSON-LD, or, where you can edit the HTML, wrap the visible date in `<time datetime=\"2026-01-15\">15 Jan 2026</time>`.",
   },
   "geo.answer-ready:no-answer-blocks": {
     checkId: "geo.answer-ready",

@@ -20,7 +20,7 @@ import {
   pricingTiers,
   pricingTiersInr,
 } from "@/content/pricing";
-import { JsonLd, faqLd, innerPageLd, lastUpdated, offerCatalogLd, pageMetadata } from "@/lib/seo";
+import { JsonLd, faqLd, innerPageLd, lastUpdated, offerCatalogLd, offerSourceFromExtra, pageMetadata } from "@/lib/seo";
 import { SectionTear } from "@/components/collage/SectionTear";
 import { ClosingCta } from "@/components/pages/ClosingCta";
 import { CurrencySwitch } from "@/components/pages/CurrencySwitch";
@@ -63,7 +63,8 @@ export default function PricingPage() {
       <JsonLd
         data={[
           ...innerPageLd({ name: "Pricing", description: pricingPage.metaDescription, path: "/pricing" }),
-          offerCatalogLd(pricingTiers),
+          // Tiers plus "Other services", so the structured price list matches the visible one (R7 #20).
+          offerCatalogLd([...pricingTiers, ...pricingExtrasUsd.map(offerSourceFromExtra)]),
           ...(hasFaqLd ? [faq] : []),
         ]}
       />

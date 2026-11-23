@@ -47,8 +47,8 @@ describe("labelled simulated user agent", () => {
   it("info URL falls back to seenhq.vercel.app and NEXT_PUBLIC_SITE_URL overrides it", () => {
     vi.stubEnv("NEXT_PUBLIC_SITE_URL", "");
     expect(botInfoUrl()).toBe("https://seenhq.vercel.app/bot");
-    expect(userAgent()).toBe("Mozilla/5.0 (compatible; seenhqbot/1.0; +https://seenhq.vercel.app/bot)");
-    expect(simulatedUserAgent("GPTBot/1.3")).toBe("Mozilla/5.0 (compatible; GPTBot/1.3; simulated-by seenhqbot/1.0; +https://seenhq.vercel.app/bot)");
+    expect(userAgent()).toBe("Mozilla/5.0 (compatible; noticrbot/1.0; +https://seenhq.vercel.app/bot)");
+    expect(simulatedUserAgent("GPTBot/1.3")).toBe("Mozilla/5.0 (compatible; GPTBot/1.3; simulated-by noticrbot/1.0; +https://seenhq.vercel.app/bot)");
     vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://example.org/");
     expect(userAgent()).toContain("+https://example.org/bot)");
     expect(simulatedUserAgent("bingbot/2.0")).toContain("+https://example.org/bot)");
@@ -58,16 +58,16 @@ describe("labelled simulated user agent", () => {
     for (const t of SIMULATED_BOT_TOKENS) {
       const ua = simulatedUserAgent(t);
       expect(ua).toContain(t);
-      expect(ua).toMatch(/simulated-by seenhqbot\/1\.0; \+https?:\/\/\S+\/bot\)$/);
+      expect(ua).toMatch(/simulated-by noticrbot\/1\.0; \+https?:\/\/\S+\/bot\)$/);
     }
-    // unknown token → plain seenhqbot UA
-    expect(simulatedUserAgent("EvilBot/9" as never)).toMatch(/^Mozilla\/5\.0 \(compatible; seenhqbot\/1\.0;/);
+    // unknown token → plain noticrbot UA
+    expect(simulatedUserAgent("EvilBot/9" as never)).toMatch(/^Mozilla\/5\.0 \(compatible; noticrbot\/1\.0;/);
   });
 });
 
 describe("probe targets", () => {
   it("homepage + 2 pages + robots.txt (+ llms.txt when present), same host, respecting our robots rules", () => {
-    const t = probeTargets(ctx({ robots: "User-agent: seenhqbot\nDisallow: /about\n" }));
+    const t = probeTargets(ctx({ robots: "User-agent: noticrbot\nDisallow: /about\n" }));
     expect(t.map((x) => x.url)).toEqual([HOME, `${HOME}pricing`, `${HOME}blog`, `${HOME}robots.txt`]);
     expect(t[0].baselineSize).toBeGreaterThan(5_000);
   });
@@ -163,14 +163,14 @@ describe("probeCrawlers + geo.ai-crawler-probe", () => {
     if (p.status === "ok") expect(p.skippedByRobots.filter((s) => s.bot === "GPTBot").length).toBe(3);
   });
 
-  it("seenhqbot baseline refused → inconclusive, unavailable, no requests", async () => {
+  it("noticrbot baseline refused → inconclusive, unavailable, no requests", async () => {
     const { f, calls } = fetcher(okAll);
     const p = await probeCrawlers(ctx({ homeStatus: 403 }), { deadline: deadline(), fetcher: f });
     expect(p).toEqual({ status: "inconclusive", baselineStatus: 403 });
     expect(calls).toHaveLength(0);
     const o = crawlerProbeOutcome(p);
     expect(o.status).toBe("unavailable");
-    expect(o.summary).toMatch(/seenhqbot.*inconclusive/);
+    expect(o.summary).toMatch(/noticrbot.*inconclusive/);
   });
 
   it("HEAD unsupported (405) → falls back to GET", async () => {

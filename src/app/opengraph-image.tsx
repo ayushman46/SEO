@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { site } from "@/content/site";
 
-export const alt = "seenhq: be seen by people and by the machines they ask.";
+export const alt = "noticr: be seen by people and by the machines they ask.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

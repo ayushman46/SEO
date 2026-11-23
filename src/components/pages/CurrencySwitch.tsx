@@ -8,7 +8,7 @@ export type Currency = "usd" | "inr";
 /** Panel ids double as the no-JS anchors (e.g. /pricing#india-pricing). */
 export const CURRENCY_PANEL_ID: Record<Currency, string> = { usd: "usd-pricing", inr: "india-pricing" };
 const ORDER: Currency[] = ["usd", "inr"];
-const CHANGE_EVENT = "seenhq:currency";
+const CHANGE_EVENT = "noticr:currency";
 
 /*
  * The choice lives in the URL hash only (#india-pricing = rupees, no hash = USD):
@@ -110,7 +110,7 @@ export function CurrencySwitch({
 
   return (
     <div data-currency-root="" data-enhanced={enhanced ? "" : undefined} className={className}>
-      <style href="seenhq-currency-switch" precedence="default">
+      <style href="noticr-currency-switch" precedence="default">
         {NO_JS_CSS}
       </style>
       <div

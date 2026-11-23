@@ -1,4 +1,4 @@
-# seenhq
+# noticr
 
 SEO + GEO (Generative Engine Optimization) audits: see how your site shows up in search **and** in AI answers.
 

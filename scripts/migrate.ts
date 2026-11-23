@@ -21,7 +21,7 @@ import postgres, { type TransactionSql } from "postgres";
 import { sslOptionsFor } from "../src/lib/db/ssl";
 
 const MIGRATIONS_DIR = path.resolve(process.cwd(), "db", "migrations");
-const LOCK_KEY = 7_311_420_501; // arbitrary, stable advisory-lock id for seenhq migrations
+const LOCK_KEY = 7_311_420_501; // arbitrary, stable advisory-lock id for noticr migrations
 
 const LOCK_TIMEOUT = "60s";
 

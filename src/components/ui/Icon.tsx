@@ -1,7 +1,7 @@
 import type { SVGProps } from "react";
 
 /**
- * Hand-drawn 24px line icons (1.6 stroke), drawn for seenhq.
+ * Hand-drawn 24px line icons (1.6 stroke), drawn for noticr.
  * Keys match FeatureItem.icon in src/content/types.ts plus a few UI glyphs.
  */
 const paths = {

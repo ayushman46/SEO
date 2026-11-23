@@ -80,10 +80,10 @@ describe("preventSmoothFor", () => {
 });
 
 describe("samePageHashTarget", () => {
-  const here = "https://seenhq.com/pricing";
+  const here = "https://noticr.com/pricing";
   it("returns the id for same-page fragments", () => {
     expect(samePageHashTarget("#india-pricing", here)).toBe("india-pricing");
-    expect(samePageHashTarget("https://seenhq.com/pricing#faq", `${here}#india-pricing`)).toBe("faq");
+    expect(samePageHashTarget("https://noticr.com/pricing#faq", `${here}#india-pricing`)).toBe("faq");
   });
   it("ignores other pages, empty hashes and other origins", () => {
     expect(samePageHashTarget("/services#seo", here)).toBeNull();

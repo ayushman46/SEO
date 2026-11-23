@@ -6,10 +6,16 @@ import { PriceText } from "@/components/pages/PriceText";
 import { useQuote } from "./QuoteContext";
 import { RequestLink } from "./QuoteParts";
 
-/** Publishes the tray's real height as `--fix-tray-h` on <html> while it is mounted. */
+/**
+ * While the tray is mounted and visible: marks <html> with `data-fix-tray-open` and publishes the
+ * tray's real height as `--fix-tray-h`. Both are removed in the ref cleanup, which also runs when
+ * a kept-alive route is hidden (cacheComponents), so the reserve never outlives the visible tray
+ * (R7 #21).
+ */
 function trackTrayHeight(el: HTMLElement | null) {
   if (!el || typeof ResizeObserver === "undefined") return;
   const root = document.documentElement;
+  root.setAttribute("data-fix-tray-open", "");
   const set = () => root.style.setProperty("--fix-tray-h", `${Math.ceil(el.getBoundingClientRect().height)}px`);
   set();
   const ro = new ResizeObserver(set);
@@ -17,6 +23,7 @@ function trackTrayHeight(el: HTMLElement | null) {
   return () => {
     ro.disconnect();
     root.style.removeProperty("--fix-tray-h");
+    root.removeAttribute("data-fix-tray-open");
   };
 }
 
@@ -28,7 +35,7 @@ function trackTrayHeight(el: HTMLElement | null) {
  * sits under them, the explainer drops, and the request button takes its own full-width row.
  *
  * The tray's measured height is published as `--fix-tray-h` (ResizeObserver), and globals.css
- * uses it while the tray exists: `scroll-padding-bottom` on html, so focused controls and
+ * keys off the `data-fix-tray-open` attribute the tray sets on <html> while mounted and visible: `scroll-padding-bottom` on html, so focused controls and
  * anchor jumps are never scrolled behind it (WCAG 2.2 SC 2.4.11), `padding-bottom` on body so
  * the end of the page (footer included) can scroll clear, and the sticky email gate's max
  * height. Plain buttons and links in DOM order; changes are announced by the QuoteProvider's

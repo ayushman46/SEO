@@ -87,7 +87,7 @@ describe("crawl: robots.txt redirected to another host (R2 #8, #25)", () => {
     expect(ctx.robots.status).toBe("ok");
     expect(ctx.robots.url).toBe("https://cdn.other-host.example.net/robots.txt");
     expect(ctx.robots.requestedUrl).toBe(`${O}/robots.txt`);
-    // The crawler honoured Disallow: / for seenhqbot.
+    // The crawler honoured Disallow: / for noticrbot.
     expect(ctx.pages).toHaveLength(1);
     expect(notes.some((n) => n.includes("robots.txt disallows crawling /about"))).toBe(true);
     const ids = analysis.issues.map((i) => i.id);

@@ -1,6 +1,6 @@
 {
   "version": "0.0.1",
   "configurations": [
-    { "name": "seenhq", "runtimeExecutable": "npm", "runtimeArgs": ["run", "start", "--", "-p", "3210"], "port": 3210 }
+    { "name": "noticr", "runtimeExecutable": "npm", "runtimeArgs": ["run", "start", "--", "-p", "3210"], "port": 3210 }
   ]
 }

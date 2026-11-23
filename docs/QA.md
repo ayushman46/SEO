@@ -88,7 +88,7 @@ No critical or high security defects were found in the application code.
 - `git ls-files` includes `.env.example` only; `.gitignore` has `.env*` with `!.env.example`.
 
 ### Copy honesty (rendered HTML of all 8 public pages, the 404 page and llms.txt)
-- No matches for "sign in", "log in", "dashboard", "SeenHQ", "Seenhq", "trusted by", "used by", "[COPY]".
+- No matches for "sign in", "log in", "dashboard", "noticr", "Noticr", "trusted by", "used by", "[COPY]".
 - "guarantee" appears only as negations ("Can you guarantee rankings…?" FAQ on /, "No guarantees of rankings or citations" and "a guide, not a guarantee" on /terms).
 
 ## Commands

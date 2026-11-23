@@ -4,13 +4,13 @@ import type { LegalDoc } from "./types";
 export const privacyMeta = {
   metaTitle: "Privacy policy: how we handle your data",
   metaDescription:
-    "How seenhq handles data from the free audit, its AI reading, report unlock and contact form: what we collect, why, who processes it and how to delete it.",
+    "How noticr handles data from the free audit, its AI reading, report unlock and contact form: what we collect, why, who processes it and how to delete it.",
 };
 
 export const termsMeta = {
   metaTitle: "Terms of service: audits and paid services",
   metaDescription:
-    "The terms for using seenhq: what the free audit does and doesn't promise, acceptable use, paid services, liability and how these terms can change.",
+    "The terms for using noticr: what the free audit does and doesn't promise, acceptable use, paid services, liability and how these terms can change.",
 };
 
 export const privacy = {
@@ -20,7 +20,7 @@ export const privacy = {
     {
       heading: "Who we are",
       body: [
-        "This website and its services are operated under the seenhq name. In this policy, \"seenhq\", \"we\" and \"us\" mean the operator of seenhq.",
+        "This website and its services are operated under the noticr name. In this policy, \"noticr\", \"we\" and \"us\" mean the operator of noticr.",
         "For any question about this policy or your data, use the contact form at /contact and we will reply by email.",
       ],
     },
@@ -36,8 +36,8 @@ export const privacy = {
     {
       heading: "What we fetch from the websites you audit",
       body: [
-        "When you enter a website address, our crawler (user agent \"seenhqbot\") fetches publicly available pages from that site: the address you entered (normally the homepage), robots.txt, the sitemap, llms.txt and up to five internal pages. We always read the page you asked us to audit; for the internal pages we skip anything the site's robots.txt disallows for seenhqbot. We never submit forms and never access password-protected areas.",
-        "As part of the crawler access test, we also send a small number of simulated requests to public pages of that site whose user agent names the AI crawler being simulated and is labelled as a seenhq test. These requests come from our servers, not from OpenAI, Anthropic, Perplexity, Google or any other AI company. Details are on our crawler page at /bot.",
+        "When you enter a website address, our crawler (user agent \"noticrbot\") fetches publicly available pages from that site: the address you entered (normally the homepage), robots.txt, the sitemap, llms.txt and up to five internal pages. We always read the page you asked us to audit; for the internal pages we skip anything the site's robots.txt disallows for noticrbot. We never submit forms and never access password-protected areas.",
+        "As part of the crawler access test, we also send a small number of simulated requests to public pages of that site whose user agent names the AI crawler being simulated and is labelled as a noticr test. These requests come from our servers, not from OpenAI, Anthropic, Perplexity, Google or any other AI company. Details are on our crawler page at /bot.",
         "We also send the address you entered to Google PageSpeed Insights to measure performance. Google processes that request under its own terms and privacy policy.",
       ],
     },
@@ -52,14 +52,14 @@ export const privacy = {
     {
       heading: "Cookies and analytics",
       body: [
-        "seenhq does not set advertising or tracking cookies. We use Vercel Web Analytics and Speed Insights, which measure page views and performance without cookies and without identifying you personally.",
+        "noticr does not set advertising or tracking cookies. We use Vercel Web Analytics and Speed Insights, which measure page views and performance without cookies and without identifying you personally.",
         "While you view an audit, your browser briefly holds an encrypted copy of the full report so it can be unlocked. It expires after two hours and cannot be read without the unlock step.",
       ],
     },
     {
       heading: "Who processes your data",
       body: [
-        "We use a small number of service providers to run seenhq: our hosting provider (Vercel), which also provides our cookie-free analytics and server logs; if we send email notifications, our email provider; if we add a database, our database provider; Google PageSpeed Insights for performance checks; and NVIDIA's hosted model API for the AI reading of audited public pages (it receives page text only, never visitor data).",
+        "We use a small number of service providers to run noticr: our hosting provider (Vercel), which also provides our cookie-free analytics and server logs; if we send email notifications, our email provider; if we add a database, our database provider; Google PageSpeed Insights for performance checks; and NVIDIA's hosted model API for the AI reading of audited public pages (it receives page text only, never visitor data).",
         "We do not sell your personal data and we do not share it with anyone for their own marketing.",
       ],
     },
@@ -100,7 +100,7 @@ export const terms = {
     {
       heading: "About these terms",
       body: [
-        "These terms apply to your use of the seenhq website, the free audit and any paid services. This website and its services are operated under the seenhq name. By using the site you agree to these terms.",
+        "These terms apply to your use of the noticr website, the free audit and any paid services. This website and its services are operated under the noticr name. By using the site you agree to these terms.",
       ],
     },
     {
@@ -115,7 +115,7 @@ export const terms = {
     {
       heading: "Acceptable use",
       body: [
-        "Please only audit websites you own, manage or have a legitimate interest in. Do not use seenhq to overload, probe or attack any website, to get around our rate limits, or to scrape our site or reports at scale.",
+        "Please only audit websites you own, manage or have a legitimate interest in. Do not use noticr to overload, probe or attack any website, to get around our rate limits, or to scrape our site or reports at scale.",
         "We may block requests or addresses that we believe are abusing the service.",
       ],
     },
@@ -132,13 +132,13 @@ export const terms = {
     {
       heading: "No guarantees of rankings or citations",
       body: [
-        "We do not and cannot guarantee any particular ranking in Google, Bing or any other search engine, or that ChatGPT, Perplexity, Claude, Gemini, Google AI Overviews, Microsoft Copilot or any other AI engine will mention or cite your website. seenhq is not affiliated with or endorsed by any of these companies; their names are used only to describe what we check.",
+        "We do not and cannot guarantee any particular ranking in Google, Bing or any other search engine, or that ChatGPT, Perplexity, Claude, Gemini, Google AI Overviews, Microsoft Copilot or any other AI engine will mention or cite your website. noticr is not affiliated with or endorsed by any of these companies; their names are used only to describe what we check.",
       ],
     },
     {
       heading: "Your content and our reports",
       body: [
-        "You keep all rights in your website and content. Reports we produce for you are yours to use within your business. The seenhq site, software, design and brand remain ours.",
+        "You keep all rights in your website and content. Reports we produce for you are yours to use within your business. The noticr site, software, design and brand remain ours.",
       ],
     },
     {

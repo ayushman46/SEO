@@ -7,7 +7,7 @@ export const home = {
     title: "Be seen by people and by the machines they ask.",
     // States the offer on the first screen (Fable's ruling 2): free audit, then fixed-price fixes. 40 words max.
     subtitle:
-      "Get a free audit in about a minute: a ranked list of what stops Google and AI assistants like ChatGPT from reading your site. Then we can fix up to 8 issues for $149, with no contract and before/after proof.",
+      "Get a free audit in about a minute: a ranked list of what stops Google and AI assistants like ChatGPT from reading your site. Then we make up to 8 code fixes for $149, with no contract and before/after proof.",
     primaryCta: { label: "Run a free audit", href: "/audit" },
     secondaryCta: { label: "See services", href: "/services" },
   },
@@ -201,7 +201,7 @@ export const home = {
   pricingTeaser: {
     kicker: "Pricing",
     title: "Start free, then pay a fixed price",
-    body: "The audit is free. Each paid service has one published price, and you see the total in writing before you pay.",
+    body: "The audit is free. Each paid service has a published price or starting price, and you see the total in writing before you pay.",
     cta: { label: "See pricing", href: "/pricing" },
   },
 
@@ -226,7 +226,7 @@ export const home = {
       a: "llms.txt is a plain-text file at the root of a website, for example example.com/llms.txt, that gives AI tools a short summary of the site and links to its most useful pages. It is a proposed standard described at llmstxt.org. It is optional and quick to add.",
     },
     {
-      q: "What does the free seenhq audit check?",
+      q: "What does the free noticr audit check?",
       a: "Your homepage and up to five more pages. It checks whether Google and AI crawlers can reach and read them, whether your name, prices, hours and contact details are in plain text and agree from page to page, and how fast the page loads on a phone. It also runs a simulated AI-crawler test. Every check and its weight is on the methodology page.",
     },
     {
@@ -266,16 +266,16 @@ export const homeProblemSource = {
   href: "https://www.brightlocal.com/research/smb-report-confident-visibility/",
 } as const;
 
-/** Home page meta. The title is used as-is (no " · seenhq" suffix), so it carries the brand itself. */
+/** Home page meta. The title is used as-is (no " · noticr" suffix), so it carries the brand itself. */
 export const homeMeta = {
-  metaTitle: "seenhq: SEO and GEO audits for Google and AI search",
+  metaTitle: "noticr: SEO and GEO audits for Google and AI search",
   metaDescription:
-    "Free SEO and GEO audit in about a minute, then fixed-price fixes done for you: Full audit $39, Fix sprint $149 for up to 8 fixes. No contract.",
+    "Free SEO and GEO audit in about a minute, then fixed-price fixes done for you: Full audit $39, Fix sprint $149 for up to 8 code fixes. No contract.",
 };
 
 /** Meta for /sample-report (an illustrative report, built by frontend from sample data). */
 export const sampleReportMeta = {
   metaTitle: "Sample audit report: see every check and fix",
   metaDescription:
-    "An illustrative seenhq audit report: SEO, GEO and speed scores, the AI reading, every check with its fix, and the export for your developer.",
+    "An illustrative noticr audit report: SEO, GEO and speed scores, the AI reading, every check with its fix, and the export for your developer.",
 };

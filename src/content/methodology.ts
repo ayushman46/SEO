@@ -1,7 +1,7 @@
 import type { Cta, FaqItem, PageCopy } from "./types";
 
 /**
- * /methodology: "How the seenhq audit works". Our main trust page, so every number here is the
+ * /methodology: "How the noticr audit works". Our main trust page, so every number here is the
  * engine's real number. Check weights mirror CHECK_WEIGHTS in src/lib/audit/score.ts, and
  * tests/content/seo-copy.test.ts fails if they drift.
  */
@@ -37,9 +37,9 @@ export interface DocSection {
 export const methodologyPage = {
   metaTitle: "How the audit works: checks, scores and limits",
   metaDescription:
-    "What the free seenhq audit fetches, every SEO, GEO, AI reading and speed check it runs, how the scores are weighted, and the limits we know about.",
+    "What the free noticr audit fetches, every SEO, GEO, AI reading and speed check it runs, how the scores are weighted, and the limits we know about.",
   kicker: "Methodology",
-  title: "How the seenhq audit works",
+  title: "How the noticr audit works",
   intro:
     "The free audit reads up to six public pages of a website and scores them for SEO, GEO (Generative Engine Optimization) and mobile speed. Every check, weight and known limit is below.",
 } satisfies PageCopy;
@@ -49,7 +49,7 @@ export const methodologySections: DocSection[] = [
     id: "what-we-fetch",
     title: "What we fetch",
     body: [
-      "Our crawler, seenhqbot, visits a site only when someone enters its address on our audit page. It fetches public pages over the normal web, the same way a search engine crawler does, and never runs JavaScript, submits forms or enters password-protected areas.",
+      "Our crawler, noticrbot, visits a site only when someone enters its address on our audit page. It fetches public pages over the normal web, the same way a search engine crawler does, and never runs JavaScript, submits forms or enters password-protected areas.",
     ],
     items: [
       {
@@ -62,7 +62,7 @@ export const methodologySections: DocSection[] = [
       },
       {
         label: "robots.txt",
-        body: "We always read the page you asked us to audit. Internal pages your robots.txt disallows for seenhqbot are skipped and listed in the report.",
+        body: "We always read the page you asked us to audit. Internal pages your robots.txt disallows for noticrbot are skipped and listed in the report.",
       },
       {
         label: "Speed",
@@ -70,14 +70,14 @@ export const methodologySections: DocSection[] = [
       },
       {
         label: "Simulated AI-crawler requests",
-        body: "Short requests to your homepage, up to two other fetched pages, robots.txt and llms.txt, once per simulated crawler, with a labelled user agent such as \"GPTBot/1.3; simulated-by seenhqbot/1.0\", to see whether a firewall, CDN or host refuses that crawler. Anything your robots.txt disallows for seenhqbot is skipped.",
+        body: "Short requests to your homepage, up to two other fetched pages, robots.txt and llms.txt, once per simulated crawler, with a labelled user agent such as \"GPTBot/1.3; simulated-by noticrbot/1.0\", to see whether a firewall, CDN or host refuses that crawler. Anything your robots.txt disallows for noticrbot is skipped.",
       },
       {
         label: "Limits per audit",
         body: "Each request times out after 8 seconds, HTML pages are capped at 2 MB, we follow at most 3 redirects, fetch at most 3 pages at once, and stop the whole audit after 55 seconds. Private and internal network addresses are refused.",
       },
     ],
-    cta: { label: "About seenhqbot", href: "/bot" },
+    cta: { label: "About noticrbot", href: "/bot" },
   },
   {
     id: "checks",
@@ -102,7 +102,7 @@ export const methodologySections: DocSection[] = [
           { id: "seo.sitemap", weight: 6, label: "XML sitemap", body: "A valid sitemap lists your public pages and robots.txt points to it." },
           { id: "seo.structured-data", weight: 6, label: "Structured data", body: "Your JSON-LD parses and every item states a schema.org type." },
           { id: "seo.image-alt", weight: 5, label: "Image alt text", body: "Meaningful images have descriptive alt text." },
-          { id: "seo.open-graph", weight: 4, label: "Social sharing (Open Graph)", body: "The homepage has a share title, description and image." },
+          { id: "seo.open-graph", weight: 4, label: "Social sharing (Open Graph)", body: "Every page we read has a share title, description and image." },
           { id: "seo.lang", weight: 3, label: "Language attribute", body: "Pages declare their language." },
           {
             id: "seo.soft-404",
@@ -151,7 +151,7 @@ export const methodologySections: DocSection[] = [
           { id: "geo.organization-schema", weight: 14, label: "Business schema", body: "The homepage has Organization or LocalBusiness structured data with your name, website address, logo and profile links." },
           { id: "geo.faq", weight: 10, label: "Questions & answers", body: "At least three customer questions are answered on the site." },
           { id: "geo.entity-consistency", weight: 8, label: "Name consistency", body: "Your business name is the same in titles, share tags and schema." },
-          { id: "geo.dates", weight: 8, label: "Freshness dates", body: "Content pages show a published or updated date, visibly or in schema." },
+          { id: "geo.dates", weight: 8, label: "Freshness dates", body: "Content pages carry a published or updated date in schema, a <time> tag or a date meta tag." },
           { id: "geo.raw-html-facts", weight: 8, label: "Facts readable without JavaScript", body: "Your core facts are in the HTML a plain fetcher receives, not only in JSON-LD or after scripts run. Sites that are an empty shell until JavaScript runs are flagged." },
           { id: "geo.author", weight: 7, label: "Author signals", body: "Content pages name an author or the business owner, visibly or in schema." },
           { id: "geo.llms-txt", weight: 6, label: "llms.txt", body: "A plain-text guide for AI tools exists at /llms.txt. It is an optional, emerging standard, so it carries little weight." },
@@ -241,7 +241,7 @@ export const methodologySections: DocSection[] = [
     body: [
       "As of 23 November 2026 we do not run a database. Audit requests, report unlock emails and contact messages are processed in memory and appear in our hosting provider's server logs, which it keeps for a limited time. Notifications we receive by email are deleted within 24 months. If we add a database, we will update the privacy policy first, and keep audit records, unlock emails and contact messages for up to 24 months, then delete them.",
       "Text from audited pages is sent to NVIDIA's hosted model API for the AI reading; visitor emails and contact messages are never sent to it.",
-      "To have an audit record, an email or a message deleted sooner, send a request through the contact form with the website address or email it relates to. We act on requests within 30 days. To stop seenhqbot from fetching your internal pages, see the crawler page.",
+      "To have an audit record, an email or a message deleted sooner, send a request through the contact form with the website address or email it relates to. We act on requests within 30 days. To stop noticrbot from fetching your internal pages, see the crawler page.",
     ],
     cta: { label: "Request removal", href: "/contact" },
   },
@@ -253,7 +253,7 @@ export const methodologyFaq: FaqItem[] = [
     a: "No. It is one open-weight language model, hosted on NVIDIA's API, reading the pages we fetched. We do not query ChatGPT, Gemini, Perplexity or any other assistant.",
   },
   {
-    q: "Does the seenhq audit run JavaScript?",
+    q: "Does the noticr audit run JavaScript?",
     a: "No. It reads the HTML your server sends. Facts that only appear after JavaScript runs are reported as missing, because many AI crawlers will not see them either.",
   },
   {

@@ -1,5 +1,5 @@
 /**
- * Homepage refusal detection (R7 #3). When the audited site answers our own crawler (seenhqbot)
+ * Homepage refusal detection (R7 #3). When the audited site answers our own crawler (noticrbot)
  * with a refusal (401/403/407/429/451), a server error (5xx) or a firewall / bot-check page, there
  * is no homepage to score: grading the block page would produce a false report. Pure (no I/O).
  *
@@ -90,7 +90,7 @@ export function detectHomepageRefusal(res: HomepageResponse): HomepageRefusal | 
   return { kind, status, layer, layerName: layer ? LAYER_NAME[layer] : null };
 }
 
-const ALLOW_HINT = "If it is your site, allow the user agent seenhqbot";
+const ALLOW_HINT = "If it is your site, allow the user agent noticrbot";
 
 /** The sentence the visitor sees. Plain English, names the layer when we know it. */
 export function refusalMessage(r: HomepageRefusal): string {

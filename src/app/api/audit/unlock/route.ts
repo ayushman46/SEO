@@ -87,7 +87,7 @@ export async function POST(request: Request): Promise<Response> {
 
   after(async () => {
     const emailed = await notifyTeam(
-      `New seenhq lead: ${result.hostname}`,
+      `New noticr lead: ${result.hostname}`,
       [
         `Email: ${email}`,
         `Site: ${result.finalUrl}`,

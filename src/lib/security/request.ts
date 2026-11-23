@@ -50,7 +50,7 @@ export function rateLimitSubject(ip: string): string | null {
   return `${groups.join(":")}::/64`;
 }
 
-const DEV_SALT = "seenhq-dev-ip-salt-not-for-production";
+const DEV_SALT = "noticr-dev-ip-salt-not-for-production";
 let warnedSalt = false;
 
 /** Salted SHA-256 of an IP (hex, 64 chars). Raw IPs are never stored. */

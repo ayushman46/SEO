@@ -26,7 +26,7 @@ import { Tabs } from "@/components/ui/Tabs";
 
 export const metadata: Metadata = {
   title: "Design preview",
-  description: "Internal showcase of the seenhq design system.",
+  description: "Internal showcase of the noticr design system.",
   robots: { index: false, follow: false },
 };
 
@@ -72,7 +72,7 @@ export default function DesignPreviewPage() {
     <Container className="pt-10 pb-24">
       <header className="pb-12">
         <Badge tone="accent">noindex · internal</Badge>
-        <h1 className="mt-6 font-serif text-display-lg text-ink">seenhq design system</h1>
+        <h1 className="mt-6 font-serif text-display-lg text-ink">noticr design system</h1>
         <p className="mt-4 max-w-2xl text-lg text-muted">
           Tokens, type and every component with its states. Tokens live in <code>src/app/globals.css</code>; rules in{" "}
           <code>docs/DESIGN_SYSTEM.md</code>.

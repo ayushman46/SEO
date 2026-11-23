@@ -42,7 +42,7 @@ export interface PricingTier {
 }
 
 export interface SiteConfig {
-  name: "seenhq";
+  name: "noticr";
   tagline: string;
   description: string; // ~155 chars, used as default meta description
   contactEmail: string; // placeholder-marked

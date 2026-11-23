@@ -54,8 +54,8 @@ export function downloadText(text: string, filename: string, type = "text/markdo
   window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-/** "seenhq-example.com-tickets.md" from any hostname, safe as a filename. */
+/** "noticr-example.com-tickets.md" from any hostname, safe as a filename. */
 export function exportFilename(hostname: string, suffix: string): string {
   const host = hostname.toLowerCase().replace(/[^a-z0-9.-]+/g, "-").replace(/^[-.]+|[-.]+$/g, "").slice(0, 80) || "site";
-  return `seenhq-${host}-${suffix}.md`;
+  return `noticr-${host}-${suffix}.md`;
 }

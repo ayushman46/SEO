@@ -25,7 +25,7 @@ const aiFixture: AiInsights = {
     { key: "differentiator", label: "What makes you different", value: null, status: "missing" },
   ],
   questions: [
-    { question: "Do they do braces for adults?", answered: "yes", sourceUrl: "https://clinic.example/services", note: "The services page lists adult braces." },
+    { question: "Do they do braces for adults?", answered: "yes", sourceUrl: "https://clinic.example.com/services", note: "The services page lists adult braces." },
     { question: "How much is a cleaning?", answered: "no", sourceUrl: null, note: "No prices anywhere on the site." },
     { question: "Are they open on Sunday?", answered: "partly", sourceUrl: "javascript:alert(1)", note: "Hours are listed without Sundays." },
     { question: "Do they take insurance?", answered: "no", sourceUrl: null, note: "Not mentioned." },
@@ -54,9 +54,9 @@ const partialFixture: PartialAiInsights = {
 const resultFixture: AuditResult = {
   id: "00000000-0000-4000-8000-000000000000",
   version: 1,
-  requestedUrl: "https://clinic.example",
-  finalUrl: "https://clinic.example/",
-  hostname: "clinic.example",
+  requestedUrl: "https://clinic.example.com",
+  finalUrl: "https://clinic.example.com/",
+  hostname: "clinic.example.com",
   startedAt: "2026-11-23T10:00:00.000Z",
   durationMs: 21000,
   scores: { overall: 61, seo: 70, geo: 52, performance: null },
@@ -106,7 +106,7 @@ describe("AiPartialCard", () => {
 });
 
 describe("AiFullSection", () => {
-  const html = render(createElement(AiFullSection, { ai: aiFixture, hostname: "clinic.example", idPrefix: "f-ai" }));
+  const html = render(createElement(AiFullSection, { ai: aiFixture, hostname: "clinic.example.com", idPrefix: "f-ai" }));
 
   it("renders drafts as plain text: markup shows literally", () => {
     expect(html).not.toContain("<script>");
@@ -124,7 +124,7 @@ describe("AiFullSection", () => {
   });
 
   it("links only http(s) source URLs, in a new tab with noopener", () => {
-    expect(html).toContain('href="https://clinic.example/services"');
+    expect(html).toContain('href="https://clinic.example.com/services"');
     expect(html).toContain('rel="noopener noreferrer nofollow"');
     expect(html).not.toContain("javascript:");
   });
@@ -136,6 +136,13 @@ describe("FullReport", () => {
     expect(html).toContain(auditExportCopy.copyTickets);
     expect(html).toContain(auditExportCopy.copyPrompt);
     expect(html).toContain(auditAiCopy.fullTitle);
+  });
+
+  it("separates heading labels from their counts in the text (R7 #18)", () => {
+    const html = render(createElement(FullReport, { result: resultFixture, headingId: "full" }));
+    const text = html.replace(/<[^>]+>/g, "");
+    expect(text).toMatch(/Checks, \d/);
+    expect(text).not.toMatch(/Checks\d/);
   });
 
   it("shows the quiet line when ai is null", () => {
@@ -165,7 +172,7 @@ describe("checks with new ids", () => {
   });
 
   it("builds safe export filenames", () => {
-    expect(exportFilename("Clinic.Example", "tickets")).toBe("seenhq-clinic.example-tickets.md");
-    expect(exportFilename("../../etc", "tickets")).toBe("seenhq-etc-tickets.md");
+    expect(exportFilename("Clinic.Example", "tickets")).toBe("noticr-clinic.example-tickets.md");
+    expect(exportFilename("../../etc", "tickets")).toBe("noticr-etc-tickets.md");
   });
 });

@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
 import { absoluteUrl } from "@/lib/seo/metadata";
 
-const DISALLOW = ["/admin", "/api/", "/design-preview"];
+// /design-preview is not disallowed: its page sets noindex, nofollow, and crawlers must be able to fetch it to see that (R7 #19).
+const DISALLOW = ["/admin", "/api/"];
 
 /**
  * AI and search crawlers we explicitly welcome. A crawler that matches a named group ignores the "*" group,

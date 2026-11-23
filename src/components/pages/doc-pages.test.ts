@@ -13,7 +13,7 @@ import { CodeBlock, DocBody, checkAnchor } from "./DocBody";
 describe("DocBody", () => {
   const html = renderToStaticMarkup(
     createElement(DocBody, {
-      label: "How the seenhq audit works",
+      label: "How the noticr audit works",
       sections: methodologySections,
       faq: { id: "faq", title: "Common questions", items: methodologyFaq },
     }),
@@ -46,12 +46,12 @@ describe("DocBody", () => {
   it("renders per-section extras (bot code blocks)", () => {
     const bot = renderToStaticMarkup(
       createElement(DocBody, {
-        label: "About seenhqbot",
+        label: "About noticrbot",
         sections: botSections,
-        extras: { block: createElement(CodeBlock, null, "User-agent: seenhqbot\nDisallow: /") },
+        extras: { block: createElement(CodeBlock, null, "User-agent: noticrbot\nDisallow: /") },
       }),
     );
-    expect(bot).toContain("User-agent: seenhqbot\nDisallow: /");
+    expect(bot).toContain("User-agent: noticrbot\nDisallow: /");
   });
 });
 

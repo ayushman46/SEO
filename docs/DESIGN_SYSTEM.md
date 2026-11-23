@@ -1,4 +1,4 @@
-# seenhq design system
+# noticr design system
 
 "Classical renaissance meets modern SaaS." Editorial serif, white paper, one electric blue, and surreal collages of sky,
 marble and painted fragments seen through torn paper. Theme: *being seen*. Live showcase: `/design-preview` (noindex).
@@ -48,7 +48,7 @@ Sky blues come from photography, never from UI fills.
 | `site/Nav` + `site/MobileMenu` | server + client | Floating white pill (logo, links lg+, blue square menu button < lg) + Contact + "Free audit". Mobile sheet is a native modal `<dialog>` (focus trap, Esc, inert page, focus return) + backdrop click, link click, auto-close at lg, scroll lock. No sign-in in v1. |
 | `scroll/SmoothScroll` (+ `gate`, `loop`, `smooth`, `lenis-controller`) | client | T025. Lazy Lenis island in the marketing layout; see "Scroll motion". `scroll/smooth` exports `scrollToElement(el, block)` (use it instead of `scrollIntoView`) and `lockSmoothScroll()` (call while any modal is open). |
 | `pages/ReadingProgress` | server | 3 px accent hairline at the top of long documents (`DocBody`, `LegalBody`), CSS scroll-driven `scaleX`; hidden without scroll timelines and under reduced motion. |
-| `site/Footer`, `site/Logo` | server | Eye mark on ink tile + lowercase serif wordmark "seenhq". |
+| `site/Footer`, `site/Logo` | server | Eye mark on ink tile + lowercase serif wordmark "noticr". |
 | `site/SiteChrome` | server | Skip link + Nav + `<main id="main">` + Footer. Used by the `(marketing)` layout and the root 404. |
 | `collage/torn.ts` | util | Seeded torn outlines as CSS `polygon()`: `tornRectPair`, `tornEllipsePair` (rim + cut-out share one tear), `tornBand`, `tornRect`. |
 | `collage/TornFrame` | server | Torn cut-out on a paper rim with grain and paper/float drop-shadow. `shape="rect" | "ellipse"`, `rotate`, `edges`. |

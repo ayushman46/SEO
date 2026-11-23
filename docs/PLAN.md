@@ -1,4 +1,4 @@
-# seenhq v1 plan (deadline sprint)
+# noticr v1 plan (deadline sprint)
 
 Deadline: live by **2026-11-23 12:30 IST**. Feature freeze **10:00 IST**. QA only 10:00–11:45. Prod deploy 11:45 (needs founder yes).
 Scope changes from the original brief are in DECISIONS.md (ADR-009..011) and BACKLOG.md.
@@ -24,7 +24,7 @@ Scope changes from the original brief are in DECISIONS.md (ADR-009..011) and BAC
 - [ ] T008 qa-security: continuous review, SSRF tests, axe, headers
 
 ## Wave 3 (~04:00–10:00)
-- [ ] Integration fixes, seenhq self-audit ≥ 95
+- [ ] Integration fixes, noticr self-audit ≥ 95
 - [ ] Vercel preview deploy, env vars set
 - [ ] Mobile pass at 360/768/1280/1920
 

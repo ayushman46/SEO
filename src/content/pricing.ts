@@ -24,7 +24,7 @@ export const pricingPage = {
   kicker: "Pricing",
   // $19 (Monitoring, a month) is the lowest paid price, so "from $19" is the true floor.
   title: "Fixed prices from $19. No contract.",
-  intro: "The audit is free. A Full audit reviewed by a person is $39, and a Fix sprint of up to 8 fixes is $149.",
+  intro: "The audit is free. A Full audit reviewed by a person is $39, and a Fix sprint of up to 8 code fixes is $149.",
 } satisfies PageCopy;
 
 /**
@@ -69,12 +69,13 @@ export const pricingTiers = [
     name: "Fix sprint",
     price: "$149",
     cadence: "one-time",
-    description: "Up to 8 fixes from your audit on one site, at a fixed price. Larger jobs get a fixed quote before work starts.",
+    description: "Up to 8 code fixes from your audit on one site, at a fixed price. Larger jobs get a fixed quote before work starts.",
     features: [
-      "Up to 8 fixes from your audit, agreed up front",
+      "Up to 8 code fixes from your audit, agreed up front",
       "Typical fixes: robots.txt, sitemap, llms.txt, structured data, image sizes",
       "On one site, on a platform we can access",
       "Before/after proof for every fix",
+      "Rewriting page text (FAQs, direct answers, your business description) is a separate service: Content & entity",
     ],
     cta: { label: "Request a Fix sprint", href: "/contact?service=technical-fixes" },
   },
@@ -95,7 +96,7 @@ export const pricingTiers = [
 
 export const pricingFaq = [
   {
-    q: "Is the seenhq audit really free?",
+    q: "Is the noticr audit really free?",
     a: "Yes. Scores and your top three issues show straight away. The full list of issues and fixes needs your email. No card.",
   },
   {
@@ -104,7 +105,7 @@ export const pricingFaq = [
   },
   {
     q: "What is the difference between the Full audit and the Fix sprint?",
-    a: "The Full audit tells you what to fix and in what order. The Fix sprint is us making up to 8 of those fixes. You can buy the audit, fix the quick wins yourself and hand the rest to us.",
+    a: "The Full audit tells you what to fix and in what order. The Fix sprint is us making up to 8 of the code fixes. You can buy the audit, fix the quick wins yourself and hand the rest to us.",
   },
   {
     q: "What does monitoring actually involve?",
@@ -121,6 +122,10 @@ export const pricingFaq = [
   {
     q: "How do I pay?",
     a: "Pay by bank transfer, UPI or card. Once we have agreed the scope by email, we send an invoice before work starts. Payment is due before work starts for one-time services; monitoring is billed monthly in advance.",
+  },
+  {
+    q: "How are timing, site access and refunds handled?",
+    a: "They are set in the quote we email you, which states the scope, price, timing and the access each fix needs. You give us that access and keep your own backup of the site. If we haven't started the work, you get a full refund. Once work has started, we agree a fair partial refund based on what has been delivered.",
   },
   {
     q: "Do you offer pricing in rupees?",

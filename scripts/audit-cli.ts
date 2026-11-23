@@ -41,7 +41,7 @@ async function main() {
     }
     const partial = toPartialReport(result);
     const s = result.scores;
-    console.log(`\nseenhq audit — ${result.finalUrl}`);
+    console.log(`\nnoticr audit — ${result.finalUrl}`);
     console.log(`  duration ${(result.durationMs / 1000).toFixed(1)} s · pages ${result.pages.length} · truncated ${result.truncated}`);
     console.log(`  scores  overall ${s.overall} · seo ${s.seo} · geo ${s.geo} · performance ${s.performance ?? "n/a"}`);
     if (result.coreWebVitals) {

@@ -314,7 +314,7 @@ export async function crawl(requestedUrl: string, opts: CrawlOptions): Promise<C
         const idx = cursor++;
         const url = queue[idx];
         if (isBlocked(robotsParsed, url, OUR_BOT)) {
-          notes.push(`robots.txt disallows crawling ${pathOf(url)} for seenhqbot, so we skipped it.`);
+          notes.push(`robots.txt disallows crawling ${pathOf(url)} for noticrbot, so we skipped it.`);
           continue;
         }
         if (remaining() < MIN_PAGE_START_MS || signal.aborted) {

@@ -18,7 +18,7 @@ export function Footer() {
         <Container className="pt-8 pb-10 sm:pt-10">
           <div className="grid gap-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,2fr)]">
             <div className="max-w-sm">
-              <Link href="/" aria-label="seenhq home" className="inline-block rounded-lg">
+              <Link href="/" aria-label="noticr home" className="inline-block rounded-lg">
                 <Logo size="lg" />
               </Link>
               <p className="mt-5 max-w-[28ch] font-serif text-title-lg text-balance text-ink-2">{site.tagline}</p>
@@ -57,7 +57,7 @@ export function Footer() {
 
           <div className="mt-16 flex flex-col gap-3 border-t border-line-strong/70 pt-6 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
             <p>
-              © {year} seenhq · <PlaceholderText value={site.location} />
+              © {year} noticr · <PlaceholderText value={site.location} />
             </p>
             <p>Imagery: public-domain works by Leonardo da Vinci and Michelangelo, The Met (CC0), NASA, and CC0 sky photography.</p>
           </div>

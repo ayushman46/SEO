@@ -5,9 +5,9 @@
  */
 import { QUOTE_TEXT, toOrderFields, type Quote, type QuoteOrderFields } from "@/lib/quote";
 
-export const QUOTE_STORAGE_KEY = "seenhq:quote";
+export const QUOTE_STORAGE_KEY = "noticr:quote";
 /** Fired on window when this tab stores or clears the quote (the "storage" event only fires in other tabs). */
-export const QUOTE_CHANGE_EVENT = "seenhq:quote-change";
+export const QUOTE_CHANGE_EVENT = "noticr:quote-change";
 
 export interface StoredQuote {
   v: 1;

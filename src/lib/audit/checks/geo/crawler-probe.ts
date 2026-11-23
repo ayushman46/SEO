@@ -1,7 +1,7 @@
 /**
  * geo.ai-crawler-probe (T016 C, ADR-017): pure evaluation of the live crawler probe done in
  * net/probe.ts. We request the same URLs with a labelled simulated User-Agent per AI bot and
- * compare against what our own crawler (seenhqbot) got. When a bot is refused although
+ * compare against what our own crawler (noticrbot) got. When a bot is refused although
  * robots.txt allows it, we name the layer that refused it from response headers / block page.
  */
 import type { Severity } from "../../types";
@@ -158,7 +158,7 @@ export function crawlerProbeOutcome(probe: CrawlerProbe, bodyCap = 64 * 1024): C
   if (probe.status === "inconclusive") {
     return unavailable(
       def,
-      `Our own crawler (seenhqbot) was refused by your site (status ${probe.baselineStatus}), so the simulated AI-crawler test is inconclusive. ${PROBE_HONESTY}`,
+      `Our own crawler (noticrbot) was refused by your site (status ${probe.baselineStatus}), so the simulated AI-crawler test is inconclusive. ${PROBE_HONESTY}`,
     );
   }
 

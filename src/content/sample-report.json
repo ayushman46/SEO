@@ -146,7 +146,7 @@
       "status": "warn",
       "score": 0.5,
       "weight": 4,
-      "summary": "A made-up URL (/seenhq-check-7f3a9c2e) redirected to your homepage instead of returning 404."
+      "summary": "A made-up URL (/noticr-check-7f3a9c2e) redirected to your homepage instead of returning 404."
     },
     {
       "id": "geo.ai-crawlers",
@@ -478,7 +478,7 @@
       "effort": "moderate",
       "impact": 0.9,
       "affectedUrls": [
-        "https://www.marigold-dental.example/seenhq-check-7f3a9c2e"
+        "https://www.marigold-dental.example/noticr-check-7f3a9c2e"
       ]
     },
     {

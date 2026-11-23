@@ -25,10 +25,10 @@ vi.mock("@/lib/audit/net/ssrf", async () => {
   const { classifyIp } = await import("@/lib/audit/net/ip");
   const { AuditError: AE } = await import("@/lib/audit/types");
   const FAKE_DNS: Record<string, string> = {
-    "site.seenhq-test.com": "93.184.215.14",
-    "www.site.seenhq-test.com": "93.184.215.14",
-    "rebind.seenhq-test.com": "10.0.0.7",
-    "meta.seenhq-test.com": "169.254.169.254",
+    "site.noticr-test.com": "93.184.215.14",
+    "www.site.noticr-test.com": "93.184.215.14",
+    "rebind.noticr-test.com": "10.0.0.7",
+    "meta.noticr-test.com": "169.254.169.254",
   };
   return {
     resolvePublicAddress: async (host: string) => {
@@ -43,7 +43,7 @@ vi.mock("@/lib/audit/net/ssrf", async () => {
 
 const { safeFetch } = await import("@/lib/audit/net/fetch");
 
-const BASE = "http://site.seenhq-test.com";
+const BASE = "http://site.noticr-test.com";
 const HTML = "<!doctype html><html><head><title>ok</title></head><body>hello</body></html>";
 let server: http.Server;
 
@@ -64,7 +64,7 @@ beforeAll(async () => {
       res.writeHead(200, { "content-type": "text/html" });
       res.end(`<html><body>${req.headers.host}|${req.headers["user-agent"]}</body></html>`);
     } else if (path === "/r1") redirect("/ok");
-    else if (path === "/to-www") redirect("http://www.site.seenhq-test.com/ok", 301);
+    else if (path === "/to-www") redirect("http://www.site.noticr-test.com/ok", 301);
     else if (path.startsWith("/loop/")) {
       // /loop/n redirects to n+1 until n reaches 3, then serves a page.
       const n = Number(path.split("/")[2]);
@@ -76,11 +76,11 @@ beforeAll(async () => {
     }
     else if (path === "/to-metadata") redirect("http://169.254.169.254/latest/meta-data/");
     else if (path === "/to-decimal-ip") redirect("http://2130706433/");
-    else if (path === "/to-rebind") redirect("http://rebind.seenhq-test.com/");
-    else if (path === "/to-meta-host") redirect("http://meta.seenhq-test.com/");
-    else if (path === "/to-port") redirect("http://site.seenhq-test.com:8080/");
+    else if (path === "/to-rebind") redirect("http://rebind.noticr-test.com/");
+    else if (path === "/to-meta-host") redirect("http://meta.noticr-test.com/");
+    else if (path === "/to-port") redirect("http://site.noticr-test.com:8080/");
     else if (path === "/to-file") redirect("file:///etc/passwd");
-    else if (path === "/to-creds") redirect("http://user:pw@site.seenhq-test.com/");
+    else if (path === "/to-creds") redirect("http://user:pw@site.noticr-test.com/");
     else if (path === "/pdf") {
       res.writeHead(200, { "content-type": "application/pdf" });
       res.end("%PDF-1.4");
@@ -145,18 +145,18 @@ describe("safeFetch", () => {
   it("connects to the pinned (validated) address while keeping the Host header and UA", async () => {
     const r = await safeFetch(`${BASE}/host`, { kind: "html" });
     expect(r.status).toBe(200);
-    expect(r.text).toMatch(/site\.seenhq-test\.com(:\d+)?\|/);
-    expect(r.text).toContain("seenhqbot/1.0");
+    expect(r.text).toMatch(/site\.noticr-test\.com(:\d+)?\|/);
+    expect(r.text).toContain("noticrbot/1.0");
   });
 
   it("follows redirects and re-validates every hop", async () => {
     const r = await safeFetch(`${BASE}/r1`, { kind: "html" });
     expect(r.finalUrl).toBe(`${BASE}/ok`);
     expect(r.redirects).toEqual([`${BASE}/ok`]);
-    expect(state.resolved).toEqual(["site.seenhq-test.com", "site.seenhq-test.com"]);
+    expect(state.resolved).toEqual(["site.noticr-test.com", "site.noticr-test.com"]);
 
     const www = await safeFetch(`${BASE}/to-www`, { kind: "html" });
-    expect(www.finalUrl).toBe("http://www.site.seenhq-test.com/ok");
+    expect(www.finalUrl).toBe("http://www.site.noticr-test.com/ok");
   });
 
   it("stops after 3 redirects", async () => {
@@ -180,7 +180,7 @@ describe("safeFetch", () => {
   it("rejects private targets before any request", async () => {
     expect(await code(safeFetch("http://127.0.0.1/", { kind: "html" }))).toBe("blocked_host");
     expect(await code(safeFetch("http://localhost/", { kind: "html" }))).toBe("blocked_host");
-    expect(await code(safeFetch("http://rebind.seenhq-test.com/", { kind: "html" }))).toBe("blocked_host");
+    expect(await code(safeFetch("http://rebind.noticr-test.com/", { kind: "html" }))).toBe("blocked_host");
   });
 
   it("returns the redirect itself when maxRedirects is 0", async () => {

@@ -36,7 +36,7 @@ const AUDIT_ERROR_MAP: Record<AuditErrorCode, { status: number; message: string 
   unreachable: {
     status: 422,
     message:
-      "We couldn't read that website. It may be offline, or its firewall may be refusing our crawler. Check the address and try again. If it is your site, allow the user agent seenhqbot.",
+      "We couldn't read that website. It may be offline, or its firewall may be refusing our crawler. Check the address and try again. If it is your site, allow the user agent noticrbot.",
   },
   not_html: { status: 422, message: "That address didn't return a web page (HTML), so there's nothing to audit." },
   too_large: { status: 422, message: "That page is too large for the free audit to process." },

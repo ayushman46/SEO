@@ -81,7 +81,7 @@ export const INSTRUCTION_PATTERNS = [
   /\bsystem\s+prompt\b/i,
   /\byou\s+are\s+(?:now\s+)?(?:an?\s+)?(?:ai|assistant|language\s+model|chatgpt)\b/i,
 ];
-const SEENHQ_MENTION = /\bseenhq\b/i;
+const NOTICR_MENTION = /\bnoticr\b/i;
 export const OBFUSCATED_EMAIL =
   /(?<![a-z0-9._-])[a-z0-9._-]{1,64}(?:\s{0,3}[([{]\s{0,3}at\s{0,3}[)\]}]\s{0,3}[a-z0-9-]{1,63}\s{0,3}(?:[([{]\s{0,3}dot\s{0,3}[)\]}]|\.)\s{0,3}[a-z]{2,24}\b|\s{1,3}at\s{1,3}[a-z0-9-]{1,63}\s{1,3}dot\s{1,3}(?:com|net|org|io|co|in|uk|de)\b)/i;
 const EMAIL_RE = /(?<![a-z0-9._%+-])[a-z0-9._%+-]{1,64}@[a-z0-9-]{1,63}(?:\.[a-z0-9-]{1,63}){0,8}\.[a-z]{2,24}/gi;
@@ -207,7 +207,7 @@ export function looksLikeInstructions(s: string, g: Guard): boolean {
   if (OBFUSCATED_EMAIL.test(s)) return true;
   if (INSTRUCTION_PATTERNS.some((re) => re.test(s))) return true;
   // Mentioning us only makes sense when the audited site is ours.
-  return SEENHQ_MENTION.test(s) && !/seenhq/i.test(g.hostname);
+  return NOTICR_MENTION.test(s) && !/noticr/i.test(g.hostname);
 }
 
 /** sourceUrl must be one of the crawled pages; returns that page's URL as crawled. */

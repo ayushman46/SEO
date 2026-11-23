@@ -8,7 +8,6 @@ import {
   useRef,
   useState,
   type FormEvent,
-  type ReactNode,
   type RefObject,
 } from "react";
 import { auditForm, auditResultCopy } from "@/content/audit";
@@ -30,16 +29,15 @@ import { auditUi } from "./labels";
 import { ProgressSteps } from "./ProgressSteps";
 import { FixTray } from "./quote/FixTray";
 import { QuotePanel } from "./quote/QuotePanel";
-import { QuoteProvider } from "./quote/QuoteContext";
+import { QuoteProvider, useQuote } from "./quote/QuoteContext";
+import { clearStoredQuote } from "./quote/handoff";
+import { RequestLink } from "./quote/QuoteParts";
 import { ScoreSummary } from "./ScoreSummary";
 import { scrollToElement } from "@/components/scroll/smooth";
 import { topFixes } from "./verdict";
 
 /** The API allows ~60 s; give the network a little headroom before calling it a timeout. */
 const CLIENT_TIMEOUT_MS = 75_000;
-
-/** Same reserve as the streaming fallback (AuditFlowFallback), so the swap does not shift the page. */
-const IDLE_RESERVE = "min-h-[min(40rem,80svh)]";
 
 type FlowState =
   | { status: "idle" }
@@ -56,15 +54,11 @@ type FlowState =
 /**
  * The free-audit flow: URL form -> progress -> partial report -> email gate -> full report.
  * The sealed report and the result live only in this component's state.
- * `children` is shown below the form while idle (server-rendered explainer).
+ * The idle explainer is rendered once by the page, after this component, and hidden by CSS
+ * while the hidden `data-audit-active` marker below is present (R7 #17: it used to be passed in
+ * as children to both the Suspense fallback and this component, so the HTML carried it twice).
  */
-export function AuditFlow({
-  initialUrl = "",
-  children,
-}: {
-  initialUrl?: string;
-  children?: ReactNode;
-}) {
+export function AuditFlow({ initialUrl = "" }: { initialUrl?: string }) {
   const uid = useId();
   const initial = initialUrl.trim().slice(0, 2048);
   const initialValid = initial !== "" && looksLikeUrl(initial);
@@ -103,6 +97,8 @@ export function AuditFlow({
 
     const run = ++runRef.current;
     setFieldError(null);
+    // A quote stored from an earlier report must not ride along with an enquiry about this one (R7 #22).
+    clearStoredQuote();
     setState({ status: "running", url, run });
 
     try {
@@ -151,8 +147,19 @@ export function AuditFlow({
     return () => window.clearTimeout(t);
   }, [initialValid, initial, start]);
 
-  // Abort any in-flight audit when leaving the page.
-  useEffect(() => () => controllerRef.current?.abort(), []);
+  // Abort any in-flight audit when leaving the page. The route can be kept alive and hidden
+  // (cacheComponents), so also reset to idle: coming Back must not show an error card for an
+  // audit the visitor abandoned (R7 #8). Clearing the ref first makes the run's catch a no-op.
+  useEffect(
+    () => () => {
+      const c = controllerRef.current;
+      if (!c) return;
+      controllerRef.current = null;
+      c.abort();
+      setState({ status: "idle" });
+    },
+    [],
+  );
 
   // Move focus after the DOM has the target. Runs after child effects (score rings measure first).
   useEffect(() => {
@@ -249,7 +256,7 @@ export function AuditFlow({
         </div>
       </Container>
 
-      {state.status === "idle" ? <div className={IDLE_RESERVE}>{children}</div> : null}
+      {state.status !== "idle" ? <span hidden data-audit-active="" /> : null}
 
       {state.status === "running" ? (
         <Container size="narrow" className="mt-10 min-h-[min(40rem,80svh)] pb-24">
@@ -339,7 +346,7 @@ function Report({
                   <span className="mb-3 flex items-center gap-2.5 text-kicker font-semibold text-muted uppercase">
                     <span aria-hidden className="h-px w-6 bg-ink/30" />
                     {auditUi.reportFor}
-                  </span>
+                  </span>{" "}
                   <span className="block font-serif text-display-md text-ink [overflow-wrap:anywhere]">
                     {partial.hostname}
                   </span>
@@ -464,6 +471,7 @@ function PartialBody({
           <section aria-labelledby={ids.locked}>
             <h3 id={ids.locked} className={`${h3} flex items-baseline gap-3`}>
               {auditResultCopy.lockedIssuesTitle}
+              <span className="sr-only">, </span>
               <span className="font-sans text-sm font-medium text-muted tabular-nums">
                 {partial.lockedIssues.length}
               </span>
@@ -500,6 +508,8 @@ function PartialBody({
 
 function NextSteps({ headingId, onReset }: { headingId: string; onReset: () => void }) {
   const cta = auditResultCopy.helpCta;
+  const q = useQuote();
+  const quote = q ? (q.selectionQuote ?? q.quote) : null;
   return (
     <section
       aria-labelledby={headingId}
@@ -512,9 +522,17 @@ function NextSteps({ headingId, onReset }: { headingId: string; onReset: () => v
         <Button variant="secondary" onClick={onReset}>
           {auditResultCopy.runAnother}
         </Button>
-        <Button href={cta.href} icon="arrow-right">
-          {cta.label}
-        </Button>
+        {/* Carries the quote and audit to /contact like the panel and tray buttons (R7 #7):
+            the picked issues if any, otherwise the whole-report quote. */}
+        {q && quote && quote.lines.length > 0 ? (
+          <RequestLink q={q} quote={quote} pill>
+            {cta.label}
+          </RequestLink>
+        ) : (
+          <Button href={cta.href} icon="arrow-right">
+            {cta.label}
+          </Button>
+        )}
       </div>
     </section>
   );

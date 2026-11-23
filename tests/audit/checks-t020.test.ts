@@ -132,10 +132,10 @@ describe("seo.soft-404", () => {
 
   it("one request to a made-up path on the audited host, no redirects followed", async () => {
     const f = vi.fn(async () => res(404));
-    const p = await probeSoft404(ctxOf(), { timeoutMs: 3_000, fetcher: f, path: "/seenhq-missing-page-test" });
+    const p = await probeSoft404(ctxOf(), { timeoutMs: 3_000, fetcher: f, path: "/noticr-missing-page-test" });
     expect(f).toHaveBeenCalledTimes(1);
     const [url, opts] = f.mock.calls[0] as unknown as [string, { maxRedirects: number }];
-    expect(url).toBe("https://acme.example.com/seenhq-missing-page-test");
+    expect(url).toBe("https://acme.example.com/noticr-missing-page-test");
     expect(opts.maxRedirects).toBe(0);
     expect(soft404Outcome(p, ctxOf()).status).toBe("pass");
   });
@@ -155,7 +155,7 @@ describe("seo.soft-404", () => {
 
   it("respects robots.txt for our own bot", async () => {
     const f = vi.fn(async () => res(404));
-    const p = await probeSoft404(ctxOf({ robots: "User-agent: seenhqbot\nDisallow: /" }), { timeoutMs: 3_000, fetcher: f });
+    const p = await probeSoft404(ctxOf({ robots: "User-agent: noticrbot\nDisallow: /" }), { timeoutMs: 3_000, fetcher: f });
     expect(p).toEqual({ status: "skipped", reason: "robots" });
     expect(f).not.toHaveBeenCalled();
   });

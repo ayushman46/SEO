@@ -21,14 +21,14 @@
 - **Founder decisions open:** NVIDIA_API_KEY; named person on About; payments; DATABASE_URL; privacy wording tweaks (R5 B7, B8); FAQ heading wording; whether to keep the eye blink.
 
 ## 2026-11-23 10:55 IST: round 2 done; founder wants the PREVIOUS home page back; production deploy on hold until it is restored
-- **Committed + pushed (a54bf4c):** round 2 copy fixes (R5-copy), wiring, rendered design QA fixes (R5-design-qa: tray on phones, focus not obscured, rate card alignment). 721 tests, typecheck, lint, build green. Preview of that state: https://seenhq-pa0z65w2t-ayushs-projects-32c1d225.vercel.app (routes 200, audit + unlock OK, new prices visible).
+- **Committed + pushed (a54bf4c):** round 2 copy fixes (R5-copy), wiring, rendered design QA fixes (R5-design-qa: tray on phones, focus not obscured, rate card alignment). 721 tests, typecheck, lint, build green. Preview of that state: https://noticr-pa0z65w2t-ayushs-projects-32c1d225.vercel.app (routes 200, audit + unlock OK, new prices visible).
 - **Founder (10:50):** "go back to the previous home landing page, it was better." Running: frontend-designer T033 restores the HOME page (route / only) to the v1.1 design (commit afe001d), keeping current prices, honest copy, logo marquee, smooth scroll, a11y/perf fixes. Inner-page redesign stays.
 - **Founder (10:05):** deploy the new version to production once fixes are done; keep the fixing loop running until the session limit. => After T033: build, screenshots vs v1.1, preview, smoke test, then `npx vercel deploy --prod --yes` (approved), PageSpeed Insights, then next critic round (critics must NOT redesign the home page again: home layout is frozen to v1.1; only bugs, copy truth and a11y there).
 - **Production is still v1.1 with old prices.**
 
 ## 2026-11-23 09:20 IST: feedback loop round 1 done and on preview; round 2 critics running
 - **Committed + pushed (13f3c91):** copy rewrite (115 edits, docs/COPY_STYLE.md + style tests), below-market price ladder (Full audit $39/₹2,999, Fix sprint fixed $149/₹9,999 up to 8 fixes, Monitoring $19/₹999, fact-check $59/₹3,999, local setup $99/₹3,999, unblock $49/₹2,999, content from $99/₹6,999), Lenis smooth scroll (gated, self-disabling guard, docs/SCROLL_PERF.md), design review R4 (56 findings), three signature moments (eye blink, report front page, pricing rate card). 711 tests, typecheck, lint, build green.
-- **Preview:** https://seenhq-8jlrmdrps-ayushs-projects-32c1d225.vercel.app. **Production is still v1.1 with the OLD prices and copy.**
+- **Preview:** https://noticr-8jlrmdrps-ayushs-projects-32c1d225.vercel.app. **Production is still v1.1 with the OLD prices and copy.**
 - **Running (round 2):** copy critic -> docs/reviews/R5-copy.md; rendered design/a11y/scroll QA -> docs/reviews/R5-design-qa.md.
 - **Exact next step:** apply R5 findings (content-seo for copy, frontend-designer for design; sequential), rebuild, preview, then round 3 critics; repeat until critics find little or the usage limit hits. Ask founder before production deploy (new prices go live with it).
 - **Not verified:** scroll feel and FPS in a visible real browser (the in-app pane was hidden and throttled). Headless timespan measured 60 fps at 1x CPU.
@@ -43,27 +43,27 @@
 
 ## 2026-11-23 03:20 IST: platform-aware fixes added; still WAITING for founder yes to deploy production
 - **Committed + pushed:** platform detection + 135 vendor-verified where-to-click fix entries (ADR-019). 675 tests, typecheck, lint, build green.
-- **Latest preview (final candidate):** https://seenhq-14z10gium-ayushs-projects-32c1d225.vercel.app (audit of webflow.com via its API: 200 in 4.8 s, score 92).
+- **Latest preview (final candidate):** https://noticr-14z10gium-ayushs-projects-32c1d225.vercel.app (audit of webflow.com via its API: 200 in 4.8 s, score 92).
 - **Production is still v1.** Next step on founder yes: `npx vercel deploy --prod --yes`, smoke test, PageSpeed Insights, launch report v1.1.
-- **Known:** Shopify's bot check sometimes refuses seenhqbot (403), so some Shopify stores cannot be audited.
+- **Known:** Shopify's bot check sometimes refuses noticrbot (403), so some Shopify stores cannot be audited.
 
 ## 2026-11-23 02:45 IST: v1.1 reviewed, fixed, on preview; WAITING for founder yes to deploy production
 - **Committed + pushed (39c92d4):** all R3 review findings fixed (1 critical ReDoS, 1 high label trust, 14 others). 605 tests x3, typecheck, lint, build green. New pages a11y/best-practices/SEO 100 locally.
-- **Preview (v1.1 final candidate):** https://seenhq-klvcg209z-ayushs-projects-32c1d225.vercel.app. All routes 200; real audit of wikipedia.org through the deployed API: 200 in 2.0 s, 31 checks.
+- **Preview (v1.1 final candidate):** https://noticr-klvcg209z-ayushs-projects-32c1d225.vercel.app. All routes 200; real audit of wikipedia.org through the deployed API: 200 in 2.0 s, 31 checks.
 - **Production (https://seenhq.vercel.app) is still v1.** The harness blocked `vercel deploy --prod` without a fresh founder approval. Next step when the founder says yes: `npx vercel deploy --prod --yes`, smoke test routes + audit + quote hand-off, PageSpeed Insights on /, /audit, /sample-report, /methodology, then write docs/LAUNCH_REPORT.md v1.1 section.
 - **Founder actions:** approve production deploy; NVIDIA_API_KEY (AI reading is off without it; then run one real audit and tune prompts); decide Fix sprint fixed vs "From"; contact email; Bing verification; optional DATABASE_URL + npm run db:migrate (0001 + 0002), PAGESPEED_API_KEY, ADMIN_PASSWORD.
 - **Backlog candidates (docs/MARKET_RESEARCH_3_FULL.md, CONVERSION_RESEARCH.md):** payment link (Razorpay/UPI), follow-up emails, platform-aware fix steps, re-audit diff + change alerts (need DB), white-label reports, competitor comparison, AI shopping feed readiness.
 
 ## 2026-11-23 01:50 IST: v1.1 built, on preview, under review
 - **Committed + pushed (fc8c945):** AI reading (NVIDIA, off until NVIDIA_API_KEY is set), 9 new checks (content-format, fact-consistency, raw-html-facts, ai-crawler-probe, snippet-eligibility, review-signals, bing-indexnow, soft-404, ai-clarity), export (tickets / agent prompt), instant quote + order hand-off to contact form, /methodology, /bot, /sample-report, logo marquee, copy + legal updates. 547 tests, typecheck, lint, build green. Browser-checked locally: logo strip, sample report, real audit of python.org (79), quote panel, hand-off to /contact.
-- **Preview:** https://seenhq-ido5sx3ub-ayushs-projects-32c1d225.vercel.app
+- **Preview:** https://noticr-ido5sx3ub-ayushs-projects-32c1d225.vercel.app
 - **Running:** qa-security review T023 → docs/reviews/R3-v1.1.md.
 - **Exact next step:** apply R3 findings (owners: audit-engine / architect-backend / frontend-designer / content-seo), rebuild, Lighthouse on preview pages, then production deploy (vercel deploy --prod) and PageSpeed check, then final report.
 - **Founder decisions open:** NVIDIA_API_KEY; Fix sprint fixed $199 vs "From $199"; INR price for Content & entity; taxes shown inclusive; contact email + Bing verification for our own site; founder identity on About.
 - **Research docs:** MARKET_RESEARCH.md, _2_PRODUCT.md, _3_FULL.md, CONVERSION_RESEARCH.md.
 
 ## 2026-11-23 00:30 IST: v1.1 sprint (founder: run autonomously until 12:30 today)
-Founder brief: improve the free audit with an NVIDIA-hosted LLM, add every validated market gap, deepest market research, and a real free-to-paid path. If a usage limit interrupts, resume with "continue the SeenHQ sprint" and pick up from this entry.
+Founder brief: improve the free audit with an NVIDIA-hosted LLM, add every validated market gap, deepest market research, and a real free-to-paid path. If a usage limit interrupts, resume with "continue the noticr sprint" and pick up from this entry.
 - **Live:** https://seenhq.vercel.app is v1 (commit fe25d51 + ring fix). Nothing from v1.1 is deployed yet.
 - **In flight (uncommitted in the working tree unless noted):**
   - audit-engine: T014 NVIDIA LLM insights (spec docs/tasks/014-ai-insights.md; contract v1.1 in src/lib/audit/types.ts), then T016 four gap checks + export.ts (docs/MARKET_RESEARCH_2_PRODUCT.md "build now").
@@ -78,7 +78,7 @@ Founder brief: improve the free audit with an NVIDIA-hosted LLM, add every valid
 - **Next (optional, founder):** DATABASE_URL, PAGESPEED_API_KEY, ADMIN_PASSWORD, email keys, custom domain (see launch report).
 
 ## 2026-11-23 ~00:30 IST: QA done, preview deployed
-- **Preview:** https://seenhq-7xbaexaql-ayushs-projects-32c1d225.vercel.app (Vercel Authentication on; open while logged in to Vercel). All routes 200, missing path 404. Real audit of vercel.com via the deployed API: 200 in 3.2 s; unlock 200 (seal secret works across instances).
+- **Preview:** https://noticr-7xbaexaql-ayushs-projects-32c1d225.vercel.app (Vercel Authentication on; open while logged in to Vercel). All routes 200, missing path 404. Real audit of vercel.com via the deployed API: 200 in 3.2 s; unlock 200 (seal secret works across instances).
 - **Vercel env set (values never printed):** AUDIT_SEAL_SECRET, IP_HASH_SALT (preview + production), NEXT_PUBLIC_SITE_URL=https://seenhq.vercel.app (production).
 - **QA (docs/QA.md):** no critical/high security issues. Placeholders replaced with neutral wording (founder decision). Lighthouse mobile local: A11y/BP/SEO 100 on all 8 pages, CLS 0; Performance 57-79 locally but this laptop benchmarks 670-800 and runs vary widely; measure on production with PageSpeed Insights after deploy.
 - **Exact next step:** founder yes for production deploy (vercel deploy --prod), then smoke test production + PageSpeed Insights on seenhq.vercel.app, then launch report.
@@ -91,7 +91,7 @@ Founder brief: improve the free audit with an NVIDIA-hosted LLM, add every valid
 - **Known issues for launch report:** rate limit per-instance without DATABASE_URL (ADR-013); leads only logged without DATABASE_URL; Core Web Vitals "Not measured" without PAGESPEED_API_KEY.
 - **Time left:** ~11.8 h to 10:00 freeze.
 
-## 2026-11-22 ~20:30 IST: PAUSED (usage limit). Resume with "continue the SeenHQ sprint"
+## 2026-11-22 ~20:30 IST: PAUSED (usage limit). Resume with "continue the noticr sprint"
 - **Done + pushed:** all pages built (home, /audit flow, services, pricing, about, contact, privacy, terms, 404, design-preview), each independently reviewed and fixed. Typecheck, lint, 257 tests and `npm run build` green at this commit.
 - **Was in flight when paused (may be partially applied in this commit or lost):**
   - audit-engine applying R2 findings 1-8, 12-18, 22-25 (docs/reviews/R2-engine-backend.md). Re-check each finding against the code; the 4 DoS ones (1-4) are the priority.

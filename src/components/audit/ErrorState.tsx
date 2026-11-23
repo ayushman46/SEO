@@ -20,7 +20,8 @@ export function ErrorState({ error, onRetry }: { error: FlowError; onRetry?: () 
     return () => window.clearTimeout(id);
   }, [error]);
 
-  const rate = error.code === "rate_limited";
+  // Both are "wait, then retry" states: clock icon, wait title and the retry time (R7 #8).
+  const rate = error.code === "rate_limited" || error.code === "server_busy";
   const title = rate ? auditUi.rateTitle : error.code === "generic" ? auditUi.genericTitle : auditUi.errorTitle;
 
   return (

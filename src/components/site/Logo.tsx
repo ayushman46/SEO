@@ -1,6 +1,6 @@
 import { cx } from "@/components/ui/cx";
 
-/** The seenhq mark: an open eye on an ink tile, electric-blue iris. */
+/** The noticr mark: an open eye on an ink tile, electric-blue iris. */
 export function LogoMark({ size = 30, className }: { size?: number; className?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden focusable="false" className={cx("shrink-0", className)}>
@@ -16,7 +16,7 @@ export function LogoMark({ size = 30, className }: { size?: number; className?: 
   );
 }
 
-/** Mark + lowercase serif wordmark. Brand is always "seenhq". */
+/** Mark + lowercase serif wordmark. Brand is always "noticr". */
 export function Logo({ size = "md", tone = "light", className }: { size?: "md" | "lg"; tone?: "light" | "night"; className?: string }) {
   return (
     <span className={cx("inline-flex items-center gap-2", className)}>
@@ -28,7 +28,7 @@ export function Logo({ size = "md", tone = "light", className }: { size?: "md" |
           tone === "night" ? "text-night-ink" : "text-ink",
         )}
       >
-        seenhq
+        noticr
       </span>
     </span>
   );

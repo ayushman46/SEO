@@ -1,4 +1,4 @@
--- seenhq — 0002_quote (T019: instant quote + order intake)
+-- noticr — 0002_quote (T019: instant quote + order intake)
 -- Additive and idempotent. scripts/migrate.ts wraps each file in a transaction (no BEGIN/COMMIT).
 -- contact_submissions already has row level security enabled with no policies (0001); new columns
 -- inherit that, so nothing here is reachable through a public data API.

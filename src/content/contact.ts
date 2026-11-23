@@ -57,7 +57,7 @@ export const contactForm = {
       placeholder: "We rank well locally but never show up when people ask ChatGPT for a dentist nearby.",
     },
     consent: {
-      label: "I agree that seenhq may store these details to reply to my enquiry, as described in the privacy policy.",
+      label: "I agree that noticr may store these details to reply to my enquiry, as described in the privacy policy.",
     },
   },
   submitLabel: "Send message",
@@ -67,6 +67,8 @@ export const contactForm = {
     body: "We reply within two working days. In the meantime, you can run a free audit of your site.",
     cta: { label: "Run a free audit", href: "/audit" },
   },
+  /** Success after sending a quote from an audit report: no "run an audit" nudge (R7 #11). */
+  successWithQuote: { body: "We reply within two working days with your quote in writing." },
   errors: {
     generic: "Something went wrong sending your message. Please try again in a few minutes.",
     rateLimited: "You have sent several messages in a short time. Please wait a while and try again.",

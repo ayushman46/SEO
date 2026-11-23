@@ -1,4 +1,4 @@
-# seenhq copy style
+# noticr copy style
 
 Adopted 2026-11-23 from the copy review (docs/reviews/R4-copy-slop.md). Applies to every user-facing string in `src/content/**`, `src/lib/audit/issues.ts` and `src/components/audit/labels.ts`. The mechanical rules are enforced by `tests/content/copy-style.test.ts`.
 
@@ -11,7 +11,7 @@ Adopted 2026-11-23 from the copy review (docs/reviews/R4-copy-slop.md). Applies 
 7. **Write for the dentist.** If a term needs a parenthesis to explain it (entity, canonical, soft 404, user agent, snippet eligibility), use plain words on marketing pages and keep the term for /methodology and how-to-fix steps.
 8. **FAQ answers start with the answer.** "Yes." "No." "$49." Then at most two sentences. An answer that runs long belongs on a page, with a link. *(Test: FAQ answers on marketing pages max 75 words; other marketing strings max 90 words.)*
 9. **Plain punctuation.** One colon per sentence at most, no semicolon where a full stop works, no fragments in threes ("Free, about a minute, no setup.").
-10. **Hard rules stay hard.** seenhq is lowercase. The AI reading is one model's reading and never what ChatGPT, Gemini or any assistant says. The crawler test is "simulated", never "live". No testimonials, counts, logos or guarantees. Nothing that suggests an online member area.
+10. **Hard rules stay hard.** noticr is lowercase. The AI reading is one model's reading and never what ChatGPT, Gemini or any assistant says. The crawler test is "simulated", never "live". No testimonials, counts, logos or guarantees. Nothing that suggests an online member area.
 
 ## Banned on marketing pages
 

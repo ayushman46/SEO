@@ -80,15 +80,22 @@ export function RequestLink({
   quote,
   children,
   variant = "primary",
+  pill = false,
   className,
 }: {
   q: QuoteState;
   quote: Quote;
   children: ReactNode;
   variant?: ButtonVariant;
+  /** Keep the standard one-line pill shape (to sit beside an ordinary <Button>). */
+  pill?: boolean;
   className?: string;
 }) {
-  const cls = buttonClass({ variant, size: "md", className: cx("h-auto! min-h-11 rounded-control! py-2 whitespace-normal! text-center", className) });
+  const cls = buttonClass({
+    variant,
+    size: "md",
+    className: cx(pill ? undefined : "h-auto! min-h-11 rounded-control! py-2 whitespace-normal! text-center", className),
+  });
   if (q.sample) {
     return (
       <Link href="/audit" className={cls}>

@@ -33,7 +33,7 @@ describe("detectHomepageRefusal", () => {
     const r = detectHomepageRefusal(res(403, PLAIN_403, { server: "Apache" }));
     expect(r).toMatchObject({ kind: "refused", status: 403, layer: null });
     expect(refusalMessage(r!)).toBe(
-      "This site refused our crawler (HTTP 403). We can't audit it from outside. If it is your site, allow the user agent seenhqbot or try again later.",
+      "This site refused our crawler (HTTP 403). We can't audit it from outside. If it is your site, allow the user agent noticrbot or try again later.",
     );
   });
 
@@ -41,7 +41,7 @@ describe("detectHomepageRefusal", () => {
     const r = detectHomepageRefusal(res(403, CF_BLOCK, { server: "cloudflare", "cf-ray": "8a1b2c3d4e5f-LHR" }));
     expect(r).toMatchObject({ kind: "challenge", status: 403, layer: "cloudflare", layerName: "Cloudflare" });
     expect(refusalMessage(r!)).toContain("(HTTP 403, looks like Cloudflare)");
-    expect(refusalMessage(r!)).toContain("allow the user agent seenhqbot");
+    expect(refusalMessage(r!)).toContain("allow the user agent noticrbot");
   });
 
   it("Akamai 403 names Akamai", () => {

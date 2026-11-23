@@ -70,7 +70,7 @@ Reason: The label says "live", the sentence under it says "simulated". The engin
 Current:
 
 ````text
-seenhq offers eight focused services for startups, SaaS teams and local businesses. Each one has a fixed scope and a clear deliverable, so you know exactly what you are paying for before we start. The SEO audit and GEO audit are delivered together as one Full audit, at one price. Three services look beyond your own website: an AI fact-check that corrects the sources behind wrong AI answers, a local AI visibility setup for the profiles AI assistants read, and an AI crawler unblock for sites that turn AI crawlers away without meaning to. Every service is done by a person, and none of them can promise what an AI will say.
+noticr offers eight focused services for startups, SaaS teams and local businesses. Each one has a fixed scope and a clear deliverable, so you know exactly what you are paying for before we start. The SEO audit and GEO audit are delivered together as one Full audit, at one price. Three services look beyond your own website: an AI fact-check that corrects the sources behind wrong AI answers, a local AI visibility setup for the profiles AI assistants read, and an AI crawler unblock for sites that turn AI crawlers away without meaning to. Every service is done by a person, and none of them can promise what an AI will say.
 ````
 
 Replacement:
@@ -182,7 +182,7 @@ Reason: 120 words, ending on the "nobody can control an AI" caveat that the next
 Current:
 
 ````text
-The seenhq audit is free. The Full audit and Monitoring have one fixed price per site. A fix sprint depends on how much needs fixing, so its price is a starting point: you get a fixed quote by email before any work starts, and you pay nothing until you agree to it. Monitoring can be cancelled any month. Prices are per site and exclude applicable taxes. We confirm scope and a fixed quote in writing before any paid work starts.
+The noticr audit is free. The Full audit and Monitoring have one fixed price per site. A fix sprint depends on how much needs fixing, so its price is a starting point: you get a fixed quote by email before any work starts, and you pay nothing until you agree to it. Monitoring can be cancelled any month. Prices are per site and exclude applicable taxes. We confirm scope and a fixed quote in writing before any paid work starts.
 ````
 
 Replacement:
@@ -198,7 +198,7 @@ Reason: "Fixed quote before any work starts" is said three times in one paragrap
 Current:
 
 ````text
-seenhq checks your website for Google and for AI answer engines like ChatGPT, Perplexity and Gemini. Paste your address to get scores, a separate AI model's reading of your pages and a ranked list of fixes, in about a minute.
+noticr checks your website for Google and for AI answer engines like ChatGPT, Perplexity and Gemini. Paste your address to get scores, a separate AI model's reading of your pages and a ranked list of fixes, in about a minute.
 ````
 
 Replacement:
@@ -598,16 +598,16 @@ Reason: Trim the list; keep the one honesty line this page needs, in fewer words
 Current:
 
 ````text
-seenhq audits your website for Google and AI answer engines like ChatGPT and Perplexity, then fixes what stops you from being found, cited and chosen.
+noticr audits your website for Google and AI answer engines like ChatGPT and Perplexity, then fixes what stops you from being found, cited and chosen.
 ````
 
 Replacement:
 
 ````text
-seenhq audits your website for Google and AI answer engines like ChatGPT and Perplexity, then fixes what stops them reading and quoting it.
+noticr audits your website for Google and AI answer engines like ChatGPT and Perplexity, then fixes what stops them reading and quoting it.
 ````
 
-Reason: "Found, cited and chosen": a list of three for rhythm, and "chosen" is a result seenhq cannot deliver. This string is the default meta description and the llms.txt summary.
+Reason: "Found, cited and chosen": a list of three for rhythm, and "chosen" is a result noticr cannot deliver. This string is the default meta description and the llms.txt summary.
 
 ### 37. `src/content/contact.ts`
 
@@ -639,20 +639,20 @@ Replacement:
 A small studio for SEO and AI search
 ````
 
-Reason: The About H1 is the home page H1, word for word. Say what seenhq is.
+Reason: The About H1 is the home page H1, word for word. Say what noticr is.
 
 ### 39. `src/content/about.ts`
 
 Current:
 
 ````text
-seenhq is a small SEO and GEO studio. We audit websites for search engines and AI answer engines, then help fix what stops them from being found, trusted and cited.
+noticr is a small SEO and GEO studio. We audit websites for search engines and AI answer engines, then help fix what stops them from being found, trusted and cited.
 ````
 
 Replacement:
 
 ````text
-seenhq is a small SEO and GEO studio. We audit websites for Google and AI answer engines, then fix what the audit finds.
+noticr is a small SEO and GEO studio. We audit websites for Google and AI answer engines, then fix what the audit finds.
 ````
 
 Reason: "Found, trusted and cited" triad; "help fix" hedges a thing the studio simply does.
@@ -662,13 +662,13 @@ Reason: "Found, trusted and cited" triad; "help fix" hedges a thing the studio s
 Current:
 
 ````text
-More people now ask an AI assistant instead of scrolling through search results. Most small businesses have no idea whether those assistants can read their website, let alone recommend it. We built seenhq to make that visible and fixable without an agency retainer.
+More people now ask an AI assistant instead of scrolling through search results. Most small businesses have no idea whether those assistants can read their website, let alone recommend it. We built noticr to make that visible and fixable without an agency retainer.
 ````
 
 Replacement:
 
 ````text
-A small business has no easy way to tell whether AI assistants can read its website. seenhq checks that for free and fixes it without an agency retainer.
+A small business has no easy way to tell whether AI assistants can read its website. noticr checks that for free and fixes it without an agency retainer.
 ````
 
 Reason: Third telling of "people now ask AI" on the site, plus an unsupported "most small businesses have no idea".
@@ -726,13 +726,13 @@ Reason: "For real businesses" is filler. Rendered title is 44 characters with th
 Current:
 
 ````text
-seenhq helps startups, SaaS teams and local businesses be found on Google and cited by AI answer engines. Learn who we are and how we work.
+noticr helps startups, SaaS teams and local businesses be found on Google and cited by AI answer engines. Learn who we are and how we work.
 ````
 
 Replacement:
 
 ````text
-seenhq is a small SEO and GEO studio for startups, SaaS teams and local businesses: free audit, fixed-price fixes, no promised rankings.
+noticr is a small SEO and GEO studio for startups, SaaS teams and local businesses: free audit, fixed-price fixes, no promised rankings.
 ````
 
 Reason: "Learn who we are and how we work" is a filler closer. 136 characters.
@@ -1294,7 +1294,7 @@ Reason: Rhetorical-question H1 on the page whose only job is the form.
 Current:
 
 ````text
-Enter your website address. seenhq checks your homepage and up to five key pages for SEO, GEO and mobile performance, has a language model read them to see how clearly they describe your business, then scores everything and ranks what to fix first.
+Enter your website address. noticr checks your homepage and up to five key pages for SEO, GEO and mobile performance, has a language model read them to see how clearly they describe your business, then scores everything and ranks what to fix first.
 ````
 
 Replacement:
@@ -1438,32 +1438,32 @@ Reason: Rhetorical opener on a link.
 Current:
 
 ````text
-seenhqbot is the web crawler behind the free seenhq website audit. It fetches a handful of public pages from a site only when someone asks us to audit that site, and it never crawls the web on its own.
+noticrbot is the web crawler behind the free noticr website audit. It fetches a handful of public pages from a site only when someone asks us to audit that site, and it never crawls the web on its own.
 ````
 
 Replacement:
 
 ````text
-seenhqbot fetches up to six public pages from a site, only when someone asks seenhq to audit that site. It never crawls on its own.
+noticrbot fetches up to six public pages from a site, only when someone asks noticr to audit that site. It never crawls on its own.
 ````
 
-Reason: "A handful" and "the web crawler behind the free seenhq website audit" where a number and a verb will do. A site owner reading logs wants the number.
+Reason: "A handful" and "the web crawler behind the free noticr website audit" where a number and a verb will do. A site owner reading logs wants the number.
 
 ### 90. `src/content/bot.ts`
 
 Current:
 
 ````text
-seenhq is a small SEO and GEO studio. Our free audit checks a website for Google and for AI answer engines, and seenhqbot is the part that fetches the pages. It is not a search engine, it does not build an index, and we do not use the pages it fetches to train AI models.
+noticr is a small SEO and GEO studio. Our free audit checks a website for Google and for AI answer engines, and noticrbot is the part that fetches the pages. It is not a search engine, it does not build an index, and we do not use the pages it fetches to train AI models.
 ````
 
 Replacement:
 
 ````text
-seenhq is a small SEO and GEO studio, and seenhqbot fetches pages for its free website audit. It builds no index, and the pages are not used to train AI models.
+noticr is a small SEO and GEO studio, and noticrbot fetches pages for its free website audit. It builds no index, and the pages are not used to train AI models.
 ````
 
-Reason: Third copy of "seenhq is a small SEO and GEO studio" plus three negatives where two matter.
+Reason: Third copy of "noticr is a small SEO and GEO studio" plus three negatives where two matter.
 
 ### 91. `src/content/bot.ts`
 
@@ -1502,7 +1502,7 @@ Reason: "For the reason above" points at a paragraph three sections up.
 Current:
 
 ````text
-The seenhq audit is a free, automated check that reads up to six public pages of a website and scores them for SEO, GEO (Generative Engine Optimization) and mobile performance. This page lists what it fetches, every check it runs, how the scores are calculated, what the AI reading is and is not, and the limits we know about.
+The noticr audit is a free, automated check that reads up to six public pages of a website and scores them for SEO, GEO (Generative Engine Optimization) and mobile performance. This page lists what it fetches, every check it runs, how the scores are calculated, what the AI reading is and is not, and the limits we know about.
 ````
 
 Replacement:
@@ -1896,9 +1896,9 @@ These are outside the files under review but must change in the same commit, or 
 
 **Delete**
 
-1. **/about, "seenhq at a glance"** (`aboutSections[0]`). It repeats the page intro and the home hero. Nothing is lost.
-2. **Home FAQ, "Is seenhq useful for a local business, not just a startup?"** A leading question the hero eyebrow already answers ("for startups and local businesses"). If it stays, use edit 18.
-3. **Pricing FAQ, "Is seenhq affordable for a local business?"** Same problem. The price cards are the answer. If it stays, use edit 65.
+1. **/about, "noticr at a glance"** (`aboutSections[0]`). It repeats the page intro and the home hero. Nothing is lost.
+2. **Home FAQ, "Is noticr useful for a local business, not just a startup?"** A leading question the hero eyebrow already answers ("for startups and local businesses"). If it stays, use edit 18.
+3. **Pricing FAQ, "Is noticr affordable for a local business?"** Same problem. The price cards are the answer. If it stays, use edit 65.
 4. **The three statistics in `services.ts`** (Small Business Expo survey, BrightLocal survey, the HackerNoon scan). They are sourced, so they are not fake proof, but they are padding in a service description, and a single founder's scan of 591 sites is an anecdote. Edits 4, 5 and 6 remove them. If one is wanted, put it on the home problem section with a link to the source.
 5. **`pricingNoteInr` and the third India note.** Both repeat the line directly above them (edits 62 and 64).
 
@@ -1945,7 +1945,7 @@ These phrases are required verbatim by tests, so the edits keep them. Each is wo
 7. **Write for the dentist.** If a term needs a parenthesis to explain it (entity, canonical, soft 404, user agent, snippet eligibility), use the plain words on marketing pages and keep the term for /methodology and how-to-fix steps.
 8. **FAQ answers start with the answer.** "Yes." "No." "$49." Then at most two sentences. An answer over 60 words belongs on a page, with a link.
 9. **Plain punctuation.** One colon per sentence at most, no semicolon where a full stop works, no fragments in threes ("Free, about a minute, no setup.").
-10. **Hard rules stay hard.** seenhq is lowercase. The AI reading is one model's reading and never what ChatGPT, Gemini or any assistant says. The crawler test is "simulated", never "live". No testimonials, counts, logos or guarantees. Nothing that suggests an online member area.
+10. **Hard rules stay hard.** noticr is lowercase. The AI reading is one model's reading and never what ChatGPT, Gemini or any assistant says. The crawler test is "simulated", never "live". No testimonials, counts, logos or guarantees. Nothing that suggests an online member area.
 
 ## Counts
 

@@ -51,7 +51,7 @@ export const auditEmailGate = {
   emailLabel: "Email",
   emailPlaceholder: "you@company.com",
   consentLabel:
-    "I agree that seenhq may store my email with this report and contact me about it. I can ask for it to be deleted at any time.",
+    "I agree that noticr may store my email with this report and contact me about it. I can ask for it to be deleted at any time.",
   submitLabel: "Unlock full report",
   submittingLabel: "Unlocking…",
   privacyNote: "We never sell your email. See the privacy policy for details.",
@@ -67,14 +67,15 @@ export const auditErrors = {
   invalid_url: auditForm.invalidInput,
   blocked_host: "We can't audit that address. It points to a private or reserved network, which we don't scan for security reasons.",
   unreachable:
-    "We couldn't read that website. It may be offline, or its firewall may be refusing our crawler. Check the address and try again. If it is your site, allow the user agent seenhqbot.",
+    "We couldn't read that website. It may be offline, or its firewall may be refusing our crawler. Check the address and try again. If it is your site, allow the user agent noticrbot.",
   timeout: "The website took too long to respond. Try again in a few minutes.",
   not_html: "That address doesn't return a web page. Try your homepage address instead.",
   too_large: "That page is too large for us to scan. Try your homepage address or a lighter page.",
   rate_limited: "You've run several audits in a short time. Please wait a little while before running another one.",
   invalid_or_expired: "This report has expired. Run the audit again to unlock the full results.",
   generic: "Something went wrong on our side. Please try again in a moment.",
-  server_busy: "We're running a lot of audits right now. Please try again in a minute.",
+  server_busy:
+    "An earlier audit from your network is still finishing, or we're running a lot of audits right now. Please try again in a minute.",
 } as const;
 
 /**

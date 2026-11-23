@@ -69,10 +69,10 @@ export class InFlightGuard {
  */
 export const AUDIT_IN_FLIGHT_LIMITS: InFlightLimits = { maxTotal: 4, maxPerKey: 1 };
 
-const globalForGuards = globalThis as typeof globalThis & { __seenhqAuditGuard?: InFlightGuard };
+const globalForGuards = globalThis as typeof globalThis & { __noticrAuditGuard?: InFlightGuard };
 
 /** Shared per-instance guard for /api/audit (cached on globalThis so dev reloads keep one copy). */
 export function auditInFlightGuard(): InFlightGuard {
-  globalForGuards.__seenhqAuditGuard ??= new InFlightGuard(AUDIT_IN_FLIGHT_LIMITS);
-  return globalForGuards.__seenhqAuditGuard;
+  globalForGuards.__noticrAuditGuard ??= new InFlightGuard(AUDIT_IN_FLIGHT_LIMITS);
+  return globalForGuards.__noticrAuditGuard;
 }

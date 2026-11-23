@@ -6,4 +6,6 @@ export const auditForm = {
   submitLabel: "Run free audit",
   submittingLabel: "Auditing…",
   invalidInput: "That doesn't look like a website address. Try something like example.com.",
+  /** Shown only when scripts are off (<noscript> on /audit): the GET form just carries the address. */
+  noScript: "The audit runs in your browser, so it needs JavaScript. Please turn JavaScript on and try again.",
 } as const;

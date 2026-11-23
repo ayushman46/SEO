@@ -39,7 +39,7 @@ export function Nav() {
             aria-hidden
             className="nav-pill-bg absolute inset-0 -z-10 rounded-pill bg-white/95 shadow-pill ring-1 ring-ink/[0.06] after:absolute after:inset-0 after:rounded-pill after:opacity-0 after:shadow-float"
           />
-          <Link href="/" aria-label="seenhq home" className="mr-1 rounded-lg py-1 pr-2">
+          <Link href="/" aria-label="noticr home" className="mr-1 rounded-lg py-1 pr-2">
             <Logo />
           </Link>
           <nav aria-label="Main" className="hidden lg:block">

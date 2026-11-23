@@ -13,7 +13,7 @@ export const TITLE_RE = /<title[^<>]{0,200}>([^<]{0,200})/i;
 const BODY_CAP = 32 * 1024;
 
 export function soft404Path(): string {
-  return `/seenhq-missing-page-${randomBytes(6).toString("hex")}`;
+  return `/noticr-missing-page-${randomBytes(6).toString("hex")}`;
 }
 
 export async function probeSoft404(

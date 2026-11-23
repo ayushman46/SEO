@@ -44,7 +44,7 @@ describe("POST /api/audit: refusal message", () => {
     const err = await errorOf(res);
     expect(err.code).toBe("unreachable");
     expect(err.message).toBe(
-      "This site refused our crawler (HTTP 403, looks like Cloudflare). We can't audit it from outside. If it is your site, allow the user agent seenhqbot or try again later.",
+      "This site refused our crawler (HTTP 403, looks like Cloudflare). We can't audit it from outside. If it is your site, allow the user agent noticrbot or try again later.",
     );
   });
 
@@ -53,6 +53,6 @@ describe("POST /api/audit: refusal message", () => {
     const err = await errorOf(await POST(req()));
     expect(err.code).toBe("unreachable");
     expect(err.message).not.toContain("ECONNRESET");
-    expect(err.message).toContain("seenhqbot");
+    expect(err.message).toContain("noticrbot");
   });
 });

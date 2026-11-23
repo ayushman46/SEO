@@ -91,7 +91,7 @@ for (const job of jobs) {
 }
 
 // ---------------------------------------------------------------------------
-// Brand assets: the seenhq eye mark (same geometry as src/components/site/Logo.tsx),
+// Brand assets: the noticr eye mark (same geometry as src/components/site/Logo.tsx),
 // rendered from inline SVG. Outputs public/logo.png (512, used by Organization
 // JSON-LD), src/app/icon.svg, src/app/apple-icon.png (180) and src/app/favicon.ico
 // (32 + 16 px PNGs in an ICO container, for clients that only ask for /favicon.ico).

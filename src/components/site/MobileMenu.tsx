@@ -85,7 +85,7 @@ export function MobileMenu({ links, cta, className }: { links: Cta[]; cta: Cta; 
         className="menu-sheet fixed inset-x-3 top-3 bottom-auto m-0 w-auto overflow-hidden rounded-panel bg-white p-0 text-ink shadow-float"
       >
         <div className="flex items-center justify-between py-3 pr-3 pl-5">
-          <Link href="/" onClick={close} aria-label="seenhq home" className="rounded-md">
+          <Link href="/" onClick={close} aria-label="noticr home" className="rounded-md">
             <Logo />
           </Link>
           <button

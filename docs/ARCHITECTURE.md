@@ -1,4 +1,4 @@
-# Architecture — seenhq v1
+# Architecture — noticr v1
 
 ## Stack
 Next.js 16.4 (App Router, RSC, route handlers, server actions) · TypeScript strict · Tailwind CSS v4 · `motion` · Zod · `postgres` (any Postgres; Neon recommended) · `cheerio`, `robots-parser`, `ipaddr.js` for the audit engine · Vercel (+ Analytics, Speed Insights).
@@ -37,7 +37,7 @@ tests/**                      qa-security (each agent may add tests for its own 
 ## Audit flow
 1. `/audit` form → `POST /api/audit {url}`.
 2. Handler: Zod-validate, normalize URL, rate-limit (5/h/IP), `runAudit(url)` with a 55 s budget.
-3. Crawl (`crawl.ts`): SSRF-safe fetch of homepage → robots.txt, sitemap, llms.txt, http→https probe → pick up to 5 internal links (same host, HTML, allowed for seenhqbot) → parse pages. PageSpeed runs in parallel (30 s cap).
+3. Crawl (`crawl.ts`): SSRF-safe fetch of homepage → robots.txt, sitemap, llms.txt, http→https probe → pick up to 5 internal links (same host, HTML, allowed for noticrbot) → parse pages. PageSpeed runs in parallel (30 s cap).
 4. After the crawl, three things run in parallel inside the remaining budget (`run.ts`):
    - **Deterministic checks** (`runChecks`): every SEO/GEO check over the crawled pages (pure, no IO).
    - **Live probes** (network, through `safeFetch`, audited host only): the AI-crawler probe (`net/probe.ts`, ADR-017: labelled simulated UAs for 6 AI bots, HEAD first with GET only when refused/unsupported, concurrency 2, 429 = not tested, 15-min per-host cache per instance, ≤ 42 requests, ≤ 6 s, skipped under 3 s usable) and the soft-404 probe (`net/soft404.ts`, one made-up URL, ≤ 4 s).

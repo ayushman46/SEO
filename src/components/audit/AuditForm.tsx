@@ -6,7 +6,8 @@ import { Icon } from "@/components/ui/Icon";
 
 /**
  * The /audit page URL form. Controlled when `onChange` is given; otherwise an uncontrolled
- * server-rendered GET form (used as the streaming fallback, and it works without JS).
+ * server-rendered GET form (the streaming fallback). Without JS that form only carries the
+ * address to /audit; the audit itself needs JavaScript.
  */
 export function AuditForm({
   id,

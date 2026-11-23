@@ -10,12 +10,12 @@ import { privacyMeta, termsMeta } from "@/content/legal";
 import { methodologyPage } from "@/content/methodology";
 import { botPage } from "@/content/bot";
 
-export const TITLE_SUFFIX = " · seenhq";
+export const TITLE_SUFFIX = " · noticr";
 export const OG_IMAGE = {
   url: "/opengraph-image",
   width: 1200,
   height: 630,
-  alt: "seenhq: be seen by people and by the machines they ask.",
+  alt: "noticr: be seen by people and by the machines they ask.",
 } as const;
 
 /** Normalise any configured site address to a bare origin: adds https:// when missing, drops paths and trailing slashes. */
@@ -43,7 +43,7 @@ export function absoluteUrl(path = "/"): string {
 }
 
 export interface BuildMetadataInput {
-  /** Page title without the " · seenhq" suffix (the root template adds it). */
+  /** Page title without the " · noticr" suffix (the root template adds it). */
   title: string;
   description: string;
   /** Site path, e.g. "/pricing". Used for the canonical and og:url. */
@@ -122,6 +122,11 @@ export const rootMetadata: Metadata = {
     "max-image-preview": "large",
     "max-snippet": -1,
   },
+  // Bing Webmaster Tools meta-tag verification (R7 #15). Inert until BING_SITE_VERIFICATION is set
+  // in Vercel; read at build time for static pages, so redeploy after setting it.
+  ...(process.env.BING_SITE_VERIFICATION?.trim()
+    ? { verification: { other: { "msvalidate.01": process.env.BING_SITE_VERIFICATION.trim() } } }
+    : {}),
 };
 
 /** Ready-made `export const metadata = pageMetadata.x` values for each marketing page. */

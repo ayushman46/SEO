@@ -1,5 +1,5 @@
 import { contentUpdated, site } from "@/content/site";
-import type { FaqItem, PricingTier, Service } from "@/content/types";
+import type { FaqItem, PriceExtra, PricingTier, Service } from "@/content/types";
 import { absoluteUrl, siteUrl } from "./metadata";
 
 /** A JSON-LD node. Kept loose on purpose; schema.org is large and we only emit a few types. */
@@ -113,13 +113,26 @@ export function publishableUsdPrice(price: string): number | null {
   return m ? Number(m[1]) : null;
 }
 
-/** Offer price fields for a USD tier: a numeric price, plus a minimum ("From") or monthly price specification. */
-function offerPriceFields(tier: PricingTier): Record<string, unknown> {
+/** What an Offer needs: a pricing tier, or a non-tier service mapped with offerSourceFromExtra. */
+export type OfferSource = Pick<PricingTier, "name" | "description" | "price" | "cadence">;
+
+/** Maps a non-tier service ("Other services" on /pricing) to an offer source. Extras are one-time. */
+export function offerSourceFromExtra(extra: PriceExtra): OfferSource {
+  return { name: extra.name, description: extra.description, price: extra.price, cadence: "one-time" };
+}
+
+/**
+ * Offer price fields for a USD tier: a numeric price, plus a minimum ("From"), per-location or monthly
+ * price specification.
+ */
+function offerPriceFields(tier: OfferSource): Record<string, unknown> {
   const price = publishableUsdPrice(tier.price);
   if (price === null) return {};
   const fields: Record<string, unknown> = { price, priceCurrency: "USD" };
   if (/^\s*From\b/i.test(tier.price)) {
     fields.priceSpecification = { "@type": "PriceSpecification", minPrice: price, priceCurrency: "USD" };
+  } else if (/per location/i.test(tier.price)) {
+    fields.priceSpecification = { "@type": "UnitPriceSpecification", price, priceCurrency: "USD", unitText: "per location" };
   } else if (/month/i.test(tier.cadence)) {
     fields.priceSpecification = { "@type": "UnitPriceSpecification", price, priceCurrency: "USD", unitText: "MONTH" };
   }
@@ -130,7 +143,7 @@ function offerPriceFields(tier: PricingTier): Record<string, unknown> {
  * OfferCatalog for /pricing. Only USD prices are published (as numbers, priceCurrency USD);
  * tiers priced in any other currency keep name/description but carry no price.
  */
-export function offerCatalogLd(tiers: readonly PricingTier[]): JsonLdNode {
+export function offerCatalogLd(tiers: readonly OfferSource[]): JsonLdNode {
   return {
     "@context": CONTEXT,
     "@type": "OfferCatalog",

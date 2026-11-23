@@ -1,6 +1,6 @@
-# Market research round 3: full market reference for seenhq (2026-11-23)
+# Market research round 3: full market reference for noticr (2026-11-23)
 
-Scope: seenhq (https://seenhq.vercel.app, opened 2026-11-23) is a free SEO + GEO audit (homepage plus up to five pages, PageSpeed data, scores, top three issues free, full list for an email) with fixed-price human services: $49 full audit, fix sprint from $199, monitoring $29/month, AI fact-check from $69, local AI visibility setup $149 per location, AI crawler unblock $149. The site states it does not track what AI engines say and gives no outcome guarantees.
+Scope: noticr (https://seenhq.vercel.app, opened 2026-11-23) is a free SEO + GEO audit (homepage plus up to five pages, PageSpeed data, scores, top three issues free, full list for an email) with fixed-price human services: $49 full audit, fix sprint from $199, monitoring $29/month, AI fact-check from $69, local AI visibility setup $149 per location, AI crawler unblock $149. The site states it does not track what AI engines say and gives no outcome guarantees.
 
 This document builds on `MARKET_RESEARCH.md` (round 1, services) and `MARKET_RESEARCH_2_PRODUCT.md` (round 2, product features). It does not repeat their findings; where it relies on them it says "R1" or "R2".
 
@@ -21,7 +21,7 @@ This document builds on `MARKET_RESEARCH.md` (round 1, services) and `MARKET_RES
 
 - **SEO software and services**: tools and labour that improve visibility in classic search results (rank tracking, site audit, keyword and link data, local listings, content).
 - **GEO / AEO / AI visibility**: tools and labour that affect or measure whether AI systems (ChatGPT, Gemini, Google AI Overviews and AI Mode, Perplexity, Copilot, Claude) can read, cite, mention or recommend a business. Meticulous Research's scope note is the tightest published definition found: it excludes agencies without their own software, general SEO tools without answer-engine monitoring, and the answer engines themselves (https://www.meticulousresearch.com/product/generative-engine-optimization-geo-software-market-7095, October 2026) [I, paid-report publisher].
-- seenhq sits across both: an audit tool (software) plus productised services (labour).
+- noticr sits across both: an audit tool (software) plus productised services (labour).
 
 ### 1.2 Analyst estimates
 
@@ -40,7 +40,7 @@ This document builds on `MARKET_RESEARCH.md` (round 1, services) and `MARKET_RES
 1. All of the above are paid-report publishers whose free pages do not show their method. None is a named top-tier analyst (Gartner, Forrester, IDC). I found no Gartner or IDC sizing of GEO: **not found**.
 2. The USD 85-97 bn "SEO software" figures are not credible as a measure of SEO tooling. Adobe paid about USD 1.9 bn in total equity value for Semrush, one of the largest pure SEO software vendors, in a deal announced 2025-11-19 and closed 2026-04-28 (https://guptadeepak.com/who-is-buying-building-ai-visibility/, 2026-10-06, secondary). A market where a leading vendor is worth under USD 2 bn is not a USD 97 bn software market; those reports are measuring a much broader digital-marketing basket (Precedence's own segmentation confirms this). Use them only as a direction-of-travel signal.
 3. The GEO figures span USD 0.37 bn (software only) to USD 1.8 bn (services) for 2026, a 5x spread driven by definition. The only defensible statement is: GEO software in 2026 is in the low hundreds of millions of dollars and services are roughly in the low single billions, with wide error bars.
-4. 61% of GEO services spend is attributed to large enterprises (Coherent). seenhq's segments (startups, local businesses) are the minority of today's spend.
+4. 61% of GEO services spend is attributed to large enterprises (Coherent). noticr's segments (startups, local businesses) are the minority of today's spend.
 
 ### 1.3 Funding rounds of GEO / AI-visibility startups
 
@@ -127,7 +127,7 @@ Independent / platform-reported:
 | ChatGPT referrals to 973 e-commerce sites converted worse than Google search, email and affiliates | Kaiser and Schulze, Marketing Science; Search Engine Land summary | [S] (both pages returned 403); the most rigorous study found, findings not verified by me |
 | Self-attributed sign-ups to Ahrefs in March 2026: Claude 2,836, ChatGPT 1,978, Gemini 619 | Ahrefs (URL in 2.5) | [V], single company |
 
-Reading: volume is small (about 0.3% of traffic), quality per visit is probably higher for considered purchases and sign-ups, and the e-commerce evidence is mixed. Do not put a conversion multiple on the seenhq site.
+Reading: volume is small (about 0.3% of traffic), quality per visit is probably higher for considered purchases and sign-ups, and the e-commerce evidence is mixed. Do not put a conversion multiple on the noticr site.
 
 ### 2.7 Marketer survey data
 
@@ -158,7 +158,7 @@ Reading: volume is small (about 0.3% of traffic), quality per visit is probably 
 
 ## 3. Customer segments
 
-Prices "paid today" are market prices from the sources given. Willingness-to-pay (WTP) evidence at seenhq's exact price points is untested in every segment; this is the largest unknown in the whole document.
+Prices "paid today" are market prices from the sources given. Willingness-to-pay (WTP) evidence at noticr's exact price points is untested in every segment; this is the largest unknown in the whole document.
 
 ### 3.1 Solo founders and indie SaaS
 
@@ -195,7 +195,7 @@ Prices "paid today" are market prices from the sources given. Willingness-to-pay
 - **What they pay:** per-location SaaS plus managed services (BrightLocal managed local SEO from $499/month). Enterprise list prices: **not found** (contact sales).
 - **WTP evidence:** vendors report 20% of locations invisible in ChatGPT scans (Birdeye) [S, V] and 83% of restaurants invisible (Uberall) [S, V]. Budget surveys: **not found**.
 - **How they buy:** procurement, annual contract, integrations, SLAs.
-- **What stops seenhq:** this is not a fit. A team of a few people cannot meet procurement, SSO and per-location data requirements. Treat 2-5 location owners as "local" and ignore the rest.
+- **What stops noticr:** this is not a fit. A team of a few people cannot meet procurement, SSO and per-location data requirements. Treat 2-5 location owners as "local" and ignore the rest.
 
 ### 3.5 E-commerce stores
 
@@ -271,7 +271,7 @@ All URLs opened 2026-11-23 unless marked. "R1"/"R2" means the page was opened in
 | 30 | Whitespark | https://whitespark.ca/pricing/ | Local | n/a | Platform $1/location/mo; listings $20-$999 one-time | Citations, rank tracking, listings service | No AI features on pricing page | Not found |
 | **Agencies and productised services** | | | | | | | | |
 | 31 | GEO agencies (dataset) | https://firstpagesage.com/reports/geo-aeo-pricing-statistics/ (2026-10-07) | SMB to enterprise | n/a | Starter $1,800-$4,200/mo, 3-month minimum; audit median $4,300 | Retainers, audits, sprints ($5,000-$40,000) | Low one-time prices | 214 agencies sampled |
-| 32 | OneTimeGEO | https://onetimegeo.pages.dev/ | Small sites | Free audit | $297 / $597 / $997 one-time | FAQ schema, llms.txt, content restructuring; "30-day citation results or money back" | Who does the work is not stated; guarantees results seenhq says cannot be guaranteed | Not found |
+| 32 | OneTimeGEO | https://onetimegeo.pages.dev/ | Small sites | Free audit | $297 / $597 / $997 one-time | FAQ schema, llms.txt, content restructuring; "30-day citation results or money back" | Who does the work is not stated; guarantees results noticr says cannot be guaranteed | Not found |
 | 33 | No Hacks accuracy service | R1: https://nohacks.co/accuracy | Brands | n/a | $1,000 check; $6,000-$15,000 fix | Check, trace, fix, re-ask | Low price | Not found |
 | 34 | Insites | https://www.insites.com/the-8-best-...agencies (updated 2026-11-17) | Agencies | Trial after demo | From $399/mo plus per-audit | White-label AI visibility audits, lead-gen widgets, 7 AI platforms | Low entry price | Not found |
 | 35 | AgencyAnalytics | https://agencyanalytics.com/pricing | Agencies | 14-day trial | $20/client/mo annual; AI Tracker +$20.83/mo | White-label portal, custom domain, AI Tracker credits | No site-readiness audit described | Not found |
@@ -290,9 +290,9 @@ All URLs opened 2026-11-23 unless marked. "R1"/"R2" means the page was opened in
 
 ### 5.1 Capability vs competitor group
 
-Legend: **F** present free somewhere in the group; **$** present but paid; **$$** present only at about $245/month and up or enterprise; **A** absent on the pages opened; **?** not verified. seenhq column: **Y** live (per the site), **P** planned in R1/R2, **N** no.
+Legend: **F** present free somewhere in the group; **$** present but paid; **$$** present only at about $245/month and up or enterprise; **A** absent on the pages opened; **?** not verified. noticr column: **Y** live (per the site), **P** planned in R1/R2, **N** no.
 
-| Capability | AI trackers | SEO suites | Free graders | Local tools | Agencies / productised | India providers | seenhq | Small-team gap? |
+| Capability | AI trackers | SEO suites | Free graders | Local tools | Agencies / productised | India providers | noticr | Small-team gap? |
 |---|---|---|---|---|---|---|---|---|
 | AI mention / visibility score | $ (F via HubSpot, Semrush 3/day) | $ / F | F | $ (BrightLocal, 4 countries) | $ | $ (Pallix Rs 2,499) | N (by choice) | No. Commodity (R2). |
 | Prompt tracking over time | $ | $ | A | $ | $ | $ | N | No. |
@@ -354,7 +354,7 @@ Build convention: "crawler + deterministic code + one LLM call" as asked. Effort
 - **Who lacks it at this price:** Insites from $399/month plus per-audit fees; SE Ranking white label only through a $69/month annual add-on on a $129+ plan; AgencyAnalytics $20/client/month and its AI Tracker is tracking, not a readiness audit; Otterly offers only branded Looker reports to partners; Promptwatch white label is Enterprise. Closest low-price rival: Airefs agency plan $49-$59/month with own-logo reports (a tracker, not a site audit). SEOptimer (the classic white-label audit tool) could not be opened: **unverified**.
 - **Build:** branding parameters on the report template; a reseller account table; Stripe/Razorpay credits; deterministic. No LLM call beyond the audit's own.
 - **Effort:** 12-18 hours including billing.
-- **Honest limits:** R2 found share links and PDFs are free elsewhere (SEOmator), so the value is the audit content plus the reseller terms, not the PDF. Channel conflict with seenhq's own services must be ruled out in writing. WTP is inferred, not tested.
+- **Honest limits:** R2 found share links and PDFs are free elsewhere (SEOmator), so the value is the audit content plus the reseller terms, not the PDF. Channel conflict with noticr's own services must be ruled out in writing. WTP is inferred, not tested.
 
 #### N3. Product-page shopping readiness for stores off Shopify, with an OpenAI-format feed draft
 - **What:** for a product URL or a sample of up to 20 product pages: check the nine required feed fields (`item_id`, `title`, `description`, `url`, `brand`, `seller_name`, `image_url`, `availability`, `price`) plus identifiers (`gtin`, `mpn`), returns and shipping fields can be filled from the page; check that price, stock and SKU agree between visible HTML, JSON-LD and (if supplied) the feed; flag `AggregateRating` markup with no visible reviews; flag schema injected only by JavaScript; then export a draft JSONL/CSV in OpenAI's field names for the owner to complete.
@@ -417,7 +417,7 @@ Build convention: "crawler + deterministic code + one LLM call" as asked. Effort
 - **Who has it:** Promptwatch, ReddGrow ($99/month), Airefs brand mentions from $299/month [S for the first two].
 - **Build:** no automated Reddit fetching (Reddit is litigating against scrapers, see 7.3); a static, deterministic guidance block by business type plus search links the owner clicks.
 - **Effort:** 3-4 hours for guidance only; 8-10 hours if an official Reddit API integration is approved.
-- **Honest limits:** seeding forum posts is against most communities' rules and seenhq should not sell it.
+- **Honest limits:** seeding forum posts is against most communities' rules and noticr should not sell it.
 
 #### N11. India directory consistency (Justdial first)
 - **What:** owner pastes their Justdial (and Sulekha/IndiaMART) listing details or URL; compare name, phone, address, hours with the site and schema.
@@ -438,7 +438,7 @@ Build convention: "crawler + deterministic code + one LLM call" as asked. Effort
 ### Option A: "The fix desk": fixed-price, human-checked fixes for small sites, below agency pricing
 - **Claim:** free audit that finds what blocks AI and search from reading you, then a person fixes it for a published one-time price and re-tests.
 - **Strongest evidence:** agencies start at $1,800-$4,200/month with a 3-month minimum and a $4,300 median audit (First Page Sage); nearly 60% of small-business owners do not know where to start and 40% of those who checked found wrong information (Squarespace, vendor); the standing complaint about free scanners is that they diagnose and do not fix (Shopify community); trackers moved up-market (Profound enterprise-only since September 2026).
-- **Against:** freelancers already sell GEO projects at $150-$300 (Fiverr) and clients expect lower prices; OneTimeGEO sells $297-$997 packages with a money-back "citation results" guarantee that seenhq cannot honestly match; WTP at $49-$199 is untested; human hours cap revenue.
+- **Against:** freelancers already sell GEO projects at $150-$300 (Fiverr) and clients expect lower prices; OneTimeGEO sells $297-$997 packages with a money-back "citation results" guarantee that noticr cannot honestly match; WTP at $49-$199 is untested; human hours cap revenue.
 
 ### Option B: "The readiness engine for freelancers and small agencies"
 - **Claim:** the cheapest honest AI-search readiness audit a freelancer can put their logo on, per report.
@@ -474,15 +474,15 @@ Wording guardrails that follow from the evidence: say "readable", "accurate" and
 
 ### 7.3 Legal and terms constraints on querying AI assistants
 - OpenAI's terms list among prohibited acts: "Automatically or programmatically extract data or Output" (https://openai.com/policies/row-terms-of-use/, effective 2026-01-01) [I]. Consumer-UI scraping of ChatGPT is therefore a terms breach; human-typed checks (R1) and official API use are the safe routes. API answers differ from what users see (brand overlap 15.5-23.8%, Surfer), so API-based "what ChatGPT says" reports must be labelled as API results.
-- Google sued SerpApi on 2025-12-19 under the DMCA for circumventing its anti-scraping system (https://blog.google/technology/safety-security/serpapi-lawsuit/) [I]; SerpApi's motion to dismiss was pending on 2026-02-21, and Reddit has a parallel suit against SerpApi and others (https://www.theregister.com/2026/02/21/serpapi_google_scraping_lawsuit/) [I]. Later rulings: **not found**. Many trackers depend on such data suppliers; seenhq should not build on scraped Google AI Overview data.
+- Google sued SerpApi on 2025-12-19 under the DMCA for circumventing its anti-scraping system (https://blog.google/technology/safety-security/serpapi-lawsuit/) [I]; SerpApi's motion to dismiss was pending on 2026-02-21, and Reddit has a parallel suit against SerpApi and others (https://www.theregister.com/2026/02/21/serpapi_google_scraping_lawsuit/) [I]. Later rulings: **not found**. Many trackers depend on such data suppliers; noticr should not build on scraped Google AI Overview data.
 - Perplexity, Anthropic and Google consumer terms on automated querying were not opened this round: **unverified**; assume the same restriction.
 - Reddit fetching: avoid without an API agreement (N10).
-- seenhq's own crawler: keep honouring robots.txt, identify itself, stay SSRF-safe; simulated bot user-agents must be labelled as simulations (R1).
+- noticr's own crawler: keep honouring robots.txt, identify itself, stay SSRF-safe; simulated bot user-agents must be labelled as simulations (R1).
 
 ### 7.4 Trademark and claims risks
 - **Claims:** the FTC's Operation AI Comply (since September 2024) and more than a dozen "AI washing" cases in 2025 target unsubstantiated capability claims, including business-to-business claims and materials supplied to resellers (Holland & Knight summary, https://www.hklaw.com/en/insights/publications/2026/08/operation-ai-comply-2-years-later-continued-enforcement, 2026-08-18) [I, law-firm summary; no GEO-specific case found]. Guarantees such as "30-day citation results or money back" (OneTimeGEO) are the kind of claim to avoid. If N2 ships, reseller materials carry the same duty.
-- **No right to visibility:** IndiaMART v. OpenAI (Calcutta High Court, 2026-05-20, via CyberPeace) means a customer cannot compel an assistant to list them; seenhq must never imply a remedy exists.
-- **Trademarks:** using "ChatGPT", "Gemini", "Claude", "Perplexity" descriptively is normal practice but logos and "certified/partner" wording need permission. Whether "GEO" or "AEO" are registered marks in India or the US, and whether "seenhq" conflicts with an existing mark: **not checked; needs a trademark search**.
+- **No right to visibility:** IndiaMART v. OpenAI (Calcutta High Court, 2026-05-20, via CyberPeace) means a customer cannot compel an assistant to list them; noticr must never imply a remedy exists.
+- **Trademarks:** using "ChatGPT", "Gemini", "Claude", "Perplexity" descriptively is normal practice but logos and "certified/partner" wording need permission. Whether "GEO" or "AEO" are registered marks in India or the US, and whether "noticr" conflicts with an existing mark: **not checked; needs a trademark search**.
 - **India advertising:** NMC rules for clinics (R1). ASCI guidance on AI-related advertising claims: **not found**.
 - **Reviews:** no incentives or gating in review-ask kits (R1); N4 stays informational.
 
@@ -490,11 +490,11 @@ Wording guardrails that follow from the evidence: say "readable", "accurate" and
 - Repeat-run overlap of local AI answers is 21-33%; 71-80% of businesses appear in half of attempts or fewer (BrightLocal, 2026-09-16) [V].
 - API vs UI brand overlap 15.5-23.8% (Surfer) [V].
 - Most published "what drives AI visibility" studies are correlational and vendor-run (Seer, Trustpilot, G2, Yext, Insites); G2's own regression shows R-squared 0.009.
-- seenhq's LLM-read facts can be wrong; every LLM-derived finding should show the source text it was read from, and deterministic checks should be preferred where both are possible.
+- noticr's LLM-read facts can be wrong; every LLM-derived finding should show the source text it was read from, and deterministic checks should be preferred where both are possible.
 - Simulated crawler probes come from non-verified IPs and can be wrong in either direction (R1).
 
 ### 7.6 Business risks specific to a small team
-- WTP at seenhq's prices is untested in every segment (3).
+- WTP at noticr's prices is untested in every segment (3).
 - Human services at $49-$199 with 3-12 hours of work (R1 effort estimates) leave thin margins outside India-cost labour; price or scope must be watched per job.
 - Demand base is small in absolute terms: AI referrals about 0.28% of traffic; classic local results still dominated by the map pack. The honest pitch is "fix what blocks you everywhere", not "AI is your main channel".
 

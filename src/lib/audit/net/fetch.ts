@@ -14,7 +14,7 @@ export const MAX_HTML_BYTES = 2 * 1024 * 1024;
 export const MAX_TEXT_BYTES = 512 * 1024;
 export const MAX_REDIRECTS = 3;
 
-/** Fallback public site when NEXT_PUBLIC_SITE_URL is unset (we don't own seenhq.com). */
+/** Fallback public site when NEXT_PUBLIC_SITE_URL is unset (we don't own noticr.com). */
 export const DEFAULT_SITE_URL = "https://seenhq.vercel.app";
 
 /** Info URL in every User-Agent we send: `${NEXT_PUBLIC_SITE_URL || DEFAULT_SITE_URL}/bot`. */
@@ -24,7 +24,7 @@ export function botInfoUrl(): string {
 }
 
 export function userAgent(): string {
-  return `Mozilla/5.0 (compatible; seenhqbot/1.0; +${botInfoUrl()})`;
+  return `Mozilla/5.0 (compatible; noticrbot/1.0; +${botInfoUrl()})`;
 }
 
 /**
@@ -41,10 +41,10 @@ export const SIMULATED_BOT_TOKENS = [
 ] as const;
 export type SimulatedBotToken = (typeof SIMULATED_BOT_TOKENS)[number];
 
-/** e.g. "Mozilla/5.0 (compatible; GPTBot/1.3; simulated-by seenhqbot/1.0; +https://seenhq.vercel.app/bot)" */
+/** e.g. "Mozilla/5.0 (compatible; GPTBot/1.3; simulated-by noticrbot/1.0; +https://seenhq.vercel.app/bot)" */
 export function simulatedUserAgent(token: SimulatedBotToken): string {
   if (!(SIMULATED_BOT_TOKENS as readonly string[]).includes(token)) return userAgent();
-  return `Mozilla/5.0 (compatible; ${token}; simulated-by seenhqbot/1.0; +${botInfoUrl()})`;
+  return `Mozilla/5.0 (compatible; ${token}; simulated-by noticrbot/1.0; +${botInfoUrl()})`;
 }
 
 export interface SafeFetchOptions {

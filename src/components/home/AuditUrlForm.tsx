@@ -25,8 +25,8 @@ export function looksLikeUrl(raw: string): boolean {
 }
 
 /**
- * Hero URL form. Works without JS (GET /audit?url=…); with JS it validates
- * first and navigates client-side.
+ * Hero URL form. A plain GET to /audit?url=… (so the address still arrives without JS, though
+ * the audit itself needs JavaScript); with JS it validates first and navigates client-side.
  */
 export function AuditUrlForm({
   tone = "light",

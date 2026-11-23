@@ -3,7 +3,7 @@ import type { FetchedText } from "./context";
 
 export type Robots = ReturnType<typeof robotsParser>;
 
-export const OUR_BOT = "seenhqbot";
+export const OUR_BOT = "noticrbot";
 
 /** Parsed robots.txt, or null when there is none / it couldn't be read. */
 export function parseRobots(robots: FetchedText): Robots | null {
