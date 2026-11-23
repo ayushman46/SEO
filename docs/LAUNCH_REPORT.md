@@ -1,5 +1,14 @@
 # seenhq launch report
 
+## Before you take orders
+Until these are set in Vercel, every contact message, order request and audit lead exists **only in the Vercel runtime logs**, which are short-lived and alert nobody. The visitor is still told "your message is in".
+
+Set at least one of these (both is best), then redeploy:
+1. **Email:** `RESEND_API_KEY` + `CONTACT_NOTIFY_EMAIL` + `MAIL_FROM` (a sender on a domain you verified in Resend; the default `onboarding@resend.dev` only delivers to the Resend account owner's own address).
+2. **Database:** `DATABASE_URL` (and `DATABASE_URL_UNPOOLED`), then run `npm run db:migrate` once against that database.
+
+Then send one test enquiry on /contact and confirm it arrives. Until then, each undelivered submission logs an `UNDELIVERED` error in Vercel's runtime logs naming the missing variables.
+
 ## v1.1 (deployed to production 2026-11-23 07:10 IST)
 **Live:** https://seenhq.vercel.app · 675 tests, typecheck, lint, build green · independent review R3: 16 findings, all fixed.
 

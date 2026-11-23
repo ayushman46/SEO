@@ -80,7 +80,8 @@ export function verifyOrder(input: {
         problem: "unknown-service",
       };
     }
-    // A quote above the Fix sprint's scope cap carries its larger-job starting price (always "from").
+    // A Fix sprint line covering more than its own scope cap carries its larger-job starting price
+    // (always "from"); it is never accepted as a fixed price.
     const larger = largerJobPriceIn(item, input.currency);
     const p = larger && it.from && it.price === larger.amount ? larger : priceIn(item, input.currency);
     const catalogPrice = p === null ? null : p.amount;

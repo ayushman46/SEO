@@ -1,7 +1,7 @@
 "use client";
 
 import { auditQuoteCopy } from "@/content/audit";
-import { QUOTE_TEXT } from "@/lib/quote";
+import { isFixedSprintOnly, QUOTE_TEXT } from "@/lib/quote";
 import { PriceText } from "@/components/pages/PriceText";
 import { useQuote } from "./QuoteContext";
 import { RequestLink } from "./QuoteParts";
@@ -24,7 +24,7 @@ function trackTrayHeight(el: HTMLElement | null) {
  * The running "fix list" (T026, R4 findings 4 and 5; R5 findings 2 and 3): fixed to the
  * bottom at every width, shown only while something is picked. From sm it is one row (count,
  * total, tax and the Fix sprint explainer on the left; Clear and the request button on the
- * right). Below sm the count and total keep one full line with Clear beside them, the tax note
+ * right). The explainer shows only when the pick is one fixed-price Fix sprint. Below sm the count and total keep one full line with Clear beside them, the tax note
  * sits under them, the explainer drops, and the request button takes its own full-width row.
  *
  * The tray's measured height is published as `--fix-tray-h` (ResizeObserver), and globals.css
@@ -60,9 +60,12 @@ export function FixTray({ id }: { id: string }) {
             {QUOTE_TEXT.tax}
             {sq.confirmNote ? <span className="hidden sm:inline"> {QUOTE_TEXT.confirm}</span> : null}
           </p>
-          <p className="hidden truncate text-xs text-ink-2 sm:block">
-            <PriceText value={auditQuoteCopy.fixListExplainer(q.currency)} />
-          </p>
+          {/* Only true for a pick that is one fixed-price Fix sprint (R7 findings 2/9). */}
+          {isFixedSprintOnly(sq) ? (
+            <p className="hidden truncate text-xs text-ink-2 sm:block">
+              <PriceText value={auditQuoteCopy.fixListExplainer(q.currency)} />
+            </p>
+          ) : null}
         </div>
         <button
           type="button"

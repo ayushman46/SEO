@@ -4,6 +4,7 @@ import { ISSUE_CATALOG, type IssueKey } from "@/lib/audit/issues";
 import { CATALOG, catalogItem, QUOTE_SCOPE_CAP } from "@/lib/quote/catalog";
 import { QUOTE_TEXT, buildQuote, issueFixInfo, toOrderFields, toOrderItems, type QuoteIssueInput } from "@/lib/quote/quote";
 import { verifyOrder } from "@/lib/quote/verify";
+import { FIXER_CATALOG_KEY, routeFor } from "@/lib/quote/mapping";
 
 function issue(key: IssueKey, over: Partial<AuditIssue> = {}): AuditIssue {
   const c = ISSUE_CATALOG[key];
@@ -179,8 +180,10 @@ describe("buildQuote", () => {
       title: `Probe ${i}`,
     }));
     const overCap = buildQuote({ issues: many, pagesScanned: 6, currency: "USD" });
-    expect(overCap.reviewReasons).toEqual(["issues-over-cap"]);
-    // No Fix sprint line here (probe blocks go to the AI crawler unblock), so nothing is repriced.
+    // The 8-fix cap is the Fix sprint's own (R7 findings 4/5). No Fix sprint line here (probe blocks
+    // go to the AI crawler unblock), so nothing is repriced and the fixed $49 stays fixed.
+    expect(overCap.reviewReasons).toEqual([]);
+    expect(overCap.fixedTotal).toBe(true);
     expect(overCap.lines.map((l) => [l.key, l.priceText])).toEqual([["ai-crawler-unblock", "$49"]]);
     const involved = buildQuote({
       issues: [{ id: "geo.ai-crawler-probe:waf", checkId: "geo.ai-crawler-probe", severity: "high", title: "WAF", effort: "involved" }],
@@ -244,6 +247,122 @@ describe("buildQuote", () => {
       const v = verifyOrder({ currency: q.currency, items: toOrderItems(q), submittedTotal: q.total, submittedFixed: q.fixedTotal });
       expect(v).toMatchObject({ valid: true, fixed: false, catalogTotal: q.total });
     }
+  });
+
+  describe("the 8-fix cap counts only the Fix sprint's own issues (R7 findings 4/5)", () => {
+    const all = Object.keys(ISSUE_CATALOG).map((k) => issue(k as IssueKey));
+    const keyOf = (i: AuditIssue) => FIXER_CATALOG_KEY[routeFor(i).service];
+    /** in the default quote: paid (not DIY/none), above low severity, not developer-level */
+    const defaultPaid = (i: AuditIssue) => {
+      const r = routeFor(i);
+      return r.fixer !== "diy" && r.fixer !== "none" && i.severity !== "low" && i.effort !== "involved";
+    };
+    const sprint = all.filter((i) => keyOf(i) === "fix-sprint" && defaultPaid(i));
+    const content = all.filter((i) => keyOf(i) === "content-entity" && defaultPaid(i));
+    const factCheck = all.filter((i) => keyOf(i) === "ai-fact-check" && routeFor(i).fixer !== "diy");
+    const sprintLine = (q: ReturnType<typeof buildQuote>) => q.lines.find((l) => l.key === "fix-sprint");
+
+    it("has enough fixtures", () => {
+      expect(sprint.length).toBeGreaterThan(QUOTE_SCOPE_CAP.maxPaidIssues);
+      expect(content.length).toBeGreaterThanOrEqual(4);
+      expect(factCheck.length).toBeGreaterThanOrEqual(3);
+    });
+
+    it("8 sprint issues: fixed $149", () => {
+      const q = buildQuote({ issues: sprint.slice(0, 8), pagesScanned: 6, currency: "USD" });
+      expect(q.lines.map((l) => l.key)).toEqual(["fix-sprint"]);
+      expect(sprintLine(q)).toMatchObject({ price: 149, priceKind: "fixed", priceText: "$149" });
+      expect(q.reviewReasons).toEqual([]);
+      expect(q.fixedTotal).toBe(true);
+      expect(q.totalText).toBe("$149");
+    });
+
+    it("9 sprint issues: From $249, issues-over-cap", () => {
+      const q = buildQuote({ issues: sprint.slice(0, 9), pagesScanned: 6, currency: "USD" });
+      expect(sprintLine(q)).toMatchObject({ price: 249, priceKind: "from", priceText: "From $249" });
+      expect(q.reviewReasons).toEqual(["issues-over-cap"]);
+      expect(q.fixedTotal).toBe(false);
+      expect(q.totalText).toBe("From $249");
+    });
+
+    it("6 sprint + 4 Content & entity issues: the sprint stays at fixed $149", () => {
+      const q = buildQuote({ issues: [...sprint.slice(0, 6), ...content.slice(0, 4)], pagesScanned: 6, currency: "USD" });
+      expect(q.coveredIssueIds).toHaveLength(10);
+      expect(sprintLine(q)).toMatchObject({ price: 149, priceKind: "fixed", priceText: "$149" });
+      expect(sprintLine(q)!.covers).toHaveLength(6);
+      expect(q.lines.find((l) => l.key === "content-entity")).toMatchObject({ priceText: "From $99" });
+      expect(q.reviewReasons).toEqual(["from-price"]);
+      expect(q.total).toBe(248);
+      expect(q.totalText).toBe("From $248");
+      expect(q.summary).toContain("Fix sprint ($149)");
+      expect(q.summary).not.toContain("$249");
+    });
+
+    it("8 sprint + 1 content issue: sprint $149, From $248", () => {
+      const q = buildQuote({ issues: [...sprint.slice(0, 8), content[0]], pagesScanned: 6, currency: "USD" });
+      expect(sprintLine(q)).toMatchObject({ price: 149, priceKind: "fixed", priceText: "$149" });
+      expect(q.totalText).toBe("From $248");
+      expect(q.reviewReasons).not.toContain("issues-over-cap");
+    });
+
+    it("over 8 issues on all-fixed lines keeps a fixed total", () => {
+      const issues = [...sprint.slice(0, 6), ...factCheck.slice(0, 3)];
+      const q = buildQuote({ issues, pagesScanned: 6, currency: "USD", selectedIssueIds: issues.map((i) => i.id) });
+      expect(q.coveredIssueIds).toHaveLength(9);
+      expect(q.lines.map((l) => [l.key, l.priceText])).toEqual([
+        ["fix-sprint", "$149"],
+        ["ai-fact-check", "$59"],
+      ]);
+      expect(q.reviewReasons).toEqual([]);
+      expect(q.fixedTotal).toBe(true);
+      expect(q.totalText).toBe("$208");
+    });
+
+    it("selected issues: 8 sprint picks + 2 content picks keep $149; 9 sprint picks reprice", () => {
+      const pool = [...sprint, ...content];
+      const eightPlus = buildQuote({
+        issues: pool,
+        pagesScanned: 6,
+        currency: "USD",
+        selectedIssueIds: [...sprint.slice(0, 8), ...content.slice(0, 2)].map((i) => i.id),
+      });
+      expect(sprintLine(eightPlus)).toMatchObject({ price: 149, priceKind: "fixed", priceText: "$149" });
+      expect(eightPlus.reviewReasons).toEqual(["from-price"]);
+      expect(eightPlus.totalText).toBe("From $248");
+
+      const nine = buildQuote({
+        issues: pool,
+        pagesScanned: 6,
+        currency: "USD",
+        selectedIssueIds: [...sprint.slice(0, 9), content[0]].map((i) => i.id),
+      });
+      expect(sprintLine(nine)).toMatchObject({ price: 249, priceKind: "from", priceText: "From $249" });
+      expect(nine.reviewReasons).toEqual(["from-price", "issues-over-cap"]);
+      expect(nine.totalText).toBe("From $348");
+    });
+
+    it("INR: 6 sprint + 4 content keeps the fixed sprint price; 9 sprint issues go to the larger-job price", () => {
+      const mixed = buildQuote({ issues: [...sprint.slice(0, 6), ...content.slice(0, 4)], pagesScanned: 6, currency: "INR" });
+      expect(sprintLine(mixed)).toMatchObject({ price: 9999, priceKind: "fixed", priceText: "₹9,999" });
+      expect(mixed.totalText).toBe("From ₹16,998");
+      const over = buildQuote({ issues: sprint.slice(0, 9), pagesScanned: 6, currency: "INR" });
+      expect(sprintLine(over)).toMatchObject({ price: 17999, priceKind: "from", priceText: "From ₹17,999" });
+      expect(over.reviewReasons).toEqual(["issues-over-cap"]);
+    });
+
+    it("every variant's order hand-off verifies; the larger-job price only as 'from'", () => {
+      const variants = [
+        buildQuote({ issues: sprint.slice(0, 8), pagesScanned: 6, currency: "USD" }),
+        buildQuote({ issues: sprint.slice(0, 9), pagesScanned: 6, currency: "INR" }),
+        buildQuote({ issues: [...sprint.slice(0, 6), ...content.slice(0, 4)], pagesScanned: 6, currency: "USD" }),
+      ];
+      for (const q of variants) {
+        const v = verifyOrder({ currency: q.currency, items: toOrderItems(q), submittedTotal: q.total, submittedFixed: q.fixedTotal });
+        expect(v).toMatchObject({ valid: true, fixed: q.fixedTotal, catalogTotal: q.total });
+      }
+      const fixedLarger = { serviceSlug: "technical-fixes", label: "Fix sprint", price: 249, from: false };
+      expect(verifyOrder({ currency: "USD", items: [fixedLarger], submittedTotal: 249, submittedFixed: true }).valid).toBe(false);
+    });
   });
 
   it("is deterministic and tolerates duplicates and junk", () => {

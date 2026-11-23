@@ -66,7 +66,16 @@ export interface SafeFetchOptions {
   signal?: AbortSignal;
   /** default 3; 0 = return the redirect response itself without following */
   maxRedirects?: number;
+  /**
+   * kind "html" only: return non-HTML error responses (status >= 400, content type missing or not
+   * HTML) with the body truncated at 64 KB instead of failing with not_html. The homepage uses this so
+   * a firewall's JSON or plain-text refusal is reported as a refusal (R7 #3).
+   */
+  allowErrorBodies?: boolean;
 }
+
+/** Body cap for error responses read under allowErrorBodies. */
+export const ERROR_BODY_MAX_BYTES = 64 * 1024;
 
 export interface SafeFetchResult {
   requestedUrl: string;
@@ -100,7 +109,7 @@ function flattenHeaders(res: IncomingMessage): Record<string, string> {
   return out;
 }
 
-function isHtmlContentType(ct: string): boolean {
+export function isHtmlContentType(ct: string): boolean {
   return /\b(text\/html|application\/xhtml\+xml)\b/i.test(ct);
 }
 
@@ -322,9 +331,25 @@ export async function safeFetch(inputUrl: string, opts: SafeFetchOptions): Promi
     }
 
     const contentType = headers["content-type"] ?? "";
+    // HTML error pages take the normal path (2 MB cap); only non-HTML error bodies are read here.
+    const errorBody =
+      opts.kind === "html" &&
+      opts.allowErrorBodies === true &&
+      status >= 400 &&
+      (!contentType || !isHtmlContentType(contentType));
     if (opts.method === "HEAD") {
       res.destroy();
       return { requestedUrl, finalUrl: current, status, headers, bytes: Buffer.alloc(0), text: "", truncated: false, redirects, location: null };
+    }
+    if (errorBody) {
+      let body: { bytes: Buffer; truncated: boolean };
+      try {
+        body = await readBody(res, ERROR_BODY_MAX_BYTES, "truncate", url.hostname);
+      } catch (err) {
+        throw networkError(err, url, signal);
+      }
+      const text = decode(body.bytes, pickCharset(contentType, body.bytes));
+      return { requestedUrl, finalUrl: current, status, headers, bytes: body.bytes, text, truncated: body.truncated, redirects, location: null };
     }
     if (opts.kind === "html" && contentType && !isHtmlContentType(contentType)) {
       res.destroy();

@@ -54,7 +54,10 @@ beforeAll(async () => {
       res.writeHead(code, { location: to });
       res.end();
     };
-    if (path === "/ok") {
+    if (path === "/json-429") {
+      res.writeHead(429, { "content-type": "application/json" });
+      res.end('{"error":"slow down"}');
+    } else if (path === "/ok") {
       res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
       res.end(HTML);
     } else if (path === "/host") {
@@ -188,6 +191,15 @@ describe("safeFetch", () => {
 
   it("requires HTML for pages", async () => {
     expect(await code(safeFetch(`${BASE}/pdf`, { kind: "html" }))).toBe("not_html");
+  });
+
+  it("allowErrorBodies returns a non-HTML error response instead of not_html (R7 #3)", async () => {
+    expect(await code(safeFetch(`${BASE}/json-429`, { kind: "html" }))).toBe("not_html");
+    const r = await safeFetch(`${BASE}/json-429`, { kind: "html", allowErrorBodies: true });
+    expect(r.status).toBe(429);
+    expect(r.text).toContain("slow down");
+    // a 200 non-HTML response is still refused
+    expect(await code(safeFetch(`${BASE}/pdf`, { kind: "html", allowErrorBodies: true }))).toBe("not_html");
   });
 
   it("caps HTML at 2 MB (streamed and declared)", async () => {

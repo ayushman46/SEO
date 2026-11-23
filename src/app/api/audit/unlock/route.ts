@@ -2,7 +2,7 @@ import { after } from "next/server";
 import { z } from "zod";
 import type { AuditResult } from "@/lib/audit/types";
 import { insertLead } from "@/lib/db/leads";
-import { notifyTeam } from "@/lib/mailer";
+import { notifyTeam, reportUndeliveredSubmission } from "@/lib/mailer";
 import { jsonError, jsonOk, readJsonBody } from "@/lib/security/http";
 import { rateLimitByIp } from "@/lib/security/rate-limit";
 import { getClientIp, getUserAgent, hashIp } from "@/lib/security/request";
@@ -85,8 +85,8 @@ export async function POST(request: Request): Promise<Response> {
     console.error(`[api/audit/unlock] could not store lead: ${error instanceof Error ? error.message : "unknown error"}`);
   }
 
-  after(() =>
-    notifyTeam(
+  after(async () => {
+    const emailed = await notifyTeam(
       `New seenhq lead: ${result.hostname}`,
       [
         `Email: ${email}`,
@@ -96,8 +96,10 @@ export async function POST(request: Request): Promise<Response> {
         `Audit id: ${result.id}`,
         `Stored in database: ${stored ? "yes" : "no"}`,
       ].join("\n"),
-    ),
-  );
+    );
+    // R7 finding 1: a lead that was neither stored nor emailed shows up as a production error.
+    reportUndeliveredSubmission("api/audit/unlock", "lead", { stored, emailed });
+  });
 
   return jsonOk({ result });
 }

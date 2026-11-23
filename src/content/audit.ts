@@ -66,7 +66,8 @@ export const auditEmailGate = {
 export const auditErrors = {
   invalid_url: auditForm.invalidInput,
   blocked_host: "We can't audit that address. It points to a private or reserved network, which we don't scan for security reasons.",
-  unreachable: "We couldn't reach that website. Check that it is online and publicly accessible, then try again.",
+  unreachable:
+    "We couldn't read that website. It may be offline, or its firewall may be refusing our crawler. Check the address and try again. If it is your site, allow the user agent seenhqbot.",
   timeout: "The website took too long to respond. Try again in a few minutes.",
   not_html: "That address doesn't return a web page. Try your homepage address instead.",
   too_large: "That page is too large for us to scan. Try your homepage address or a lighter page.",

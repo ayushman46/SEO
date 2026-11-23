@@ -62,7 +62,19 @@ function readError(body: unknown, res: Response): FlowError {
     const header = Number(res.headers.get("retry-after"));
     if (Number.isFinite(header) && header > 0) retryAfter = header;
   }
-  return toFlowError(code, retryAfter);
+  const flow = toFlowError(code, retryAfter);
+  // The server writes specific, user-facing reasons for these two codes (which firewall refused
+  // us, or what is wrong with the address). They are our own strings, rendered as plain text.
+  const serverMessage = (err as { message?: unknown } | undefined)?.message;
+  if (
+    (flow.code === "unreachable" || flow.code === "invalid_url") &&
+    typeof serverMessage === "string" &&
+    serverMessage.trim().length > 0 &&
+    serverMessage.length <= 400
+  ) {
+    flow.message = serverMessage.trim();
+  }
+  return flow;
 }
 
 async function postJson(url: string, payload: unknown, signal?: AbortSignal): Promise<{ res: Response; body: unknown }> {

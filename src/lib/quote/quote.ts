@@ -126,7 +126,7 @@ export const QUOTE_TEXT = {
     "from-price": "Some prices are starting prices; the final price depends on the work involved.",
     "price-on-request": "One service has no published price in this currency yet.",
     "pages-over-cap": `The quote covers the ${QUOTE_SCOPE_CAP.maxPagesScanned} pages the free audit reads; a larger site needs a person to look.`,
-    "issues-over-cap": `More than ${QUOTE_SCOPE_CAP.maxPaidIssues} fixes is a larger job than one Fix sprint covers, so the Fix sprint shows its larger-job starting price and a person quotes it.`,
+    "issues-over-cap": `More than ${QUOTE_SCOPE_CAP.maxPaidIssues} Fix sprint fixes is a larger job than one Fix sprint covers, so the Fix sprint shows its larger-job starting price and a person quotes it.`,
     "involved-work": "At least one fix needs a developer, so a person scopes it first.",
   } satisfies Record<QuoteReviewReason, string>,
 } as const;
@@ -264,7 +264,11 @@ export function buildQuote(input: QuoteInput): Quote {
   lines.splice(MAX_ORDER_ITEMS);
 
   const coveredIssueIds = lines.flatMap((l) => l.covers.map((c) => c.id));
-  const issuesOverCap = coveredIssueIds.length > QUOTE_SCOPE_CAP.maxPaidIssues;
+  // The 8-fix cap belongs to the Fix sprint alone (R7 findings 4/5): only the issues on the Fix
+  // sprint line count. Issues routed to other services (Content & entity, AI crawler unblock, ...)
+  // are priced by their own lines and never push the sprint to its larger-job price.
+  const sprintCovers = lines.find((l) => l.key === "fix-sprint")?.covers.length ?? 0;
+  const issuesOverCap = sprintCovers > QUOTE_SCOPE_CAP.maxPaidIssues;
 
   const reviewReasons: QuoteReviewReason[] = [];
   if (lines.length > 0) {
@@ -276,17 +280,19 @@ export function buildQuote(input: QuoteInput): Quote {
     if (paidIssues.some((r) => r.issue.effort === "involved")) reviewReasons.push("involved-work");
   }
 
-  // Above the cap the job is larger than one Fix sprint: its line shows the published larger-job
-  // starting price (catalog fix-sprint.largerJob), never the fixed sprint price.
+  // Above the cap the sprint's own job is larger than one Fix sprint: that line (and only a line
+  // whose own covers exceed the cap) shows the published larger-job starting price
+  // (catalog fix-sprint.largerJob), never the fixed sprint price.
   if (issuesOverCap) {
     for (let i = 0; i < lines.length; i++) {
-      const item = catalogItem(lines[i].key);
-      const larger = largerJobPriceIn(item, currency);
+      if (lines[i].covers.length <= QUOTE_SCOPE_CAP.maxPaidIssues) continue;
+      const larger = largerJobPriceIn(catalogItem(lines[i].key), currency);
       if (!larger) continue;
       lines[i] = { ...lines[i], price: larger.amount, priceKind: "from", priceText: priceTextFor("from", larger.amount, currency) };
     }
   }
-  const fixedTotal = reviewReasons.length === 0;
+  // Fixed only when every line is a fixed price and nothing else needs a person to look.
+  const fixedTotal = reviewReasons.length === 0 && lines.every((l) => l.priceKind === "fixed");
   const total = lines.reduce((sum, l) => sum + (l.price ?? 0), 0);
   const allOnRequest = lines.length > 0 && lines.every((l) => l.price === null);
   const totalText = allOnRequest
@@ -327,6 +333,15 @@ export function buildQuote(input: QuoteInput): Quote {
     coveredIssueIds,
     summary,
   };
+}
+
+/**
+ * True only when the quote is exactly one Fix sprint line at its fixed price. The UI line
+ * "One Fix sprint covers up to 8 of these for $149." is true only then (R7 findings 2/9).
+ */
+export function isFixedSprintOnly(quote: Pick<Quote, "lines">): boolean {
+  const [only, ...rest] = quote.lines;
+  return only !== undefined && rest.length === 0 && only.key === "fix-sprint" && only.priceKind === "fixed";
 }
 
 function buildSummary(s: {

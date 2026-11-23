@@ -3,7 +3,8 @@ import { gunzipSync } from "node:zlib";
 import { AuditError } from "./types";
 import type { AuditContext, FetchedText, PsiOutcome } from "./context";
 import { parsePage, resolveHref, visibleText, type PageData } from "./html";
-import { looksLikeHtml, safeFetch, REQUEST_TIMEOUT_MS, type SafeFetchResult } from "./net/fetch";
+import { isHtmlContentType, looksLikeHtml, safeFetch, REQUEST_TIMEOUT_MS, type SafeFetchResult } from "./net/fetch";
+import { detectHomepageRefusal, SiteRefusedError } from "./refusal";
 import { resolvePublicAddress } from "./net/ssrf";
 import { isSameSite, normalizeAuditUrl, pageKey } from "./url";
 import { isBlocked, looksLikeRobotsTxt, OUR_BOT, parseRobots } from "./robots";
@@ -166,7 +167,21 @@ export async function crawl(requestedUrl: string, opts: CrawlOptions): Promise<C
     psiPromise.catch(() => undefined);
 
     // ── 1. Homepage ──
-    const homeRes = await safeFetch(requestedUrl, { kind: "html", timeoutMs: reqTimeout(), signal });
+    const homeRes = await safeFetch(requestedUrl, { kind: "html", timeoutMs: reqTimeout(), signal, allowErrorBodies: true });
+    // A refused, rate-limited, failing or bot-checked homepage is not the owner's site: scoring it
+    // would grade the block page (R7 #3). Fail with a message the visitor can act on.
+    const refusal = detectHomepageRefusal(homeRes);
+    if (refusal) throw new SiteRefusedError(refusal);
+    if (homeRes.status >= 400) {
+      // Other error pages (404, 410, ...) are still audited, but only when they are HTML.
+      const ct = homeRes.headers["content-type"] ?? "";
+      if (ct && !isHtmlContentType(ct)) {
+        throw new AuditError("not_html", `${homeRes.finalUrl} isn't a web page (it returned ${ct.split(";")[0]}).`);
+      }
+      if (!ct && !looksLikeHtml(homeRes.text)) {
+        throw new AuditError("not_html", `${homeRes.finalUrl} doesn't look like a web page.`);
+      }
+    }
     const homeUrl = homeRes.finalUrl;
     const home = new URL(homeUrl);
     const origin = home.origin;
@@ -175,10 +190,10 @@ export async function crawl(requestedUrl: string, opts: CrawlOptions): Promise<C
     }
     if (homeRes.status >= 400) {
       notes.push(
-        `Your homepage answered with status ${homeRes.status}. If your site blocks automated visitors, some results may be incomplete.`,
+        `Your homepage answered with status ${homeRes.status}, so some results may describe that error page rather than your real homepage.`,
       );
     }
-    if (homeRes.truncated) notes.push("Your homepage is very large; only the first 2 MB was analysed.");
+    if (homeRes.truncated && homeRes.status < 400) notes.push("Your homepage is very large; only the first 2 MB was analysed.");
 
     // Throws AuditError("too_large") for hostile/huge DOMs, before any analysis runs.
     const homePage = parsePage({

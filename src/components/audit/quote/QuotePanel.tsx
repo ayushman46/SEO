@@ -4,6 +4,7 @@ import { auditQuoteCopy } from "@/content/audit";
 import { buttonClass } from "@/components/ui/Button";
 import { cx } from "@/components/ui/cx";
 import { PriceText } from "@/components/pages/PriceText";
+import { isFixedSprintOnly } from "@/lib/quote";
 import { useQuote } from "./QuoteContext";
 import { CurrencyToggle, QuoteTotal, RequestLink } from "./QuoteParts";
 
@@ -101,9 +102,12 @@ export function QuotePanel({
 
       {quote.bundle ? <p className="mt-4 text-sm leading-relaxed text-pretty text-muted">{quote.bundle.reason}</p> : null}
 
-      <p className="mt-4 text-sm leading-relaxed text-pretty text-ink-2">
-        <PriceText value={auditQuoteCopy.fixListExplainer(q.currency)} />
-      </p>
+      {/* Only true for a quote that is one fixed-price Fix sprint (R7 findings 2/9). */}
+      {isFixedSprintOnly(quote) ? (
+        <p className="mt-4 text-sm leading-relaxed text-pretty text-ink-2">
+          <PriceText value={auditQuoteCopy.fixListExplainer(q.currency)} />
+        </p>
+      ) : null}
 
       {hasLines ? (
         <div className="mt-6">

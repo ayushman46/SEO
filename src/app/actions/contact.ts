@@ -3,7 +3,7 @@
 import { headers } from "next/headers";
 import { after } from "next/server";
 import { insertContact, type StoredQuote } from "@/lib/db/contact";
-import { notifyTeam } from "@/lib/mailer";
+import { notifyTeam, reportUndeliveredSubmission } from "@/lib/mailer";
 import { formatPrice } from "@/lib/quote/catalog";
 import { verifyOrder } from "@/lib/quote/verify";
 import { rateLimitByIp } from "@/lib/security/rate-limit";
@@ -155,9 +155,12 @@ export async function submitContact(
     console.error(`[actions/contact] could not store submission: ${error instanceof Error ? error.message : "unknown error"}`);
   }
 
-  after(() =>
-    notifyTeam(
-      `New seenhq ${quote && !quote.malformed ? "order request" : "enquiry"}: ${data.name} (${data.service})`,
+  // The visitor is told the message arrived either way (R7 finding 1: returning ok:false before a
+  // sink is configured would reject every enquiry); a production error log makes the gap visible.
+  const kind = quote && !quote.malformed ? "order request" : "enquiry";
+  after(async () => {
+    const emailed = await notifyTeam(
+      `New seenhq ${kind}: ${data.name} (${data.service})`,
       [
         `Name: ${data.name}`,
         `Email: ${data.email}`,
@@ -170,8 +173,9 @@ export async function submitContact(
         "",
         data.message,
       ].join("\n"),
-    ),
-  );
+    );
+    reportUndeliveredSubmission("actions/contact", kind, { stored, emailed });
+  });
 
   return { ok: true, message: SUCCESS_MESSAGE };
 }

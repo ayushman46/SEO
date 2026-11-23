@@ -33,7 +33,11 @@ type AuditErrorCode = AuditErrorShape["code"];
 const AUDIT_ERROR_MAP: Record<AuditErrorCode, { status: number; message: string }> = {
   invalid_url: { status: 400, message: "That doesn't look like a valid website address. Try something like example.com." },
   blocked_host: { status: 422, message: "We can only audit public websites. That address points to a private or reserved network." },
-  unreachable: { status: 422, message: "We couldn't reach that website. Check the address and that the site is online, then try again." },
+  unreachable: {
+    status: 422,
+    message:
+      "We couldn't read that website. It may be offline, or its firewall may be refusing our crawler. Check the address and try again. If it is your site, allow the user agent seenhqbot.",
+  },
   not_html: { status: 422, message: "That address didn't return a web page (HTML), so there's nothing to audit." },
   too_large: { status: 422, message: "That page is too large for the free audit to process." },
   timeout: { status: 504, message: "The website took too long to respond, so the audit timed out. Please try again in a moment." },
@@ -50,9 +54,25 @@ function auditErrorCode(error: unknown): AuditErrorCode | null {
     : null;
 }
 
-function auditErrorResponse(code: AuditErrorCode): Response {
+function auditErrorResponse(code: AuditErrorCode, error?: unknown): Response {
   const mapped = AUDIT_ERROR_MAP[code];
+  // The engine marks errors written for visitors (e.g. "This site refused our crawler (HTTP 403,
+  // looks like Cloudflare)..."); pass those through instead of the generic copy.
+  if (code === "unreachable" && userFacingMessage(error)) {
+    return jsonError(mapped.status, code, (error as Error).message);
+  }
   return jsonError(mapped.status, code, mapped.message);
+}
+
+function userFacingMessage(error: unknown): boolean {
+  return (
+    error instanceof Error &&
+    error.name === "AuditError" &&
+    (error as { userFacing?: unknown }).userFacing === true &&
+    typeof error.message === "string" &&
+    error.message.length > 0 &&
+    error.message.length <= 500
+  );
 }
 
 export async function POST(request: Request): Promise<Response> {
@@ -126,7 +146,7 @@ async function runLimitedAudit(
     });
   } catch (error) {
     const code = auditErrorCode(error);
-    if (code) return auditErrorResponse(code);
+    if (code) return auditErrorResponse(code, error);
     if (request.signal.aborted) return jsonError(499, "client_closed_request", "The request was cancelled.");
     console.error(`[api/audit] unexpected failure: ${error instanceof Error ? error.message : "unknown error"}`);
     return jsonError(500, "internal_error", "Something went wrong while running the audit. Please try again.");

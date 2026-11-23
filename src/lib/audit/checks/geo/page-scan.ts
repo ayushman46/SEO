@@ -55,7 +55,10 @@ export const ATTRIBUTION_TAIL = /(?:[—–-]|~)\s{0,3}[A-Z][\p{L}'.-]{1,40}(?:\
 function hasAttribution(n: DomNode, text: string): boolean {
   let found = false;
   let visited = 0;
-  walk([n], null, (x) => {
+  // HTML-standard quote markup puts the attribution next to the quote, not inside it:
+  // <figure><blockquote>..</blockquote><figcaption>Jane Doe</figcaption></figure> (R7 #14).
+  const root = n.parent && isElement(n.parent) && n.parent.name === "figure" ? n.parent : n;
+  walk([root], null, (x) => {
     if (found || ++visited > 1_000) return SKIP;
     if (!isElement(x)) return SKIP;
     const a = x.attribs;
